@@ -1,0 +1,31 @@
+Two ways:
+- Lagrangian (PARTICLES)
+- Eulerian (GRID)
+
+Implement:
+- SPH: Smooth particle hydrodynamics
+  -particles represent samples of vector fields 
+  -Weighted averaging
+    -Equation: F(x) = summation of F_i * vol of particle i * W(x - x_i)
+    -Value at point x = Value at particle i * vol of particle i * smoothing kernel
+    -leap frog implementation
+
+-Pressure
+  -pressure proportional to density in SPH
+
+-Viscosity
+  -f_viscosity = coeff visc * del^2 v
+
+-Forces in a fluid
+  -f = density * g - del P + mu * del^2 * v
+
+-SURFACE RECONSTRUCTION
+  -Define color function where 1 inside and 0 outside
+  -Isosurface
+  -Anistropic kernels
+
+-Navier-Stokes equations
+
+-Advection
+
+-Marching Cubes, Marching Tile
