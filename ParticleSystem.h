@@ -6,7 +6,12 @@
 class ParticleSystem {
   public:
   
+	  ParticleSystem(float grav);
+	  void computeForces();
+
   private:
     std::vector<Particle> particles;
 
 };
+
+#endif

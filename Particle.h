@@ -6,7 +6,7 @@
 class Particle {
   public:
     Particle(void) {};
-    Particle(float mass, float volume, float pressure, Vector velocity, Point3D position);
+    Particle(float mass, float volume, float pressure, float coeffVis, Vector velocity, Point3D position);
     ~Particle(void) {};
 
     // getters and setters
@@ -29,6 +29,7 @@ class Particle {
     float pressure; // is pressure given in some other way?
     Vector velocity;
     Point3D position;
+	float coeffVis;
 
 };
 
