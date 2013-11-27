@@ -33,3 +33,6 @@ Implement:
 
 http://www.cs.cornell.edu/courses/CS5643/2013sp/
 http://cg.informatik.uni-freiburg.de/intern/seminar/gridFluids_fluid-EulerParticle.pdf
+
+Has example equation for weight function (Page 2)
+http://www.inf.ufrgs.br/cgi2007/cd_cgi/papers/harada.pdf
