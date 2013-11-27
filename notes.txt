@@ -32,3 +32,4 @@ Implement:
 
 
 http://www.cs.cornell.edu/courses/CS5643/2013sp/
+http://cg.informatik.uni-freiburg.de/intern/seminar/gridFluids_fluid-EulerParticle.pdf
