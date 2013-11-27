@@ -36,3 +36,5 @@ http://cg.informatik.uni-freiburg.de/intern/seminar/gridFluids_fluid-EulerPartic
 
 Has example equation for weight function (Page 2)
 http://www.inf.ufrgs.br/cgi2007/cd_cgi/papers/harada.pdf
+Bucket Generation & Neighborhood search (Pg. 7-9)
+http://individuals.iii.u-tokyo.ac.jp/~yoichiro/report/report-pdf/harada/international/2007apcom.pdf

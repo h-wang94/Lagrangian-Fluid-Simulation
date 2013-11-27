@@ -11,6 +11,12 @@ class ParticleSystem {
 
   private:
     std::vector<Particle> particles;
+    void calculateForces();
+    // calculate viscosity     
+    
+    // calculate pressure
+
+    // calculate gravity
 
 };
 
