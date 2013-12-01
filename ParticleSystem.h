@@ -8,16 +8,12 @@ class ParticleSystem {
   
 	  ParticleSystem(float grav);
 	  void computeForces();
+	  void update(float timestep);
+	  void setDensities();
 
   private:
     std::vector<Particle> particles;
-    void calculateForces();
-    // calculate viscosity     
-    
-    // calculate pressure
-
-    // calculate gravity
-
+	float grav;
 };
 
 #endif

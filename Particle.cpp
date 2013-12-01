@@ -1,20 +1,26 @@
 #include <iostream>
 #include "Particle.h"
 
-Particle::Particle(float mass, float volume, float pressure, float coeffVis, Vector velocity, Point3D position) {
+Particle::Particle(float mass, float density, float pressure, float coeffVis, Vector velocity, Point3D position) {
   this->mass = mass;
-  this->volume = volume;
+  //this->volume = volume; //a volume refers to a group of particles not a single particle
   this->pressure = pressure;
   this->velocity = velocity;
   this->position = position;
+  this->density = density;//density is dependent on the amount of particles relative to this particle
 }
+
 
 float Particle::getMass() const {
   return this->mass;
 }
 
 float Particle::getVolume() const {
-  return this->volume;
+  return (this->mass)/(this->density);
+}
+
+float Particle::getDensity() const {
+  return this->density;
 }
 
 float Particle::getPressure() const {
@@ -33,9 +39,14 @@ void Particle::setMass(float mass) {
   this->mass = mass;
 }
 
-void Particle::setVolume(float volume) {
+/*void Particle::setVolume(float volume) {
   this->volume = volume;
+}*/
+
+void Particle::setDensity(float density) {
+  this->density = density;
 }
+
 void Particle::setPressure(float pressure) {
   this->pressure = pressure;
 }
