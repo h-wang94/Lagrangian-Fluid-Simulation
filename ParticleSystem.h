@@ -13,6 +13,11 @@ class ParticleSystem {
 
   private:
     std::vector<Particle> particles;
+    float defaultKernel(Vector r, float h);
+    /*Vector gradientKernel(Vector r, float h);
+    float laplacianKernel(Vector r, float h);*/
+    Vector pressGradientKernel(Vector r, float h);
+    float viscLaplacianKernel(Vector r, float h);
 	float grav;
 };
 
