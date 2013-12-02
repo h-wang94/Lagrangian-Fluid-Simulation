@@ -33,9 +33,10 @@ void ParticleSystem::setDensities(){
 			float d = dist.getMagnitude();											//get the distance
 			float h = 5.0;															//CHANGE LATER (smoothing distance)
 			float tol = .000001;													//CHANGE LATER (tolerance to be counted as irrelevant particle)
-			float kernal = (1/(pow(3.14, (3/2))*pow(h,3)))*exp((d*d)/(h*h));		//Gaussian kernal smoothing function
-			if(kernal > tol){
-				float density = density + kernal * particles[j].getMass();			//add on to the density for particle particles[i]
+      // REPLACE this kernel with default ones
+			float kernel = (1/(pow(3.14, (3/2))*pow(h,3)))*exp((d*d)/(h*h));		//Gaussian kernal smoothing function
+			if(kernel > tol){
+				float density = density + kernel * particles[j].getMass();			//add on to the density for particle particles[i]
 			}
 
 
@@ -85,4 +86,21 @@ float ParticleSystem::viscLaplacianKernel(Vector r, float h) {
   float rMag = r.getMagnitude();
   return (45 * (h - rMag)) / (PI * pow(h, 6.0f));
 
+}
+
+// Leap frog integration. Takes in a dt and will loop through all the particles in our system.
+// Has not been tested.
+// Can be changed to work with leapfrogging just a certain particle.
+void ParticleSystem::leapFrog(float dt) {
+  for(int i = 0; i < particles.size(); i++) {
+    Particle& p = particles[i];
+    // get velocity at time t - dt/2. v_{t - dt/2}
+    Velocity& old = p.getVelocityHalf(); 
+    // velocity at time t + dt/2. v_{t + dt/2} = v_{t - dt / 2} + a * dt
+    p.setVelocityHalf(old + (p.getAcceleration() * dt)); 
+    // set position at time t. pos_{t + dt} = pos_{t} + v_{t + dt / 2} * dt
+    p.setPosition(p.getPosition() + (p.getVelocityHalf() * dt)); 
+    // use midpoint approximation for velocity at time t. v_{t} = (v_{t - dt / 2} + v_{t + dt / 2}) / 2.
+    p.setVelocity((old + p.getVelocityHalf()) / 2.0f); 
+  }
 }

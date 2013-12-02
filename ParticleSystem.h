@@ -18,6 +18,7 @@ class ParticleSystem {
     float laplacianKernel(Vector r, float h);*/
     Vector pressGradientKernel(Vector r, float h);
     float viscLaplacianKernel(Vector r, float h);
+    void leapFrog(float dt);
 	float grav;
 };
 

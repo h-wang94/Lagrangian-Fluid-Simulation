@@ -1,11 +1,13 @@
 #include <iostream>
 #include "Particle.h"
 
-Particle::Particle(float mass, float density, float pressure, float coeffVis, Vector velocity, Point3D position) {
+Particle::Particle(float mass, float density, float pressure, float coeffVis, Vector velocity, Velocity vectorHalf, Velocity acceleration, Point3D position) {
   this->mass = mass;
   //this->volume = volume; //a volume refers to a group of particles not a single particle
   this->pressure = pressure;
   this->velocity = velocity;
+  this->velocityHalf = velocityHalf;
+  this->acceleration = acceleration;
   this->position = position;
   this->density = density;//density is dependent on the amount of particles relative to this particle
 }
@@ -29,6 +31,14 @@ float Particle::getPressure() const {
 
 Vector Particle::getVelocity() const {
   return this->velocity;
+}
+
+Vector Particle::getVelocityHalf() const {
+  return this->velocityHalf;
+}
+
+Vector Particle::getAcceleration() const {
+  return this->acceleration;
 }
 
 Point3D Particle::getPosition() const {
@@ -55,6 +65,14 @@ void Particle::setVelocity(Vector velocity) {
   this->velocity = velocity;
 }
 
+void Particle::setVelocityHalf(Vector velocityHalf) {
+  this->velocityHalf = velocityHalf;
+}
+
+void Particle::setAcceleration(Vector acceleration) {
+  this->acceleration = acceleration;
+}
+
 void Particle::setPosition(Point3D position) {
   this->position = position;
 }
@@ -65,6 +83,7 @@ std::ostream& operator <<(ostream& outs, const Particle& particle) {
        << "// Volume: " << particle.getVolume() << endl
        << "// Pressure: " << particle.getPressure() << endl
        << "// Velocity: " << particle.getVelocity() << endl
+       << "// Velocity Half: " << particle.getVelocityHalf() << endl
        << "// Position: " << particle.getPosition() << endl
        << "//==================================================//" << endl;
   return outs;
