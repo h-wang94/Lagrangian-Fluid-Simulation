@@ -45,6 +45,15 @@ void ParticleSystem::setDensities(){
 	}
 }
 
+void ParticleSystem::setPressure() {
+
+
+}
+
+void ParticleSystem::setViscosity() {
+
+}
+
 // Poly6 Kernels used for everything except pressure and viscosity forces 
 // Notes: http://image.diku.dk/projects/media/kelager.06.pdf (Page 16)
 // Less expensive compared to gaussian one because of computation of e and no square roots
@@ -104,3 +113,5 @@ void ParticleSystem::leapFrog(float dt) {
     p.setVelocity((old + p.getVelocityHalf()) / 2.0f); 
   }
 }
+
+
