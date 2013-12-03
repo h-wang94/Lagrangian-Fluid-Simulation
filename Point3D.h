@@ -27,6 +27,7 @@ class Point3D {
         Vector pToVector(Point3D& p);
         Vector operator -(const Point3D& rhs) const;
         const Point3D operator +(const Point3D& rhs) const;
+		const Point3D operator +(const Vector& rhs) const;
         const Point3D operator *(const float& scalar) const;
 
     private:

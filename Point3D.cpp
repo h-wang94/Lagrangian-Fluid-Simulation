@@ -55,6 +55,10 @@ const Point3D Point3D::operator +(const Point3D& rhs) const {
   return Point3D(this->x + rhs.x, this->y + rhs.y, this->z + rhs.z);
 }
 
+const Point3D Point3D::operator +(const Vector& rhs) const {
+  return Point3D(this->x + rhs.getX(), this->y + rhs.getY(), this->z + rhs.getZ());
+}
+
 const Point3D Point3D::operator *(const float& scalar) const {
   return Point3D(this->x * scalar, this->y * scalar, this->z * scalar);
 }

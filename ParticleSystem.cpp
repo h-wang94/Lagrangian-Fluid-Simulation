@@ -104,7 +104,7 @@ void ParticleSystem::leapFrog(float dt) {
   for(int i = 0; i < particles.size(); i++) {
     Particle& p = particles[i];
     // get velocity at time t - dt/2. v_{t - dt/2}
-    Velocity& old = p.getVelocityHalf(); 
+    Vector& old = p.getVelocityHalf(); 
     // velocity at time t + dt/2. v_{t + dt/2} = v_{t - dt / 2} + a * dt
     p.setVelocityHalf(old + (p.getAcceleration() * dt)); 
     // set position at time t. pos_{t + dt} = pos_{t} + v_{t + dt / 2} * dt
