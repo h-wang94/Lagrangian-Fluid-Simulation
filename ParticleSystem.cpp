@@ -23,18 +23,18 @@ void ParticleSystem::update(float timestep){
 }
 
 void ParticleSystem::setDensities(){
-	
+	float h = 5.0;															//CHANGE LATER (smoothing distance)
+	float tol = .000001;													//CHANGE LATER (tolerance to be counted as irrelevant particle)
+
 	for(int i = 0; i < particles.size(); i++){
 		float density = 0.0;
+
 		for(int j = 0; j < particles.size(); j++){									//INEFFICIENT for now; going to find way to only take into 
 																					//account particles near particle[i]
 
 			Vector dist = particles[i].getPosition() - particles[j].getPosition();	//need distance between two particles
-			float d = dist.getMagnitude();											//get the distance
-			float h = 5.0;															//CHANGE LATER (smoothing distance)
-			float tol = .000001;													//CHANGE LATER (tolerance to be counted as irrelevant particle)
-      // REPLACE this kernel with default ones
-			float kernel = (1/(pow(3.14, (3/2))*pow(h,3)))*exp((d*d)/(h*h));		//Gaussian kernal smoothing function
+
+			float kernel = defaultKernel(dist, h);
 			if(kernel > tol){
 				float density = density + kernel * particles[j].getMass();			//add on to the density for particle particles[i]
 			}
