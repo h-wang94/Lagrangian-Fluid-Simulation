@@ -11,7 +11,7 @@ ParticleSystem::ParticleSystem(Vector grav){
 void ParticleSystem::computeForces(){
   // f = rho * g - pressure forces + viscosity forces
   Vector gravity, pressure, viscosity, force;
-  for(int i = 0; i < particles.size(); i++) {
+  for(unsigned int i = 0; i < particles.size(); i++) {
     // calculate gravity forces
     gravity = gravityForce(particles[i]);
     // calculate pressure forces
@@ -20,12 +20,12 @@ void ParticleSystem::computeForces(){
     viscosity = viscosityForce(particles[i], i);
 
     force = gravity - pressure + viscosity;
-    particle[i].setAcceleration(force / particle[i].getDensity()); // why density...
+    particles[i].setAcceleration(force / particles[i].getDensity()); // why density...
   }
 }
 
-void ParticleSystem::computePressure(float stiffness, float restDensity) {
-  for(int i = 0; i < particles.size(); i++) {
+void ParticleSystem::computePressure(const float stiffness, const float restDensity) {
+  for(unsigned int i = 0; i < particles.size(); i++) {
     // p = k ( (p / p0)^7 - 1)
     particles[i].setPressure(stiffness * (pow((particles[i].getDensity() / restDensity), 7.0f) - 1.0f));
   }
@@ -42,18 +42,18 @@ void ParticleSystem::update(float timestep){
 }
 
 void ParticleSystem::setDensities(){
-	
-	for(int i = 0; i < particles.size(); i++){
+	float h = 5.0;															//CHANGE LATER (smoothing distance)
+	float tol = .000001;													//CHANGE LATER (tolerance to be counted as irrelevant particle)
+
+	for(unsigned int i = 0; i < particles.size(); i++){
 		float density = 0.0;
-		for(int j = 0; j < particles.size(); j++){									//INEFFICIENT for now; going to find way to only take into 
+
+		for(unsigned int j = 0; j < particles.size(); j++){									//INEFFICIENT for now; going to find way to only take into 
 																					//account particles near particle[i]
 
 			Vector dist = particles[i].getPosition() - particles[j].getPosition();	//need distance between two particles
-			float d = dist.getMagnitude();											//get the distance
-			float h = 5.0;															//CHANGE LATER (smoothing distance)
-			float tol = .000001;													//CHANGE LATER (tolerance to be counted as irrelevant particle)
-      // REPLACE this kernel with default ones
-			float kernel = (1/(pow(3.14, (3/2))*pow(h,3)))*exp((d*d)/(h*h));		//Gaussian kernal smoothing function
+
+			float kernel = defaultKernel(dist, h);
 			if(kernel > tol){
 				float density = density + kernel * particles[j].getMass();			//add on to the density for particle particles[i]
 			}
@@ -66,27 +66,31 @@ Vector ParticleSystem::gravityForce(Particle& p) {
   return grav * p.getDensity(); // why density...
 }
 
-Vector ParticleSystem::pressureForce(Particle& p, int i) {
+Vector ParticleSystem::pressureForce(Particle& p, unsigned const int i) {
   Vector pressure;
   float coeff;
-  int j;
+  unsigned int j;
   // this is so stupid...........but ill think of a better way. i dont wanna do checks cause it might make a difference since this is computed every time for every particle
   for(j = 0; j < i; j++) {
     coeff = (p.getPressure() + particles[j].getPressure()) / 2.0f * particles[j].getVolume();
     pressure += pressGradientKernel(p.getPosition() - particles[j].getPosition(), 1.0f) * coeff;
   }
   for(j = j + 1; j < particles.size(); j++) {
-    float coeff = (p.getPressure() + particles[j].getPressure()) / 2.0f * particles[j].getVolume();
+    coeff = (p.getPressure() + particles[j].getPressure()) / 2.0f * particles[j].getVolume();
     pressure += pressGradientKernel(p.getPosition() - particles[j].getPosition(), 1.0f) * coeff;
   }
   return pressure;
 }
 
-Vector ParticleSystem::viscosityForce(Particle& p, int i) {
+Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int i) {
   Vector viscosity;
   Vector coeff;
-  int j;
+  unsigned int j;
   for(j = 0; j < i; j++) {
+    coeff = (particles[j].getVelocity() - p.getVelocity()) * particles[j].getVolume();
+    viscosity += coeff * viscLaplacianKernel(p.getPosition() - particles[i].getPosition(), 1.0f);
+  }
+  for(j = j + 1; j < particles.size(); j++) {
     coeff = (particles[j].getVelocity() - p.getVelocity()) * particles[j].getVolume();
     viscosity += coeff * viscLaplacianKernel(p.getPosition() - particles[i].getPosition(), 1.0f);
   }
@@ -140,10 +144,10 @@ float ParticleSystem::viscLaplacianKernel(Vector r, float h) {
 // Has not been tested.
 // Can be changed to work with leapfrogging just a certain particle.
 void ParticleSystem::leapFrog(float dt) {
-  for(int i = 0; i < particles.size(); i++) {
+  for(unsigned int i = 0; i < particles.size(); i++) {
     Particle& p = particles[i];
     // get velocity at time t - dt/2. v_{t - dt/2}
-    Vector& old = p.getVelocityHalf(); 
+    Vector old = p.getVelocityHalf(); 
     // velocity at time t + dt/2. v_{t + dt/2} = v_{t - dt / 2} + a * dt
     p.setVelocityHalf(old + (p.getAcceleration() * dt)); 
     // set position at time t. pos_{t + dt} = pos_{t} + v_{t + dt / 2} * dt
