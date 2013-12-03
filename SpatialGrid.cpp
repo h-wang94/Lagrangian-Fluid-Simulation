@@ -1,4 +1,5 @@
 #include "SpatialGrid.h"
+#include <cmath>
 
 
 SpatialGrid::SpatialGrid(int s, float h)
@@ -44,7 +45,7 @@ std::vector<Particle> SpatialGrid::getNeighbors(Particle p){
 		while(j <= 1){
 			while(k <= 1){
 				vector<Particle> thisBox = grid[xindex+i][yindex+j][zindex+k];
-				int l = 0;
+				unsigned int l = 0;
 				while(l < thisBox.size()){
 					list.push_back(thisBox[l]);
 					l++;

@@ -8,6 +8,16 @@ ParticleSystem::ParticleSystem(Vector grav){
 	this->grav = grav;
 }
 
+void ParticleSystem::update(float timestep){
+	this->setDensities();//for each particle, compute particle's density
+  this->computePressure(1.0f, 1.0f); // now compute each particle's pressure. randomly put in numbers.
+	//TODO:
+	//for each particle
+		//evaluate net force 
+		//compute accel
+		//leapfrog integration
+}
+
 void ParticleSystem::computeForces(){
   // f = rho * g - pressure forces + viscosity forces
   Vector gravity, pressure, viscosity, force;
@@ -29,16 +39,6 @@ void ParticleSystem::computePressure(const float stiffness, const float restDens
     // p = k ( (p / p0)^7 - 1)
     particles[i].setPressure(stiffness * (pow((particles[i].getDensity() / restDensity), 7.0f) - 1.0f));
   }
-}
-
-void ParticleSystem::update(float timestep){
-	this->setDensities();//for each particle, compute particle's density
-  this->computePressure(1.0f, 1.0f); // now compute each particle's pressure. randomly put in numbers.
-	//TODO:
-	//for each particle
-		//evaluate net force 
-		//compute accel
-		//leapfrog integration
 }
 
 void ParticleSystem::setDensities(){
