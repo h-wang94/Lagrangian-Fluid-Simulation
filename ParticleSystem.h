@@ -8,18 +8,24 @@ class ParticleSystem {
   
 	  ParticleSystem(float grav);
 	  void computeForces();
+    void computePressure();
 	  void update(float timestep);
 	  void setDensities();
+    
 
   private:
     std::vector<Particle> particles;
+
+    Vector gravityForce(Particle& p);
+    Vector pressureForce(Particle& p);
+    Vector viscosityForce(Particle& p);
     float defaultKernel(Vector r, float h);
     /*Vector gradientKernel(Vector r, float h);
     float laplacianKernel(Vector r, float h);*/
     Vector pressGradientKernel(Vector r, float h);
     float viscLaplacianKernel(Vector r, float h);
     void leapFrog(float dt);
-	float grav;
+    Vector grav;
 };
 
 #endif

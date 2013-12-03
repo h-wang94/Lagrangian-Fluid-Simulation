@@ -4,17 +4,36 @@
 
 #define PI 3.14159265
 
-ParticleSystem::ParticleSystem(float grav){
+ParticleSystem::ParticleSystem(Vector grav){
 	this->grav = grav;
 }
 
 void ParticleSystem::computeForces(){
+  // f = rho * g - pressure forces + viscosity forces
+  Vector gravity, pressure, viscosity, force;
+  for(int i = 0; i < particles.size(); i++) {
+    // calculate gravity forces
+    gravity = gravityForce(particles[i]);
+    // calculate pressure forces
+    pressure = pressureForce(particles[i], i);
+    // calculate viscosity forces
+    viscosity = viscosityForce(particles[i], i);
 
+    force = gravity - pressure + viscosity;
+    particle[i].setAcceleration(force / particle[i].getDensity()); // why density...
+  }
+}
+
+void ParticleSystem::computePressure(float stiffness, float restDensity) {
+  for(int i = 0; i < particles.size(); i++) {
+    // p = k ( (p / p0)^7 - 1)
+    particles[i].setPressure(stiffness * (pow((particles[i].getDensity() / restDensity), 7.0f) - 1.0f));
+  }
 }
 
 void ParticleSystem::update(float timestep){
 	this->setDensities();//for each particle, compute particle's density
-
+  this->computePressure(1.0f, 1.0f); // now compute each particle's pressure. randomly put in numbers.
 	//TODO:
 	//for each particle
 		//evaluate net force 
@@ -38,20 +57,40 @@ void ParticleSystem::setDensities(){
 			if(kernel > tol){
 				float density = density + kernel * particles[j].getMass();			//add on to the density for particle particles[i]
 			}
-
-
 		}
 		particles[i].setDensity(density);											//set the particle[i]'s density to particle[i]
 	}
 }
 
-void ParticleSystem::setPressure() {
-
-
+Vector ParticleSystem::gravityForce(Particle& p) {
+  return grav * p.getDensity(); // why density...
 }
 
-void ParticleSystem::setViscosity() {
+Vector ParticleSystem::pressureForce(Particle& p, int i) {
+  Vector pressure;
+  float coeff;
+  int j;
+  // this is so stupid...........but ill think of a better way. i dont wanna do checks cause it might make a difference since this is computed every time for every particle
+  for(j = 0; j < i; j++) {
+    coeff = (p.getPressure() + particles[j].getPressure()) / 2.0f * particles[j].getVolume();
+    pressure += pressGradientKernel(p.getPosition() - particles[j].getPosition(), 1.0f) * coeff;
+  }
+  for(j = j + 1; j < particles.size(); j++) {
+    float coeff = (p.getPressure() + particles[j].getPressure()) / 2.0f * particles[j].getVolume();
+    pressure += pressGradientKernel(p.getPosition() - particles[j].getPosition(), 1.0f) * coeff;
+  }
+  return pressure;
+}
 
+Vector ParticleSystem::viscosityForce(Particle& p, int i) {
+  Vector viscosity;
+  Vector coeff;
+  int j;
+  for(j = 0; j < i; j++) {
+    coeff = (particles[j].getVelocity() - p.getVelocity()) * particles[j].getVolume();
+    viscosity += coeff * viscLaplacianKernel(p.getPosition() - particles[i].getPosition(), 1.0f);
+  }
+  return viscosity;
 }
 
 // Poly6 Kernels used for everything except pressure and viscosity forces 
