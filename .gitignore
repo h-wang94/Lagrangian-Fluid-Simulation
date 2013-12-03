@@ -1,2 +1,46 @@
-as4.opensdf
+*.sdf
+*.opensdf
+
+# Compiled Object files
+*.slo
+*.lo
 *.o
+*.obj
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Stuff to ignore Visual Studio temporary files, build results, etc.
+
+# User-specific files
+*.suo
+*.user
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+x64/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+
+
+# Windows stuff
+Thumbs.db
+Desktop.ini
