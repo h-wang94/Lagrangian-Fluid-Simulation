@@ -4,8 +4,44 @@
 
 #define PI 3.14159265
 
+//====================================================================//
+// Steps to intialize SPH system
+// 1. Create fluid material
+// 2. Create n particles and set position, initial velocities, and mass. Fill in missing values.
+// 3. Smoothing kernels to compute compact support radius
+// 4. Create spatial hashing data structure(?) and insert each particle
+// 5. Create collision objects
+// 6. Initialize Leapfrog integrator for all particles
+//====================================================================//
+// Compute density and pressure
+// For each particle,
+// 1. Search neighborhood using spatial hashing
+// 2. Compute mass density but only iterate over particles in neighborhood
+// 3. Compute pressure and use material density as rest density
+//====================================================================//
+// Compute internal forces
+// For each particle,
+// 1. Search neighborhood. Repeat because all SPH forces depend on mass-density which must be computed
+//    beforea ny force density.
+// 2. compute pressure force density acting on the particle
+// 3. compute the viscosity force density acting on the particle
+// F_internal = F_pressure + F_viscosity
+//====================================================================//
+// Compute external forces 
+//====================================================================//
+// Time integration and collision handling
+//====================================================================//
+// Render particles
+//====================================================================//
 ParticleSystem::ParticleSystem(Vector grav){
 	this->grav = grav;
+}
+
+void ParticleSystem::initialize() {
+  this->setDensities();
+  this->computePressure(1.0f, 1.0f);
+  this->computeForces();
+  this->initializeLeapFrog(0.5);
 }
 
 void ParticleSystem::update(float timestep){
@@ -102,7 +138,7 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int i) {
 // Less expensive compared to gaussian one because of computation of e and no square roots
 // Not sure whether I'm supposed to normalize Vector r though
 
-float ParticleSystem::defaultKernel(Vector r, float h) {
+float ParticleSystem::defaultKernel(Vector r, const float h) {
   float rMag = r.getMagnitude();
   if (rMag >= 0 && rMag <= h) {
     return (315.0f * pow((pow(h, 2.0f) - pow(rMag, 2.0f)),3.0) / (64.0f * PI * pow(h, 9.0f)));
@@ -125,7 +161,7 @@ float ParticleSystem::laplacianKernel(Vector r, float h) {
 
 // Spiky Kernel to calculate pressure 
 // Give more repulsive pressure at short distance and thus avoids clustering.
-Vector ParticleSystem::pressGradientKernel(Vector r, float h) {
+Vector ParticleSystem::pressGradientKernel(Vector r, const float h) {
   float rMag = r.getMagnitude();
   float coeff = (-45 * pow((h - rMag), 2.0f)) / (PI * pow(h, 6.0f) * rMag);
   return r * coeff;
@@ -134,7 +170,7 @@ Vector ParticleSystem::pressGradientKernel(Vector r, float h) {
 // Viscosity kernel to calculate viscosity
 // Gives more stable viscosity and makes it possible to damp simulation better
 // Laplacian in poly6 kernel becomes negative really fast. The viscosity kernel's laplacian is positive everywhere
-float ParticleSystem::viscLaplacianKernel(Vector r, float h) {
+float ParticleSystem::viscLaplacianKernel(Vector r, const float h) {
   float rMag = r.getMagnitude();
   return (45 * (h - rMag)) / (PI * pow(h, 6.0f));
 
@@ -143,7 +179,7 @@ float ParticleSystem::viscLaplacianKernel(Vector r, float h) {
 // Leap frog integration. Takes in a dt and will loop through all the particles in our system.
 // Has not been tested.
 // Can be changed to work with leapfrogging just a certain particle.
-void ParticleSystem::leapFrog(float dt) {
+void ParticleSystem::leapFrog(const float dt) {
   for(unsigned int i = 0; i < particles.size(); i++) {
     Particle& p = particles[i];
     // get velocity at time t - dt/2. v_{t - dt/2}
@@ -157,4 +193,9 @@ void ParticleSystem::leapFrog(float dt) {
   }
 }
 
-
+// initialize. v_{-dt/2} = v_{0} - a_{0} * dt / 2
+void ParticleSystem::initializeLeapFrog(const float dt) {
+  for(unsigned int i = 0; i < particles.size(); i++) {
+    particles[i].setVelocityHalf(particles[i].getVelocity() - dt * particles[i].getAcceleration() / 2.0f);
+  }
+}

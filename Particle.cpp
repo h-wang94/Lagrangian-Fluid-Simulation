@@ -1,13 +1,13 @@
 #include <iostream>
 #include "Particle.h"
 
-Particle::Particle(float mass, float density, float pressure, float coeffVis, Vector velocity, Vector vectorHalf, Vector acceleration, Point3D position) {
+Particle::Particle(float mass, float density, float pressure, float coeffVis, Vector velocity, Point3D position) {
   this->mass = mass;
   //this->volume = volume; //a volume refers to a group of particles not a single particle
   this->pressure = pressure;
   this->velocity = velocity;
-  this->velocityHalf = velocityHalf;
-  this->acceleration = acceleration;
+  this->velocityHalf = Vector(0,0,0); // need acceleration to compute the initial v_half
+  //this->acceleration = Vector(0,0,0);
   this->position = position;
   this->density = density;//density is dependent on the amount of particles relative to this particle
 }

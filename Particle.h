@@ -35,7 +35,7 @@ class Particle {
     float density; // can be calculated from mass and volume. m/v. but we need it because it derives from m and v.
     float pressure; // is pressure given in some other way?
     Vector velocity;
-    Vector velocityHalf; //velocity in halfstep for leapfrog integration. velocity = at time t, velocityHalf = at time t + 1/2
+    Vector velocityHalf; //velocity in halfstep for leapfrog integration. velocity = at time t, velocityHalf = at time t - 1/2
     Vector acceleration; // acceleration updated through F/rho;
     Point3D position;
     float coeffVis;

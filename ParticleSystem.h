@@ -7,6 +7,7 @@ class ParticleSystem {
   public:
   
 	  ParticleSystem(Vector grav);
+    void initialize();
 	  void computeForces();
     void computePressure(const float stiffness, const float restDensity);
 	  void update(float timestep);
@@ -22,9 +23,10 @@ class ParticleSystem {
     float defaultKernel(Vector r, float h);
     /*Vector gradientKernel(Vector r, float h);
     float laplacianKernel(Vector r, float h);*/
-    Vector pressGradientKernel(Vector r, float h);
-    float viscLaplacianKernel(Vector r, float h);
-    void leapFrog(float dt);
+    Vector pressGradientKernel(Vector r, const float h);
+    float viscLaplacianKernel(Vector r, const float h);
+    void leapFrog(const float dt);
+    void initailizeLeapFrog(const float dt);
     Vector grav;
 };
 
