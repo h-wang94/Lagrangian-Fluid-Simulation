@@ -6,7 +6,7 @@
 class Particle {
   public:
     Particle(void) {};
-    Particle(float mass, float density, float pressure, float coeffVis, Vector velocity, Velocity velocityHalf, Velocity acceleration, Point3D position);
+    Particle(float mass, float density, float pressure, float coeffVis, Vector velocity, Vector velocityHalf, Vector acceleration, Point3D position);
     //Particle(float density, float pressure, float coeffVis, Vector velocity, Point3D position);
     ~Particle(void) {};
 

@@ -1,7 +1,7 @@
 #include <iostream>
 #include "Particle.h"
 
-Particle::Particle(float mass, float density, float pressure, float coeffVis, Vector velocity, Velocity vectorHalf, Velocity acceleration, Point3D position) {
+Particle::Particle(float mass, float density, float pressure, float coeffVis, Vector velocity, Vector vectorHalf, Vector acceleration, Point3D position) {
   this->mass = mass;
   //this->volume = volume; //a volume refers to a group of particles not a single particle
   this->pressure = pressure;
