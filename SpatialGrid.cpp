@@ -2,13 +2,13 @@
 #include <cmath>
 
 
-SpatialGrid::SpatialGrid(int s, float h)
+SpatialGrid::SpatialGrid(int s, float h)//s is the number of boxes for a side, h is the smoothing radius of our weighting function
 {
 	this->sideLength = s * h;
 	this->boxLength = h;
 	this->start = Point3D(-s * h/2, -s * h/2, -s * h/2); //the start of the boxes (corner of grid[0][0][0])
 	this->numEdgeBoxes = s;
-	cout<<start<<endl;
+	//cout<<start<<endl;
 	//is at the left bottom far corner of the grid
 
 	//x axis size
@@ -104,7 +104,7 @@ void SpatialGrid::updateBoxes(){
 						int yindex = (int)floor((y-this->start.getY())/(this->boxLength));
 						int zindex = (int)floor((z-this->start.getZ())/(this->boxLength));
 						if(xindex != i || yindex != j || zindex != k){
-							cout<<"omg"<<endl;
+							//cout<<"omg"<<endl;
 							grid[i][j][k].erase(grid[i][j][k].begin() + l);
 							grid[xindex][yindex][zindex].push_back(p);
 						}

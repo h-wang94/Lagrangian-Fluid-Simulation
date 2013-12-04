@@ -21,6 +21,7 @@ void ParticleSystem::update(float timestep){
   this->computePressure(3.0f, 998.29f); // now compute each particle's pressure. randomly put in numbers.
   this->computeForces();
   this->leapFrog(0.1f);
+  //grid.updateBoxes();
 }
 
 // computes the internal and external forces.
@@ -54,7 +55,8 @@ void ParticleSystem::setDensities(){
 
 	for(unsigned int i = 0; i < particles.size(); i++){
 		float density = 0.0;
-
+		//std::vector<Particle*> list = grid.getNeighbors(particles[i]);
+		//iterate through list for each particle
 		for(unsigned int j = 0; j < particles.size(); j++){									//INEFFICIENT for now; going to find way to only take into 
 																					//account particles near particle[i]
 
