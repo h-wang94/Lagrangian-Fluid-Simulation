@@ -57,7 +57,6 @@ std::vector<Particle> SpatialGrid::getNeighbors(Particle p){
 		while(j <= 1){
 			int k=-1;
 			while(k <= 1){
-<<<<<<< HEAD
 				if(!(xindex+i < 0 || xindex+i > this->numEdgeBoxes || yindex+j < 0 || yindex+j > this->numEdgeBoxes 
 					|| zindex + k < 0 || zindex + k > this->numEdgeBoxes))
 				{
@@ -67,13 +66,6 @@ std::vector<Particle> SpatialGrid::getNeighbors(Particle p){
 						list.push_back(thisBox[l]);
 						l++;
 					}
-=======
-				vector<Particle> thisBox = grid[xindex+i][yindex+j][zindex+k];
-				unsigned int l = 0;
-				while(l < thisBox.size()){
-					list.push_back(thisBox[l]);
-					l++;
->>>>>>> 42bb1470c6fc4aea369a7f5be348340d76a07098
 				}
 				k++;
 			}
@@ -87,7 +79,6 @@ std::vector<Particle> SpatialGrid::getNeighbors(Particle p){
 }
 
 void SpatialGrid::updateBoxes(){
-<<<<<<< HEAD
 	int i = 0;
 	while (i < this->numEdgeBoxes){
 		int j = 0;
@@ -121,7 +112,4 @@ void SpatialGrid::updateBoxes(){
 		i++;
 	}
 }
-=======
 
-}
->>>>>>> 42bb1470c6fc4aea369a7f5be348340d76a07098
