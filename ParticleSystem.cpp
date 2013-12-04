@@ -1,9 +1,6 @@
-#include <iostream>
 #include "ParticleSystem.h"
-#include "Particle.h"
 
 #define PI 3.14159265
-
 
 ParticleSystem::ParticleSystem(Vector grav){
   this->grav = grav;
@@ -11,48 +8,41 @@ ParticleSystem::ParticleSystem(Vector grav){
 
 void ParticleSystem::initialize() {
   this->setDensities();
-  this->computePressure(1.0f, 1.0f);
+  this->computePressure(3.0f, 998.0f);
   this->computeForces();
   this->initializeLeapFrog(0.1f);
 }
 
 void ParticleSystem::update(float timestep){
   this->setDensities();//for each particle, compute particle's density
-  this->computePressure(1.0f, 1.0f); // now compute each particle's pressure. randomly put in numbers.
+  this->computePressure(3.0f, 998.0f); // now compute each particle's pressure. randomly put in numbers.
   this->computeForces();
   this->leapFrog(0.1f);
+  //grid.updateBoxes();
 }
 
-void ParticleSystem::addParticle(Particle& p) {
-  particles.push_back(p);
-}
 
 // computes the internal and external forces.
 // also sets acceleration
 void ParticleSystem::computeForces(){
-  // f = rho * g - pressure forces + viscosity forces
   Vector gravity, pressure, viscosity, force;
   for(unsigned int i = 0; i < particles.size(); i++) {
-    // calculate gravity forces
     gravity = gravityForce(particles[i]);
-    // calculate pressure forces
     pressure = pressureForce(particles[i], i);
-    // calculate viscosity forces
     viscosity = viscosityForce(particles[i], i);
 
     force = gravity - pressure + viscosity;
-    cout << "Gravity: " << gravity << endl;
-    cout << "Pressure: " << pressure << endl;
-    cout << "Viscosity: " << viscosity << endl;
-    cout << "Force: " << force << endl;
-    particles[i].setAcceleration(force / particles[i].getDensity()); // why density...
+
+    particles[i].setAcceleration(force / particles[i].getMass()); // intuitively using mass..but slides say density...
   }
 }
 
 void ParticleSystem::computePressure(const float stiffness, const float restDensity) {
+  float pressure;
   for(unsigned int i = 0; i < particles.size(); i++) {
     // p = k ( (p / p0)^7 - 1)
-    particles[i].setPressure(stiffness * (pow((particles[i].getDensity() / restDensity), 7.0f) - 1.0f));
+    pressure = stiffness * (pow((particles[i].getDensity() / restDensity), 7.0f) - 1.0f);
+    particles[i].setPressure(pressure);
   }
 }
 
@@ -60,11 +50,10 @@ void ParticleSystem::setDensities(){
   float h = 5.0;															//CHANGE LATER (smoothing distance)
   float tol = .000001;													//CHANGE LATER (tolerance to be counted as irrelevant particle)
 
-  for(unsigned int i = 0; i < particles.size(); i++){
-    float density = 1;
-
-    for(unsigned int j = 0; j < particles.size(); j++){									//INEFFICIENT for now; going to find way to only take into 
-      //account particles near particle[i]
+	for(unsigned int i = 0; i < particles.size(); i++){
+		float density = 998.0f;
+		for(unsigned int j = 0; j < particles.size(); j++){									//INEFFICIENT for now; going to find way to only take into 
+																					//account particles near particle[i]
 
       Vector dist = particles[i].getPosition() - particles[j].getPosition();	//need distance between two particles
 
@@ -81,7 +70,7 @@ Vector ParticleSystem::gravityForce(Particle& p) {
   return grav * p.getMass(); 
 }
 
-Vector ParticleSystem::pressureForce(Particle& p, unsigned const int i) {
+Vector ParticleSystem::pressureForce(Particle& p, unsigned const int& i) {
   Vector pressure;
   float coeff;
   unsigned int j;
@@ -97,7 +86,7 @@ Vector ParticleSystem::pressureForce(Particle& p, unsigned const int i) {
   return pressure;
 }
 
-Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int i) {
+Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int& i) {
   Vector viscosity;
   Vector coeff;
   unsigned int j;
@@ -119,26 +108,14 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int i) {
 // Less expensive compared to gaussian one because of computation of e and no square roots
 // Not sure whether I'm supposed to normalize Vector r though
 
-float ParticleSystem::defaultKernel(Vector r, const float h) {
+float ParticleSystem::defaultKernel(Vector r, const float& h) {
   float rMag = r.getMagnitude();
   return (315.0f * pow((pow(h, 2.0f) - pow(rMag, 2.0f)),3.0) / (64.0f * PI * pow(h, 9.0f)));
 }
 
-// gradient and laplacian of poly6 kernels. prob not needed if we use the spiky and viscosity kernels for other calculations
-/*Vector ParticleSystem::gradientKernel(Vector r, float h) {
-  float rMag = r.getMagnitude();
-  float coeff = pow(pow(h, 2.0f) - pow(rMag, 2.0f), 2.0f) * -945 / (32 * PI * pow(h, 9.0f));
-  return r * coeff;
-  }
-
-  float ParticleSystem::laplacianKernel(Vector r, float h) {
-  float rMag = r.getMagnitude();
-  return (-945 / (32 * PI * pow(h, 9.0f))) * (pow(h, 2.0f) - pow(rMag, 2.0f)) * (3 * pow(h, 2.0f) - 7 * pow(rMag, 2.0f));
-  }*/
-
 // Spiky Kernel to calculate pressure 
 // Give more repulsive pressure at short distance and thus avoids clustering.
-Vector ParticleSystem::pressGradientKernel(Vector r, const float h) {
+Vector ParticleSystem::pressGradientKernel(Vector r, const float& h) {
   float rMag = r.getMagnitude();
   float coeff = (-45 * pow((h - rMag), 2.0f)) / (PI * pow(h, 6.0f) * rMag);
   return r * coeff;
@@ -147,18 +124,19 @@ Vector ParticleSystem::pressGradientKernel(Vector r, const float h) {
 // Viscosity kernel to calculate viscosity
 // Gives more stable viscosity and makes it possible to damp simulation better
 // Laplacian in poly6 kernel becomes negative really fast. The viscosity kernel's laplacian is positive everywhere
-float ParticleSystem::viscLaplacianKernel(Vector r, const float h) {
+float ParticleSystem::viscLaplacianKernel(Vector r, const float& h) {
   float rMag = r.getMagnitude();
   return (45 * (h - rMag)) / (PI * pow(h, 6.0f));
 
 }
 
 // Leap frog integration. Takes in a dt and will loop through all the particles in our system.
-// Has not been tested.
 // Can be changed to work with leapfrogging just a certain particle.
-void ParticleSystem::leapFrog(const float dt) {
+void ParticleSystem::leapFrog(const float& dt) {
   for(unsigned int i = 0; i < particles.size(); i++) {
-    cout << particles[i];
+    cout << "//===========================================//" << endl
+         << "// Particle Index: " << i << "   Num: " << i+1 << endl
+         << particles[i] << endl;
     Particle& p = particles[i];
     // get velocity at time t - dt/2. v_{t - dt/2}
     Vector old = p.getVelocityHalf(); 
@@ -175,24 +153,20 @@ void ParticleSystem::leapFrog(const float dt) {
 }
 
 // initialize. v_{-dt/2} = v_{0} - a_{0} * dt / 2
-void ParticleSystem::initializeLeapFrog(const float dt) {
-  cout << "//====================================//"
-       << "// Initialize LeapFrog                //"
-       << "//====================================//"
-        << endl; 
+void ParticleSystem::initializeLeapFrog(const float& dt) {
   for(unsigned int i = 0; i < particles.size(); i++) {
-  cout << particles[i];
     particles[i].setVelocityHalf(particles[i].getVelocity() - (particles[i].getAcceleration() * dt) / 2.0f);
   }
-       cout << "//====================================//" << endl;
 }
 
 
 void ParticleSystem::checkBoundary(Point3D* position, Vector* velocity) {
-  // temporary variables just so it will compile
+  if (!position || !velocity) return;
+  // temporary variables just so it will compile. these define the "boundaries" of box
   int maxX = 10;
   int maxY = 10;
   int maxZ = 10;
+  // if goes past boundaries, reflect back.
   for(unsigned int i = 0; i < particles.size(); i++) {
     if(position->getX() > maxX) {
       position->setX(2 * maxX - position->getX());
@@ -219,4 +193,9 @@ void ParticleSystem::checkBoundary(Point3D* position, Vector* velocity) {
       velocity->setZ(-velocity->getZ());
     }
   }
+}
+
+
+void ParticleSystem::addParticle(Particle& p) {
+  particles.push_back(p);
 }
