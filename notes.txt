@@ -38,3 +38,15 @@ Has example equation for weight function (Page 2)
 http://www.inf.ufrgs.br/cgi2007/cd_cgi/papers/harada.pdf
 Bucket Generation & Neighborhood search (Pg. 7-9)
 http://individuals.iii.u-tokyo.ac.jp/~yoichiro/report/report-pdf/harada/international/2007apcom.pdf
+
+
+
+//===================
+// Water values
+//===================
+mass: 0.02 kg
+Rest density: 998.29 kg /m^3
+Viscosity: 3.5 for \mu
+Gas stiffness: 3
+Kernel particles: 20
+Support radius (h): 0.0457

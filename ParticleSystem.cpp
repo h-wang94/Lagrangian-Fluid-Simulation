@@ -4,35 +4,7 @@
 
 #define PI 3.14159265
 
-//====================================================================//
-// Steps to intialize SPH system
-// 1. Create fluid material
-// 2. Create n particles and set position, initial velocities, and mass. Fill in missing values.
-// 3. Smoothing kernels to compute compact support radius
-// 4. Create spatial hashing data structure(?) and insert each particle
-// 5. Create collision objects
-// 6. Initialize Leapfrog integrator for all particles
-//====================================================================//
-// Compute density and pressure
-// For each particle,
-// 1. Search neighborhood using spatial hashing
-// 2. Compute mass density but only iterate over particles in neighborhood
-// 3. Compute pressure and use material density as rest density
-//====================================================================//
-// Compute internal forces
-// For each particle,
-// 1. Search neighborhood. Repeat because all SPH forces depend on mass-density which must be computed
-//    beforea ny force density.
-// 2. compute pressure force density acting on the particle
-// 3. compute the viscosity force density acting on the particle
-// F_internal = F_pressure + F_viscosity
-//====================================================================//
-// Compute external forces 
-//====================================================================//
-// Time integration and collision handling
-//====================================================================//
-// Render particles
-//====================================================================//
+
 ParticleSystem::ParticleSystem(Vector grav){
 	this->grav = grav;
 }
@@ -41,19 +13,18 @@ void ParticleSystem::initialize() {
   this->setDensities();
   this->computePressure(1.0f, 1.0f);
   this->computeForces();
-  this->initializeLeapFrog(0.5);
+  this->initializeLeapFrog(0.5f);
 }
 
 void ParticleSystem::update(float timestep){
 	this->setDensities();//for each particle, compute particle's density
-  this->computePressure(1.0f, 1.0f); // now compute each particle's pressure. randomly put in numbers.
-	//TODO:
-	//for each particle
-		//evaluate net force 
-		//compute accel
-		//leapfrog integration
+  this->computePressure(3.0f, 998.29f); // now compute each particle's pressure. randomly put in numbers.
+  this->computeForces();
+  this->leapFrog(0.1f);
 }
 
+// computes the internal and external forces.
+// also sets acceleration
 void ParticleSystem::computeForces(){
   // f = rho * g - pressure forces + viscosity forces
   Vector gravity, pressure, viscosity, force;
@@ -99,7 +70,7 @@ void ParticleSystem::setDensities(){
 }
 
 Vector ParticleSystem::gravityForce(Particle& p) {
-  return grav * p.getDensity(); // why density...
+  return grav * p.getMass(); 
 }
 
 Vector ParticleSystem::pressureForce(Particle& p, unsigned const int i) {
@@ -133,6 +104,8 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int i) {
   return viscosity;
 }
 
+
+// Smoothing distance h is half of the difference between particle i's most distant nearest neighbor and i
 // Poly6 Kernels used for everything except pressure and viscosity forces 
 // Notes: http://image.diku.dk/projects/media/kelager.06.pdf (Page 16)
 // Less expensive compared to gaussian one because of computation of e and no square roots
@@ -140,11 +113,7 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int i) {
 
 float ParticleSystem::defaultKernel(Vector r, const float h) {
   float rMag = r.getMagnitude();
-  if (rMag >= 0 && rMag <= h) {
-    return (315.0f * pow((pow(h, 2.0f) - pow(rMag, 2.0f)),3.0) / (64.0f * PI * pow(h, 9.0f)));
-  } else {
-    return 0;
-  }
+  return (315.0f * pow((pow(h, 2.0f) - pow(rMag, 2.0f)),3.0) / (64.0f * PI * pow(h, 9.0f)));
 }
 
 // gradient and laplacian of poly6 kernels. prob not needed if we use the spiky and viscosity kernels for other calculations
@@ -187,7 +156,11 @@ void ParticleSystem::leapFrog(const float dt) {
     // velocity at time t + dt/2. v_{t + dt/2} = v_{t - dt / 2} + a * dt
     p.setVelocityHalf(old + (p.getAcceleration() * dt)); 
     // set position at time t. pos_{t + dt} = pos_{t} + v_{t + dt / 2} * dt
-    p.setPosition(p.getPosition() + (p.getVelocityHalf() * dt)); 
+    //Vector tempPosition = p.getPosition() + (p.getVelocityHalf() * dt);
+    //tempPosition = checkBoundary(tempPosition);
+    //p.setPosition(tempPosition); 
+
+    p.setPosition(p.getPosition() + (p.getVelocityHalf() * dt));
     // use midpoint approximation for velocity at time t. v_{t} = (v_{t - dt / 2} + v_{t + dt / 2}) / 2.
     p.setVelocity((old + p.getVelocityHalf()) / 2.0f); 
   }
@@ -196,6 +169,22 @@ void ParticleSystem::leapFrog(const float dt) {
 // initialize. v_{-dt/2} = v_{0} - a_{0} * dt / 2
 void ParticleSystem::initializeLeapFrog(const float dt) {
   for(unsigned int i = 0; i < particles.size(); i++) {
-    particles[i].setVelocityHalf(particles[i].getVelocity() - dt * particles[i].getAcceleration() / 2.0f);
+    particles[i].setVelocityHalf(particles[i].getVelocity() - (particles[i].getAcceleration() * dt) / 2.0f);
   }
 }
+
+//Vector ParticleSystem::checkBoundary(Vector& position) {
+   //// temporary variables just so it will compile
+   //unsigned int maxX, maxY, maxZ = 10.0f;
+  //for(unsigned int i = 0; i < particles.size(); i++) {
+    //if(position.getX() > maxX) {
+      //position.setX(2 * maxX - position.getX());
+    //}
+    //if(position.getY() > maxY) {
+      //position.setY(2 * maxY - position.getY());
+    //}
+    //if(position.getZ() > maxZ) {
+      //position.setZ(2 * maxZ - position.getZ());
+    //}
+  //}
+/*}*/

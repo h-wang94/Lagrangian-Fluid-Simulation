@@ -26,7 +26,7 @@ class ParticleSystem {
     Vector pressGradientKernel(Vector r, const float h);
     float viscLaplacianKernel(Vector r, const float h);
     void leapFrog(const float dt);
-    void initailizeLeapFrog(const float dt);
+    void initializeLeapFrog(const float dt);
     Vector grav;
 };
 
