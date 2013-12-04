@@ -1,10 +1,21 @@
 #include <iostream>
+#include <cstdlib>
 #include "Particle.h"
 
-Particle::Particle(float mass, float pressure, float coeffVis, Vector velocity, Point3D position) {
+Particle::Particle(void) {
+  this->mass = 0.02f;
+  this->pressure = 3.0;
+  this->viscosity = 3.5;
+  this->velocity = Vector(rand() % 10, rand() % 10, rand() % 10);
+  this->position = Point3D(rand() % 10, rand() % 10, rand() % 10);
+
+}
+
+Particle::Particle(float mass, float pressure, float viscosity, float coeffVis, Vector velocity, Point3D position) {
   this->mass = mass;
   //this->volume = volume; //a volume refers to a group of particles not a single particle
   this->pressure = pressure;
+  this->viscosity = viscosity;
   this->coeffVis = coeffVis; // not sure what this is
   this->velocity = velocity;
   //this->velocityHalf = Vector(0,0,0); // need acceleration to compute the initial v_half
@@ -20,6 +31,10 @@ float Particle::getMass() const {
 
 float Particle::getVolume() const {
   return (this->mass)/(this->density);
+}
+
+float Particle::getViscosity() const {
+  return this->viscosity;
 }
 
 float Particle::getDensity() const {
@@ -53,6 +68,10 @@ void Particle::setMass(float mass) {
 /*void Particle::setVolume(float volume) {
   this->volume = volume;
 }*/
+
+void Particle::setViscosity(float viscosity) {
+  this->viscosity = viscosity;
+}
 
 void Particle::setDensity(float density) {
   this->density = density;

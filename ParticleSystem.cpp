@@ -98,6 +98,7 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int& i) {
     coeff = (particles[j].getVelocity() - p.getVelocity()) * particles[j].getVolume();
     viscosity += coeff * viscLaplacianKernel(p.getPosition() - particles[i].getPosition(), 1.0f);
   }
+  viscosity = viscosity * p.getViscosity(); 
   return viscosity;
 }
 

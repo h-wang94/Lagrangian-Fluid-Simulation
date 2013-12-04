@@ -5,8 +5,8 @@
 
 class Particle {
   public:
-    Particle(void) {};
-    Particle(float mass, float pressure, float coeffVis, Vector velocity, Point3D position);
+    Particle(void);
+    Particle(float mass, float pressure, float viscosity, float coeffVis, Vector velocity, Point3D position);
     //Particle(float mass, float density, float pressure, float coeffVis, Vector velocity, Vector velocityHalf, Vector acceleration, Point3D position);
     //Particle(float density, float pressure, float coeffVis, Vector velocity, Point3D position);
     ~Particle(void) {};
@@ -14,6 +14,7 @@ class Particle {
     // getters and setters
     float getMass() const;
     float getVolume() const;
+    float getViscosity() const;
     float getPressure() const;
     float getDensity() const;
     Vector getVelocity() const;
@@ -24,6 +25,7 @@ class Particle {
     void setMass(float mass);
     //void setVolume(float volume);
     void setPressure(float pressure);
+    void setViscosity(float viscosity);
     void setVelocity(Vector velocity);
     void setVelocityHalf(Vector velocityHalf);
     void setAcceleration(Vector acceleration);
@@ -35,6 +37,7 @@ class Particle {
     //float volume;
     float density; // can be calculated from mass and volume. m/v. but we need it because it derives from m and v.
     float pressure; // is pressure given in some other way?
+    float viscosity;
     Vector velocity;
     Vector velocityHalf; //velocity in halfstep for leapfrog integration. velocity = at time t, velocityHalf = at time t - 1/2
     Vector acceleration; // acceleration updated through F/rho;
