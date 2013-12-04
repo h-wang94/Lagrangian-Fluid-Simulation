@@ -81,9 +81,11 @@ std::ostream& operator <<(ostream& outs, const Particle& particle) {
   outs << "//==================================================//" << endl
        << "// Mass: " << particle.getMass() << endl
        << "// Volume: " << particle.getVolume() << endl
+       << "// Density: " << particle.getDensity() << endl
        << "// Pressure: " << particle.getPressure() << endl
        << "// Velocity: " << particle.getVelocity() << endl
        << "// Velocity Half: " << particle.getVelocityHalf() << endl
+       << "// Acceleration: " << particle.getAcceleration() << endl
        << "// Position: " << particle.getPosition() << endl
        << "//==================================================//" << endl;
   return outs;
