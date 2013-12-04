@@ -1,6 +1,7 @@
 #include "Particle.h"
 #include "Vector.h"
 #include "Point3D.h"
+#include "ParticleSystem.h"
 #include <iostream>
 using namespace std;
 int main() {
