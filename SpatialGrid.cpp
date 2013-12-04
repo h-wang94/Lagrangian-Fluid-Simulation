@@ -94,14 +94,16 @@ void SpatialGrid::updateBoxes(){
 					float z = pos.getZ();
 					if(abs(x) > sideLength || abs(y) > sideLength || abs(z) > sideLength){//moved particle is outside of spatial grid
 						//cant add the particle!
-						//uhhh not sure what to do here
+						//uhhh not sure what to do here so lets just leave the particle in this box and hope no other particles go OOB
 					}
-					int xindex = (int)floor((x+this->start.getX())/this->numEdgeBoxes);//need to check if this is right
-					int yindex = (int)floor((y+this->start.getY())/this->numEdgeBoxes);
-					int zindex = (int)floor((z+this->start.getZ())/this->numEdgeBoxes);
-					if(xindex != i || yindex != j || zindex != k){
-						grid[i][j][k].erase(grid[i][j][k].begin() + l);
-						grid[xindex][yindex][zindex].push_back(p);
+					else{
+						int xindex = (int)floor((x+this->start.getX())/this->numEdgeBoxes);//need to check if this is right
+						int yindex = (int)floor((y+this->start.getY())/this->numEdgeBoxes);
+						int zindex = (int)floor((z+this->start.getZ())/this->numEdgeBoxes);
+						if(xindex != i || yindex != j || zindex != k){
+							grid[i][j][k].erase(grid[i][j][k].begin() + l);
+							grid[xindex][yindex][zindex].push_back(p);
+						}
 					}
 					l++;
 				}
