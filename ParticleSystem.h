@@ -30,7 +30,7 @@ class ParticleSystem {
     void initializeLeapFrog(const float& dt);
     void leapFrog(const float& dt);
 
-    void checkBoundary(Point3D* position, Vector* velocity);
+    void checkBoundary(Point3D* position, Vector* velocity, Vector* velocityHalf);
 
     std::vector<Particle> particles;
 };

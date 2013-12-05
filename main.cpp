@@ -90,8 +90,8 @@ int main(int argc, char *argv[]) {
   testParticleSystem(argc, argv);
   //testSpatialGrid();
 
-  unsigned int i;
-  cin>>i;
+/*  unsigned int i;*/
+  /*cin>>i;*/
 }
 
 

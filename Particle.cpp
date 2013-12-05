@@ -11,7 +11,8 @@ Particle::Particle(void) {
   this->density = 0;
   this->viscosity = 3.5;
   this->position = Point3D(rand() % 10, rand() % 10, rand() % 10);
-  this->velocity = Vector(rand() % 3, rand() % 3, rand() % 3);
+  //this->velocity = Vector(rand() % 3, rand() % 3, rand() % 3);
+  this->velocity = Vector(0, 0, 0);
 
 }
 

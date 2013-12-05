@@ -1,6 +1,13 @@
 #include "ParticleSystem.h"
 
 #define PI 3.14159265
+#define MAX_X 10
+#define MAX_Y 10
+#define MAX_Z 10
+#define MIN_X 0
+#define MIN_Y 0
+#define MIN_Z 0
+#define REST_COEFF 0.7
 
 ParticleSystem::ParticleSystem(Vector grav){
   this->grav = grav;
@@ -52,10 +59,10 @@ void ParticleSystem::setDensities(){
   float tol = .000001;													//CHANGE LATER (tolerance to be counted as irrelevant particle)
   float density;
 
-	for(unsigned int i = 0; i < particles.size(); i++){
-		density = 0;
-		for(unsigned int j = 0; j < particles.size(); j++){									//INEFFICIENT for now; going to find way to only take into 
-																					//account particles near particle[i]
+  for(unsigned int i = 0; i < particles.size(); i++){
+    density = 0;
+    for(unsigned int j = 0; j < particles.size(); j++){									//INEFFICIENT for now; going to find way to only take into 
+      //account particles near particle[i]
 
       Vector dist = particles[i].getPosition() - particles[j].getPosition();	//need distance between two particles
 
@@ -141,17 +148,18 @@ float ParticleSystem::viscLaplacianKernel(Vector r, const float& h) {
 void ParticleSystem::leapFrog(const float& dt) {
   for(unsigned int i = 0; i < particles.size(); i++) {
     cout << "//===========================================//" << endl
-         << "// Particle Index: " << i << "   Num: " << i+1 << endl
-         << particles[i] << endl;
+      << "// Particle Index: " << i << "   Num: " << i+1 << endl
+      << particles[i] << endl;
     Particle& p = particles[i];
     // get velocity at time t - dt/2. v_{t - dt/2}
     Vector old = p.getVelocityHalf(); 
     // velocity at time t + dt/2. v_{t + dt/2} = v_{t - dt / 2} + a * dt
-    p.setVelocityHalf(old + (p.getAcceleration() * dt)); 
+    Vector tempVelocityHalf = old + p.getAcceleration() * dt;
     // set position at time t. pos_{t + dt} = pos_{t} + v_{t + dt / 2} * dt
-    Point3D tempPosition = p.getPosition() + (p.getVelocityHalf() * dt);
+    Point3D tempPosition = p.getPosition() + (tempVelocityHalf * dt);
     Vector tempVelocity = (old + p.getVelocityHalf()) / 2.0f;
-    checkBoundary(&tempPosition, &tempVelocity);
+    checkBoundary(&tempPosition, &tempVelocity, &tempVelocityHalf);
+    p.setVelocityHalf(tempVelocityHalf); 
     p.setPosition(tempPosition); 
     // use midpoint approximation for velocity at time t. v_{t} = (v_{t - dt / 2} + v_{t + dt / 2}) / 2.
     p.setVelocity(tempVelocity); 
@@ -161,43 +169,44 @@ void ParticleSystem::leapFrog(const float& dt) {
 // initialize. v_{-dt/2} = v_{0} - a_{0} * dt / 2
 void ParticleSystem::initializeLeapFrog(const float& dt) {
   for(unsigned int i = 0; i < particles.size(); i++) {
-    particles[i].setVelocityHalf(particles[i].getVelocity() - (particles[i].getAcceleration() * dt) / 2.0f);
+    particles[i].setVelocityHalf(particles[i].getVelocity() - ((this->grav + particles[i].getAcceleration()) * dt) / 2.0f);
   }
 }
 
 
-void ParticleSystem::checkBoundary(Point3D* position, Vector* velocity) {
-  if (!position || !velocity) return;
+void ParticleSystem::checkBoundary(Point3D* position, Vector* velocity, Vector* velocityHalf) {
+  if (!position || !velocity || !velocityHalf) return;
   // temporary variables just so it will compile. these define the "boundaries" of box
-  int maxX = 10;
-  int maxY = 10;
-  int maxZ = 10;
   // if goes past boundaries, reflect back.
-  for(unsigned int i = 0; i < particles.size(); i++) {
-    if(position->getX() > maxX) {
-      position->setX(2 * maxX - position->getX());
-      velocity->setX(-velocity->getX());
-    }
-    else if (position->getX() < 0.0f) {
-      position->setX(-position->getX());
-      velocity->setX(-velocity->getX());
-    }
-    if(position->getY() > maxY) {
-      position->setY(2 * maxY - position->getY());
-      velocity->setY(-velocity->getY());
-    }
-    else if (position->getY() < 0.0f) {
-      position->setY(-position->getY());
-      velocity->setY(-velocity->getY());
-    }
-    if(position->getZ() > maxZ) {
-      position->setZ(2 * maxZ - position->getZ());
-      velocity->setZ(-velocity->getZ());
-    }
-    else if (position->getZ() < 0.0f) {
-      position->setZ(-position->getZ());
-      velocity->setZ(-velocity->getZ());
-    }
+  if(position->getX() > MAX_X) {
+    position->setX(MAX_X);
+    velocity->setX(-REST_COEFF * velocity->getX());
+    velocityHalf->setX(-REST_COEFF * velocityHalf->getX());
+  }
+  else if (position->getX() < MIN_X) {
+    position->setX(MIN_X);
+    velocity->setX(-REST_COEFF * velocity->getX());
+    velocityHalf->setX(-REST_COEFF * velocityHalf->getX());
+  }
+  if(position->getY() > MAX_Y) {
+    position->setY(MAX_Y);
+    velocity->setY(-REST_COEFF * velocity->getY());
+    velocityHalf->setY(-REST_COEFF * velocityHalf->getY());
+  }
+  else if (position->getY() < MIN_Y) {
+    position->setY(MIN_Y);
+    velocity->setY(-REST_COEFF * velocity->getY());
+    velocityHalf->setY(-REST_COEFF * velocityHalf->getY());
+  }
+  if(position->getZ() > MAX_Z) {
+    position->setZ(MAX_Z);
+    velocity->setZ(-REST_COEFF* velocity->getZ());
+    velocityHalf->setZ(-REST_COEFF * velocityHalf->getZ());
+  }
+  else if (position->getZ() < MIN_Z) {
+    position->setZ(MIN_Z);
+    velocity->setZ(-REST_COEFF* velocity->getZ());
+    velocityHalf->setZ(-REST_COEFF * velocityHalf->getZ());
   }
 }
 
