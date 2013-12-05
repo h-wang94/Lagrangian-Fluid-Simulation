@@ -62,7 +62,7 @@ void testParticleSystem(const int argc, char* argv[]) {
     exit(1);
   }
   ParticleSystem system = ParticleSystem(Vector(0,0,-9.8));
-  Particle p1 = Particle(1, 1, 1, Vector(0,0,-1), Point3D(0.1, 0.1, 0.1));
+  Particle p1 = Particle(1, 1, 1, 1, Vector(0,0,-1), Point3D(0.1, 0.1, 0.1));
   //Particle p2 = Particle(2, 2, 1, 1, Vector(0,1,1), Point3D(1, 1, 1));
   for(unsigned int i = 0; i < numParticles; i++) {
     p1 = Particle(0.02, 998.29, 3.5, 1, Vector(rand() % 10, rand() % 10, rand() % 10), Point3D(rand() % 10, rand() % 10, rand() % 10));
