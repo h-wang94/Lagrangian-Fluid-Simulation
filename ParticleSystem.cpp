@@ -6,18 +6,18 @@ ParticleSystem::ParticleSystem(Vector grav){
   this->grav = grav;
 }
 
-void ParticleSystem::initialize() {
+void ParticleSystem::initialize(float timestep) {
   this->setDensities();
-  this->computePressure(3.0f, 998.0f);
+  this->computePressure();
   this->computeForces();
-  this->initializeLeapFrog(0.1f);
+  this->initializeLeapFrog(-timestep);
 }
 
 void ParticleSystem::update(float timestep){
   this->setDensities();//for each particle, compute particle's density
-  this->computePressure(3.0f, 998.0f); // now compute each particle's pressure. randomly put in numbers.
+  this->computePressure(); // now compute each particle's pressure. randomly put in numbers.
   this->computeForces();
-  this->leapFrog(0.1f);
+  this->leapFrog(timestep);
   //grid.updateBoxes();
 }
 
@@ -37,21 +37,23 @@ void ParticleSystem::computeForces(){
   }
 }
 
-void ParticleSystem::computePressure(const float stiffness, const float restDensity) {
+void ParticleSystem::computePressure() {
   float pressure;
   for(unsigned int i = 0; i < particles.size(); i++) {
     // p = k ( (p / p0)^7 - 1)
-    pressure = stiffness * (pow((particles[i].getDensity() / restDensity), 7.0f) - 1.0f);
+    pressure = particles[i].getStiffness() * (pow((particles[i].getDensity() / particles[i].getRestDensity()), 7.0f) - 1.0f);
     particles[i].setPressure(pressure);
   }
 }
 
+// need to look at this
 void ParticleSystem::setDensities(){
   float h = 5.0;															//CHANGE LATER (smoothing distance)
   float tol = .000001;													//CHANGE LATER (tolerance to be counted as irrelevant particle)
+  float density;
 
 	for(unsigned int i = 0; i < particles.size(); i++){
-		float density = 998.0f;
+		density = 0;
 		for(unsigned int j = 0; j < particles.size(); j++){									//INEFFICIENT for now; going to find way to only take into 
 																					//account particles near particle[i]
 
@@ -59,7 +61,7 @@ void ParticleSystem::setDensities(){
 
       float kernel = defaultKernel(dist, h);
       if(kernel > tol){
-        float density = density + kernel * particles[j].getMass();			//add on to the density for particle particles[i]
+        density += kernel * particles[j].getMass();			//add on to the density for particle particles[i]
       }
     }
     particles[i].setDensity(density);											//set the particle[i]'s density to particle[i]

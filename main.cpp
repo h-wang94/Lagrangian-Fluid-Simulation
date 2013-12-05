@@ -8,11 +8,16 @@
 using namespace std;
 
 void testSpatialGrid() {
-  Particle p1 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(0,0,0));
-  Particle p2 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(1,0,0));
-  Particle p3 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(0,0,1));
-  Particle p4 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(0,-9, -9));
-  Particle p5 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(11,11, 11));
+  /*Particle p1 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(0,0,0));*/
+  //Particle p2 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(1,0,0));
+  //Particle p3 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(0,0,1));
+  //Particle p4 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(0,-9, -9));
+  /*Particle p5 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(11,11, 11));*/
+  Particle p1 = Particle();
+  Particle p2 = Particle();
+  Particle p3 = Particle();
+  Particle p4 = Particle();
+  Particle p5 = Particle();
   SpatialGrid grid = SpatialGrid(10, 10);
   grid.addParticle(&p1);
   grid.addParticle(&p2);
@@ -64,20 +69,19 @@ void testParticleSystem(const int argc, char* argv[]) {
     exit(1);
   }
   ParticleSystem system = ParticleSystem(Vector(0,0,-9.8));
-  Particle p1 = Particle(1, 1, 3.5, 1, Vector(0,0,-1), Point3D(0.1, 0.1, 0.1));
+  Particle p1 = Particle();
   //Particle p2 = Particle(2, 2, 1, 1, Vector(0,1,1), Point3D(1, 1, 1));
   for(unsigned int i = 0; i < numParticles; i++) {
-    p1 = Particle(0.02, 998.29, 3.5, 1, Vector(rand() % 10, rand() % 10, rand() % 10), Point3D(rand() % 10, rand() % 10, rand() % 10));
+    p1 = Particle();
     system.addParticle(p1);
   }
-  system.initialize();
+  system.initialize(dt);
   for(float j = 0; j < time; j+=dt) {
     cout << "//===========================================//" << endl
          << "// Time: " << j << "                                 //" << endl
          << "//===========================================//" << endl;
-    system.update(j);
+    system.update(dt);
   }
-
 }
 
 int main(int argc, char *argv[]) {

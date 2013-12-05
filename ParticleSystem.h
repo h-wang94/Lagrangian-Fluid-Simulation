@@ -8,7 +8,7 @@ class ParticleSystem {
   public:
 	  ParticleSystem(Vector grav);
 
-    void initialize();
+    void initialize(float timestep);
 	  void update(float timestep);
 
     void addParticle(Particle& p);
@@ -18,7 +18,7 @@ class ParticleSystem {
 
 	  void setDensities();
 	  void computeForces();
-    void computePressure(const float stiffness, const float restDensity);
+    void computePressure();
     Vector gravityForce(Particle& p);
     Vector pressureForce(Particle& p, unsigned const int& i);
     Vector viscosityForce(Particle& p, unsigned const int& i);

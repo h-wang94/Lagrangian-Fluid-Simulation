@@ -6,43 +6,42 @@
 class Particle {
   public:
     Particle(void);
-    Particle(float mass, float pressure, float viscosity, float coeffVis, Vector velocity, Point3D position);
-    //Particle(float mass, float density, float pressure, float coeffVis, Vector velocity, Vector velocityHalf, Vector acceleration, Point3D position);
-    //Particle(float density, float pressure, float coeffVis, Vector velocity, Point3D position);
+    Particle(float mass, float pressure, float stiffness, float restDensity, float density, float viscosity, Point3D position, Vector velocity); 
     ~Particle(void) {};
 
     // getters and setters
     float getMass() const;
     float getVolume() const;
-    float getViscosity() const;
     float getPressure() const;
+    float getStiffness() const;
+    float getRestDensity() const;
     float getDensity() const;
+    float getViscosity() const;
+    Point3D getPosition() const;
     Vector getVelocity() const;
     Vector getVelocityHalf() const;
     Vector getAcceleration() const;
-    Point3D getPosition() const;
 
-    void setMass(float mass);
-    //void setVolume(float volume);
-    void setPressure(float pressure);
-    void setViscosity(float viscosity);
-    void setVelocity(Vector velocity);
-    void setVelocityHalf(Vector velocityHalf);
-    void setAcceleration(Vector acceleration);
-    void setPosition(Point3D position);
-    void setDensity(float density);
+    void setMass(const float mass);
+    void setDensity(const float density);
+    void setPressure(const float pressure);
+    void setPosition(const Point3D position);
+    void setVelocity(const Vector velocity);
+    void setVelocityHalf(const Vector velocityHalf);
+    void setAcceleration(const Vector acceleration);
 
   private:
     float mass;
-    //float volume;
+    float pressure;
+    float stiffness;
+    float restDensity;
     float density; // can be calculated from mass and volume. m/v. but we need it because it derives from m and v.
-    float pressure; // is pressure given in some other way?
     float viscosity;
+    Point3D position;
     Vector velocity;
     Vector velocityHalf; //velocity in halfstep for leapfrog integration. velocity = at time t, velocityHalf = at time t - 1/2
     Vector acceleration; // acceleration updated through F/rho;
-    Point3D position;
-    float coeffVis;
+    float coeffVis; // what is this for?
 
 };
 

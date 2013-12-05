@@ -2,28 +2,29 @@
 #include <cstdlib>
 #include "Particle.h"
 
+// Constructor for a water particle in random locations
 Particle::Particle(void) {
   this->mass = 0.02f;
-  this->pressure = 3.0;
+  this->pressure = 0.0;
+  this->stiffness = 3.0;
+  this->restDensity = 998.29;
+  this->density = 0;
   this->viscosity = 3.5;
-  this->velocity = Vector(rand() % 10, rand() % 10, rand() % 10);
   this->position = Point3D(rand() % 10, rand() % 10, rand() % 10);
+  this->velocity = Vector(rand() % 3, rand() % 3, rand() % 3);
 
 }
 
-Particle::Particle(float mass, float pressure, float viscosity, float coeffVis, Vector velocity, Point3D position) {
+Particle::Particle(float mass, float pressure, float stiffness, float restDensity, float density, float viscosity, Point3D position, Vector velocity) {
   this->mass = mass;
-  //this->volume = volume; //a volume refers to a group of particles not a single particle
   this->pressure = pressure;
+  this->stiffness = stiffness;
+  this->restDensity = restDensity;
+  this->density = density;
   this->viscosity = viscosity;
-  this->coeffVis = coeffVis; // not sure what this is
-  this->velocity = velocity;
-  //this->velocityHalf = Vector(0,0,0); // need acceleration to compute the initial v_half
-  //this->acceleration = Vector(0,0,0);
   this->position = position;
-  //this->density = density;//density is dependent on the amount of particles relative to this particle
+  this->velocity = velocity;
 }
-
 
 float Particle::getMass() const {
   return this->mass;
@@ -33,16 +34,28 @@ float Particle::getVolume() const {
   return (this->mass)/(this->density);
 }
 
-float Particle::getViscosity() const {
-  return this->viscosity;
+float Particle::getPressure() const {
+  return this->pressure;
+}
+
+float Particle::getStiffness() const {
+  return this->stiffness;
+}
+
+float Particle::getRestDensity() const {
+  return this->restDensity;
 }
 
 float Particle::getDensity() const {
   return this->density;
 }
 
-float Particle::getPressure() const {
-  return this->pressure;
+float Particle::getViscosity() const {
+  return this->viscosity;
+}
+
+Point3D Particle::getPosition() const {
+  return this->position;
 }
 
 Vector Particle::getVelocity() const {
@@ -57,28 +70,20 @@ Vector Particle::getAcceleration() const {
   return this->acceleration;
 }
 
-Point3D Particle::getPosition() const {
-  return this->position;
-}
-
-void Particle::setMass(float mass) {
+void Particle::setMass(const float mass) {
   this->mass = mass;
 }
 
-/*void Particle::setVolume(float volume) {
-  this->volume = volume;
-}*/
-
-void Particle::setViscosity(float viscosity) {
-  this->viscosity = viscosity;
-}
-
-void Particle::setDensity(float density) {
+void Particle::setDensity(const float density) {
   this->density = density;
 }
 
-void Particle::setPressure(float pressure) {
+void Particle::setPressure(const float pressure) {
   this->pressure = pressure;
+}
+
+void Particle::setPosition(Point3D position) {
+  this->position = position;
 }
 
 void Particle::setVelocity(Vector velocity) {
@@ -91,10 +96,6 @@ void Particle::setVelocityHalf(Vector velocityHalf) {
 
 void Particle::setAcceleration(Vector acceleration) {
   this->acceleration = acceleration;
-}
-
-void Particle::setPosition(Point3D position) {
-  this->position = position;
 }
 
 std::ostream& operator <<(ostream& outs, const Particle& particle) {
