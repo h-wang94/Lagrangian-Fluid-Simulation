@@ -118,6 +118,9 @@ float ParticleSystem::defaultKernel(Vector r, const float& h) {
 // Give more repulsive pressure at short distance and thus avoids clustering.
 Vector ParticleSystem::pressGradientKernel(Vector r, const float& h) {
   float rMag = r.getMagnitude();
+  if (rMag == 0) {
+    return Vector(0,0,0);
+  }
   float coeff = (-45 * pow((h - rMag), 2.0f)) / (PI * pow(h, 6.0f) * rMag);
   return r * coeff;
 }
