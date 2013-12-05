@@ -1,0 +1,26 @@
+Elliott Ison: cs184-ag
+Harrison Wang: cs184-cd
+Thatcher Christeaan: cs184-bi
+Kimberly Ng: cs184-et
+
+Fluids/Smoke Simulations
+
+Proposal and planned features:
+
+	We are planning to implement Lagrangian fluid simulation. We first plan to set up a basic simulation and from there program these features:
+Fluid/solid interaction
+Surface reconstruction
+Acceleration structures to help speed up the simulation
+Our simulation will utilize OpenGL for rendering and Smoothed Particle Hydrodynamics for the fluids. 
+
+Jobs:
+	We plan to have two people program the physics behind the fluid simulation and two people program the rendering of the fluid simulation. If either pair finishes early then that pair can help the other team. Afterward, once a basic simulation is complete, we will divide into pairs for the remaining features and the extra features.
+
+Extra Features if we have time:
+Interaction between fluids of different viscosity/colors
+Some type of user interaction
+Surface anisotropic smoothing
+Smoke simulation
+Eulerian fluid simulation (if we have a lot of time)
+
+We discussed this project proposal with Aayush. 

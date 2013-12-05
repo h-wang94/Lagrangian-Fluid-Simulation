@@ -46,8 +46,6 @@ void testSpatialGrid() {
     j++;
   }
 
-  /*unsigned int i;*/
-  /*cin>>i;*/
 }
 
 void testParticleSystem(const int argc, char* argv[]) {
@@ -91,6 +89,9 @@ int main(int argc, char *argv[]) {
   
   testParticleSystem(argc, argv);
   //testSpatialGrid();
+
+  unsigned int i;
+  cin>>i;
 }
 
 
