@@ -22,8 +22,7 @@ public:
 private:
 	__int8 getCutVertices();
 	int getCutEdges(__int8 v);
-	int* getTriangleVertexList(__int8 v);
-	int* getVertexNumsFromEdge(int edge);
+	vector<int> getVertexNumsFromEdge(int edge);
 	vector<Point3D> vertices;
 };
 
