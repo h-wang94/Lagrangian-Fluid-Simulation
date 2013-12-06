@@ -39,8 +39,7 @@ void ParticleSystem::computeForces(){
     viscosity = viscosityForce(particles[i], i);
 
     force = gravity - pressure + viscosity;
-
-    particles[i].setAcceleration(force / particles[i].getMass()); // intuitively using mass..but slides say density...
+    particles[i].setAcceleration(force / particles[i].getDensity()); // intuitively using mass..but slides say density...
   }
 }
 
@@ -55,20 +54,15 @@ void ParticleSystem::computePressure() {
 
 // need to look at this
 void ParticleSystem::setDensities(){
-  float h = 5.0;															//CHANGE LATER (smoothing distance)
-  float tol = .000001;													//CHANGE LATER (tolerance to be counted as irrelevant particle)
+  float h = 0.0457;															//CHANGE LATER (smoothing distance)
   float density;
 
   for(unsigned int i = 0; i < particles.size(); i++){
     density = 0;
-    for(unsigned int j = 0; j < particles.size(); j++){									//INEFFICIENT for now; going to find way to only take into 
-      //account particles near particle[i]
-
-      Vector dist = particles[i].getPosition() - particles[j].getPosition();	//need distance between two particles
-
-      float kernel = defaultKernel(dist, h);
-      if(kernel > tol){
-        density += kernel * particles[j].getMass();			//add on to the density for particle particles[i]
+    for(unsigned int j = 0; j < particles.size(); j++){ // need to use spatial grid	
+      Vector dist = particles[i].getPosition() - particles[j].getPosition();
+      if (dist.getMagnitude() <= pow(h, 2.0f)) {
+        density += defaultKernel(dist, h) * particles[j].getMass();
       }
     }
     particles[i].setDensity(density);											//set the particle[i]'s density to particle[i]
@@ -76,7 +70,7 @@ void ParticleSystem::setDensities(){
 }
 
 Vector ParticleSystem::gravityForce(Particle& p) {
-  return grav * p.getMass(); 
+  return grav * p.getDensity(); 
 }
 
 Vector ParticleSystem::pressureForce(Particle& p, unsigned const int& i) {
@@ -85,12 +79,18 @@ Vector ParticleSystem::pressureForce(Particle& p, unsigned const int& i) {
   unsigned int j;
   // this is so stupid...........but ill think of a better way. i dont wanna do checks cause it might make a difference since this is computed every time for every particle
   for(j = 0; j < i; j++) {
-    coeff = (p.getPressure() + particles[j].getPressure()) / 2.0f * particles[j].getVolume();
-    pressure += pressGradientKernel(p.getPosition() - particles[j].getPosition(), 1.0f) * coeff;
+    Vector diff = p.getPosition() - particles[j].getPosition();
+    if (diff.getMagnitude() <= pow(0.0457, 2)) {
+      coeff = (p.getPressure() + particles[j].getPressure()) / 2.0f * particles[j].getVolume();
+      pressure += pressGradientKernel(diff, 0.0457f) * coeff;
+    }
   }
   for(j = j + 1; j < particles.size(); j++) {
-    coeff = (p.getPressure() + particles[j].getPressure()) / 2.0f * particles[j].getVolume();
-    pressure += pressGradientKernel(p.getPosition() - particles[j].getPosition(), 1.0f) * coeff;
+    Vector diff = p.getPosition() - particles[j].getPosition();
+    if (diff.getMagnitude() <= pow(0.0457, 2)) {
+      coeff = (p.getPressure() + particles[j].getPressure()) / 2.0f * particles[j].getVolume();
+      pressure += pressGradientKernel(diff, 0.0457f) * coeff;
+    }
   }
   return pressure;
 }
@@ -100,12 +100,18 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int& i) {
   Vector coeff;
   unsigned int j;
   for(j = 0; j < i; j++) {
-    coeff = (particles[j].getVelocity() - p.getVelocity()) * particles[j].getVolume();
-    viscosity += coeff * viscLaplacianKernel(p.getPosition() - particles[i].getPosition(), 1.0f);
+    Vector diff = p.getPosition() - particles[i].getPosition();
+    if (diff.getMagnitude() <= pow(0.0457, 2)) {
+      coeff = (particles[j].getVelocity() - p.getVelocity()) * particles[j].getVolume();
+      viscosity += coeff * viscLaplacianKernel(p.getPosition() - particles[i].getPosition(), 1.0f);
+    }
   }
   for(j = j + 1; j < particles.size(); j++) {
-    coeff = (particles[j].getVelocity() - p.getVelocity()) * particles[j].getVolume();
-    viscosity += coeff * viscLaplacianKernel(p.getPosition() - particles[i].getPosition(), 1.0f);
+    Vector diff = p.getPosition() - particles[i].getPosition();
+    if (diff.getMagnitude() <= pow(0.0457, 2)) {
+      coeff = (particles[j].getVelocity() - p.getVelocity()) * particles[j].getVolume();
+      viscosity += coeff * viscLaplacianKernel(p.getPosition() - particles[i].getPosition(), 1.0f);
+    }
   }
   viscosity = viscosity * p.getViscosity(); 
   return viscosity;
@@ -130,7 +136,8 @@ Vector ParticleSystem::pressGradientKernel(Vector r, const float& h) {
   if (rMag == 0) {
     return Vector(0,0,0);
   }
-  float coeff = (-45 * pow((h - rMag), 2.0f)) / (PI * pow(h, 6.0f) * rMag);
+  float coeff = (-45 * pow((h - rMag), 2.0f)) / (PI * pow(h, 6.0f));
+  r.normalize();
   return r * coeff;
 }
 

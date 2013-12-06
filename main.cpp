@@ -55,11 +55,12 @@ void testSpatialGrid() {
 
 }
 
-void testParticleSystem(unsigned const int numParticles, const float dt, const float time, const bool objFile) {
+void testParticleSystem(unsigned const int numParticles, const float dt, const float timeTotal, const bool objFile) {
   ParticleSystem system = ParticleSystem(Vector(0,0,-9.8));
   Particle p1 = Particle();
   //Particle p2 = Particle(2, 2, 1, 1, Vector(0,1,1), Point3D(1, 1, 1));
   unsigned int i;
+  srand(time(NULL));
   if (objFile) {
     for(i = 0; i < numParticles; i++) {
       p1 = Particle(0.02, 0.0, 3.0, 998.29, 0, 3.5, vertexes[i], Vector(0, 0, 0));
@@ -72,9 +73,9 @@ void testParticleSystem(unsigned const int numParticles, const float dt, const f
     }
   }
   system.initialize(dt);
-  for(float j = 0; j < time; j+=dt) {
+  for(float j = 0; j < timeTotal; j+=dt) {
     cout << "//===========================================//" << endl
-      << "// Time: " << j << "                                 //" << endl
+      << "// timeTotal: " << j << "                                 //" << endl
       << "//===========================================//" << endl;
     system.update(dt);
   }
