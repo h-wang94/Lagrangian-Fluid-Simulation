@@ -10,24 +10,20 @@
 
 #include "ParticleSystem.h"
 
-class Surface {
-public:
-	float colorFunction(const ParticleSystem &ps, const vector<Particle> &neighbors, const float neighborRadius, const Point3D &position);
-	//float signedDistField(float position);
-	//float weightAtParticle(Particle p);
-};
-
 class Cube {
 public:
 	Cube();
 	Cube(const vector<Point3D> &);
 	vector<Point3D> getVertices();
 	void setVertices(const vector<Point3D> &);
-
-	__int8 getCutVertices(Surface s);
-	int getCutEdges(__int8 v);
+	vector<Point3D> getTriangles(const double &isolevel, const __int8 &vertices);
+	float colorFunction(const ParticleSystem &ps, const vector<Particle> &neighbors, const float neighborRadius, const Point3D &position);
 
 private:
+	__int8 getCutVertices();
+	int getCutEdges(__int8 v);
+	int* getTriangleVertexList(__int8 v);
+	int* getVertexNumsFromEdge(int edge);
 	vector<Point3D> vertices;
 };
 

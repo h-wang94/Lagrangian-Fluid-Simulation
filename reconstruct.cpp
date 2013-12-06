@@ -11,7 +11,7 @@
  * to find the neighbors to this position given the neighborhood radius. Either or.
  *
  * It would probably make more sense to have this in ParticleSystem or something.*/
-float Surface::colorFunction(const ParticleSystem &ps, const vector<Particle> &neighbors, const float neighborRadius, const Point3D &position) {
+float Cube::colorFunction(const ParticleSystem &ps, const vector<Particle> &neighbors, const float neighborRadius, const Point3D &position) {
 	float total = 0;
 	for (int i = 0; i < (int) neighbors.size(); i++) {
 		Particle temp = neighbors[i];
@@ -66,10 +66,10 @@ void Cube::setVertices(const vector<Point3D> &v) {
  * cube, going from 7->0. The bit is a 1 if the corner is under
  * the surface.
  */
-__int8 Cube::getCutVertices(Surface s) {
+__int8 Cube::getCutVertices() {
 	__int8 result = 0;
 	for (int i = 0; i < (int) vertices.size(); i++) {
-		//if (cube vertex < surface level) {
+		//if (colorfunc(cube vertex) < surface level) {
 		//    result |= 1 << i;
 	    //}
 	}
@@ -121,7 +121,7 @@ int Cube::getCutEdges(__int8 v) {
 	return edgeTable[v];
 }
 
-int* getTriangleVertexList(__int8 v) {
+int* Cube::getTriangleVertexList(__int8 v) {
 	int triTable[256][16] =
 	{{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 	{0, 8, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
@@ -380,4 +380,72 @@ int* getTriangleVertexList(__int8 v) {
 	{0, 3, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}};
 	return &(triTable[v]);
+}
+
+/* Returns the numbers for the two vertices between which
+ * edge exists.
+ */
+int* Cube::getVertexNumsFromEdge(int edge) {
+	int result[2];
+	switch (edge) {
+	case 0:
+	case 1:
+	case 2:
+	case 4:
+	case 5:
+	case 6:
+		result[0] = edge;
+		result[1] = edge+1;
+		break;
+	case 3:
+		result[0] = 3;
+		result[1] = 0;
+		break;
+	case 7:
+		result[0] = 7;
+		result[1] = 4;
+		break;
+	case 8:
+		result[0] = 0;
+		result[1] = 4;
+		break;
+	case 9:
+		result[0] = 1;
+		result[1] = 5;
+		break;
+	case 10:
+		result[0] = 2;
+		result[1] = 6;
+		break;
+	case 11:
+		result[0] = 3;
+		result[1] = 7;
+		break;
+	return &result;
+	}
+
+}
+
+vector<Point3D> Cube::getTriangles(const double &isolevel, const __int8 &cutV) {
+	//__int8 cutV = getCutVertices(); if we make a Mesh class of Cubes so we don't recalc vertices?
+	int cutE = getCutEdges(cutV);
+	vector<Point3D> triangles;
+	Point3D interpV[12];
+	if (cutE == 0) {  // all vertices above or below surface
+		return triangles;
+	}
+	for (int i = 0; i < 12; i++) {
+		int edge = cutE & (1 << i);
+		if (edge) {
+			int* edgeVertices = getVertexNumsFromEdge(edge);
+			//interpV[i] = interpVertex(isolevel, edgeVertices[0], edgeVertices[1], colorFunction on vertex 0, colorFunction on vertex 1);
+		}
+	}
+	int* triangleVertices = getTriangleVertexList(cutV);
+	for (int i = 0; triangleVertices[i] != -1; i+=3) {
+		triangles.push_back(interpV[triangleVertices[i  ]]);
+		triangles.push_back(interpV[triangleVertices[i+1]]);
+		triangles.push_back(interpV[triangleVertices[i+2]]);
+	}
+	return triangles;
 }
