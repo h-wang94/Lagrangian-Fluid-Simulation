@@ -11,6 +11,9 @@
 
 ParticleSystem::ParticleSystem(Vector grav){
   this->grav = grav;
+  this->h = 0.0457;
+  this->hSq = pow(h, 2.0f);
+  this->debug = true;
 }
 
 void ParticleSystem::initialize(float timestep) {
@@ -54,15 +57,15 @@ void ParticleSystem::computePressure() {
 
 // need to look at this
 void ParticleSystem::setDensities(){
-  float h = 0.0457;															//CHANGE LATER (smoothing distance)
+  //float h = 0.0457;															//CHANGE LATER (smoothing distance)
   float density;
 
   for(unsigned int i = 0; i < particles.size(); i++){
     density = 0;
     for(unsigned int j = 0; j < particles.size(); j++){ // need to use spatial grid	
       Vector dist = particles[i].getPosition() - particles[j].getPosition();
-      if (dist.getMagnitude() <= pow(h, 2.0f)) {
-        density += defaultKernel(dist, h) * particles[j].getMass();
+      if (dist.getMagnitude() <= hSq) {
+        density += defaultKernel(dist) * particles[j].getMass();
       }
     }
     particles[i].setDensity(density);											//set the particle[i]'s density to particle[i]
@@ -80,16 +83,16 @@ Vector ParticleSystem::pressureForce(Particle& p, unsigned const int& i) {
   // this is so stupid...........but ill think of a better way. i dont wanna do checks cause it might make a difference since this is computed every time for every particle
   for(j = 0; j < i; j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
-    if (diff.getMagnitude() <= pow(0.0457, 2)) {
+    if (diff.getMagnitude() <= hSq) {
       coeff = (p.getPressure() + particles[j].getPressure()) / 2.0f * particles[j].getVolume();
-      pressure += pressGradientKernel(diff, 0.0457f) * coeff;
+      pressure += pressGradientKernel(diff) * coeff;
     }
   }
   for(j = j + 1; j < particles.size(); j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
-    if (diff.getMagnitude() <= pow(0.0457, 2)) {
+    if (diff.getMagnitude() <= hSq) {
       coeff = (p.getPressure() + particles[j].getPressure()) / 2.0f * particles[j].getVolume();
-      pressure += pressGradientKernel(diff, 0.0457f) * coeff;
+      pressure += pressGradientKernel(diff) * coeff;
     }
   }
   return pressure;
@@ -100,17 +103,17 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int& i) {
   Vector coeff;
   unsigned int j;
   for(j = 0; j < i; j++) {
-    Vector diff = p.getPosition() - particles[i].getPosition();
-    if (diff.getMagnitude() <= pow(0.0457, 2)) {
+    Vector diff = p.getPosition() - particles[j].getPosition();
+    if (diff.getMagnitude() <= hSq) {
       coeff = (particles[j].getVelocity() - p.getVelocity()) * particles[j].getVolume();
-      viscosity += coeff * viscLaplacianKernel(p.getPosition() - particles[i].getPosition(), 1.0f);
+      viscosity += coeff * viscLaplacianKernel(diff);
     }
   }
   for(j = j + 1; j < particles.size(); j++) {
-    Vector diff = p.getPosition() - particles[i].getPosition();
-    if (diff.getMagnitude() <= pow(0.0457, 2)) {
+    Vector diff = p.getPosition() - particles[j].getPosition();
+    if (diff.getMagnitude() <= hSq) {
       coeff = (particles[j].getVelocity() - p.getVelocity()) * particles[j].getVolume();
-      viscosity += coeff * viscLaplacianKernel(p.getPosition() - particles[i].getPosition(), 1.0f);
+      viscosity += coeff * viscLaplacianKernel(diff);
     }
   }
   viscosity = viscosity * p.getViscosity(); 
@@ -124,14 +127,14 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int& i) {
 // Less expensive compared to gaussian one because of computation of e and no square roots
 // Not sure whether I'm supposed to normalize Vector r though
 
-float ParticleSystem::defaultKernel(Vector r, const float& h) {
+float ParticleSystem::defaultKernel(Vector r) {
   float rMag = r.getMagnitude();
   return (315.0f * pow((pow(h, 2.0f) - pow(rMag, 2.0f)),3.0) / (64.0f * PI * pow(h, 9.0f)));
 }
 
 // Spiky Kernel to calculate pressure 
 // Give more repulsive pressure at short distance and thus avoids clustering.
-Vector ParticleSystem::pressGradientKernel(Vector r, const float& h) {
+Vector ParticleSystem::pressGradientKernel(Vector r) {
   float rMag = r.getMagnitude();
   if (rMag == 0) {
     return Vector(0,0,0);
@@ -144,7 +147,7 @@ Vector ParticleSystem::pressGradientKernel(Vector r, const float& h) {
 // Viscosity kernel to calculate viscosity
 // Gives more stable viscosity and makes it possible to damp simulation better
 // Laplacian in poly6 kernel becomes negative really fast. The viscosity kernel's laplacian is positive everywhere
-float ParticleSystem::viscLaplacianKernel(Vector r, const float& h) {
+float ParticleSystem::viscLaplacianKernel(Vector r) {
   float rMag = r.getMagnitude();
   return (45 * (h - rMag)) / (PI * pow(h, 6.0f));
 
@@ -154,9 +157,11 @@ float ParticleSystem::viscLaplacianKernel(Vector r, const float& h) {
 // Can be changed to work with leapfrogging just a certain particle.
 void ParticleSystem::leapFrog(const float& dt) {
   for(unsigned int i = 0; i < particles.size(); i++) {
-    cout << "//===========================================//" << endl
-      << "// Particle Index: " << i << "   Num: " << i+1 << endl
-      << particles[i] << endl;
+    if (debug) {
+      cout << "//===========================================//" << endl
+        << "// Particle Index: " << i << "   Num: " << i+1 << endl
+        << particles[i] << endl;
+    }
     Particle& p = particles[i];
     // get velocity at time t - dt/2. v_{t - dt/2}
     Vector old = p.getVelocityHalf(); 

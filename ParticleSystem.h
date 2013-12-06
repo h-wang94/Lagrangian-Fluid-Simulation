@@ -15,6 +15,9 @@ class ParticleSystem {
 
   private:
     Vector grav;
+    float h;
+    float hSq;
+    bool debug;
 
 	  void setDensities();
 	  void computeForces();
@@ -23,9 +26,9 @@ class ParticleSystem {
     Vector pressureForce(Particle& p, unsigned const int& i);
     Vector viscosityForce(Particle& p, unsigned const int& i);
 
-    float defaultKernel(Vector r, const float& h);
-    Vector pressGradientKernel(Vector r, const float& h);
-    float viscLaplacianKernel(Vector r, const float& h);
+    float defaultKernel(Vector r);
+    Vector pressGradientKernel(Vector r);
+    float viscLaplacianKernel(Vector r);
 
     void initializeLeapFrog(const float& dt);
     void leapFrog(const float& dt);
