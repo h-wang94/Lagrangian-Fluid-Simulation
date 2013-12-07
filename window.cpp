@@ -325,12 +325,27 @@ void determineFunction(int argc, char *argv[]) {
 
 /* Display is updated/rendered here. */
 void displayFunc() {
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glEnable(GL_DEPTH_TEST);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
 	// rendering stuff goes here
 	//for each particle
+  //glEnable(GL_LIGHTING);
+  //glEnable(GL_LIGHT0);
+  //GLfloat a[] = {0.4, 0.4, 0.4};
+  //GLfloat b[] = {0.2, 0.3, 1.0};
+  //GLfloat c[] = {0.1, 0.7, 0.2};
+  //glLightfv(GL_LIGHT0, GL_SPECULAR, a);
+  //glLightfv(GL_LIGHT0, GL_AMBIENT, b);
+  //glLightfv(GL_LIGHT0, GL_DIFFUSE, c);
+  //GLfloat diffuse[] = {0, 0, 1, 1};
+  //GLfloat specular[] = {1, 1, 1, 1};
+  //GLfloat shininess = 5;
+  //glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+  //glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+  //glMaterialfv(GL_FRONT, GL_SHININESS, &shininess);
 	glBegin(GL_POINTS);
 	glColor4f(0.0, 0.2, 1.0, 1.0);
   Particle* p;
@@ -351,6 +366,7 @@ void displayFunc() {
     pSystem.update(dt);
     currentTime += dt;
   }
+  glDisable(GL_LIGHTING);
 	glEnd();
 	glFlush();
 	glutSwapBuffers();
@@ -382,7 +398,7 @@ int main(int argc, char** argv) {
   glutInit(&argc, argv);
   glutInitWindowSize(600, 600);
   glutInitWindowPosition(0, 0);
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
   glutCreateWindow("CS184 Final");
   glClearColor(0.0, 0.0, 0.0, 1.0);
   glEnable(GL_POINT_SMOOTH);

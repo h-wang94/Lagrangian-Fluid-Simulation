@@ -39,6 +39,7 @@ class ParticleSystem {
     void leapFrog(const float& dt);
 
     void checkBoundary(Point3D* position, Vector* velocity, Vector* velocityHalf);
+    void bouncebackVelocity(Vector* velocity, Vector normal);
 
 };
 
