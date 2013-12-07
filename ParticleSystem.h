@@ -20,6 +20,8 @@ class ParticleSystem {
     Vector grav;
     float h;
     float hSq;
+    std::vector<Particle> particles;
+
     bool debug;
 
 	  void setDensities();
@@ -38,7 +40,6 @@ class ParticleSystem {
 
     void checkBoundary(Point3D* position, Vector* velocity, Vector* velocityHalf);
 
-    std::vector<Particle> particles;
 };
 
 #endif

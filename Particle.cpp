@@ -10,7 +10,10 @@ Particle::Particle(void) {
   this->restDensity = 998.29;
   this->density = 0;
   this->viscosity = 3.5;
-  this->position = Point3D(rand() % 10, rand() % 10, rand() % 10);
+  float x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+  float y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+  float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+  this->position = Point3D(x, y, z);
   //this->velocity = Vector(rand() % 3, rand() % 3, rand() % 3);
   this->velocity = Vector(0, 0, 0);
 

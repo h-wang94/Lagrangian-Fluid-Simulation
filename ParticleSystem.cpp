@@ -1,12 +1,12 @@
 #include "ParticleSystem.h"
 
 #define PI 3.14159265
-#define MAX_X 10
-#define MAX_Y 10
-#define MAX_Z 10
-#define MIN_X 0
-#define MIN_Y 0
-#define MIN_Z 0
+#define MAX_X 1
+#define MAX_Y 1
+#define MAX_Z 1
+#define MIN_X -1
+#define MIN_Y -1
+#define MIN_Z -1
 #define REST_COEFF 0.7
 
 ParticleSystem::ParticleSystem() {
@@ -187,9 +187,9 @@ void ParticleSystem::leapFrog(const float& dt) {
     p.setVelocity(tempVelocity); 
 
     if (debug) {
-      cout << "//===========================================//" << endl
-        << "// Particle Index: " << i << "   Num: " << i+1 << endl
-        << particles[i].getAcceleration() << endl;
+      /*cout << "//===========================================//" << endl*/
+        //<< "// Particle Index: " << i << "   Num: " << i+1 << endl
+        /*<< particles[i] << endl;*/
     }
   }
 }

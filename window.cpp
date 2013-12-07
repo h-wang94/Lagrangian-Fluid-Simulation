@@ -27,6 +27,9 @@ std::vector<Point3D> vertexes, vt;
 std::vector<Vector>normals;
 std::vector< std::vector<int> > vertexIndexes;
 ParticleSystem pSystem;
+float currentTime = 0;
+float dt;
+float totalTime;
 
 void testSpatialGrid() {
   /*Particle p1 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(0,0,0));*/
@@ -69,11 +72,10 @@ void testSpatialGrid() {
 
 }
 
-void testParticleSystem(unsigned const int numParticles, const float dt, const float timeTotal, const bool objFile) {
+void testParticleSystem(unsigned const int numParticles, const float dt, const float totalTime, const bool objFile) {
   Particle p1 = Particle();
-  //Particle p2 = Particle(2, 2, 1, 1, Vector(0,1,1), Point3D(1, 1, 1));
   unsigned int i;
-  srand(time(NULL));
+  srand(time(NULL)); // for rand function
   if (objFile) {
     for(i = 0; i < numParticles; i++) {
       p1 = Particle(0.02, 0.0, 3.0, 998.29, 0, 3.5, vertexes[i], Vector(0, 0, 0));
@@ -86,12 +88,14 @@ void testParticleSystem(unsigned const int numParticles, const float dt, const f
     }
   }
   pSystem.initialize(dt);
-  for(float j = 0; j < timeTotal; j+=dt) {
-    cout << "//===========================================//" << endl
-      << "// timeTotal: " << j << "                                 //" << endl
-      << "//===========================================//" << endl;
-    pSystem.update(dt);
-  }
+  // dont need this now that we have opengl.
+  // but we can use this if we don't want to display...i guess
+  /*for(float j = 0; j < totalTime; j+=dt) {*/
+    //cout << "//===========================================//" << endl
+      //<< "// totalTime: " << j << "                                 //" << endl
+      //<< "//===========================================//" << endl;
+    //pSystem.update(dt);
+  /*}*/
 }
 
 //==============================================================================
@@ -295,26 +299,26 @@ void readInput(std::string fileName) {
 void determineFunction(int argc, char *argv[]) {
   bool objFile = false;
   unsigned int numParticles = 0;
-  float dt = 0;
-  float time = 0;;
+  dt = 0;
+  totalTime = 0;;
   std::string fileName;
   if (argc == 1) {
     numParticles = 1;
-    dt = 0.1;
-    time = 0.5;
+    dt = 0.001;
+    totalTime = 1;
   }
   else if (argc == 4) {
     numParticles = std::atoi(argv[1]);
     dt = std::atof(argv[2]);
-    time = std::atof(argv[3]);
+    totalTime = std::atof(argv[3]);
   }
   else if (argc == 2) {
     fileName = std::string(argv[1]);
     readInput(fileName); 
     objFile = true;
     numParticles = vertexes.size();
-    dt = 0.1;
-    time = 0.5;
+    dt = 0.001;
+    totalTime = 1;
   }
   else if (argc == 5) {
     fileName = std::string(argv[1]);
@@ -322,13 +326,13 @@ void determineFunction(int argc, char *argv[]) {
     objFile = true;
     numParticles = vertexes.size();
     dt = std::atof(argv[2]);
-    time = std::atof(argv[3]); 
+    totalTime = std::atof(argv[3]); 
   }
   else {
     cout << "Incorrect number of parameters!" << endl;
     exit(1);
   }
-  testParticleSystem(numParticles, dt, time, objFile);
+  testParticleSystem(numParticles, dt, totalTime, objFile);
 }
 
 
@@ -347,6 +351,10 @@ void displayFunc() {
     p = pSystem.getParticle(i);
     glVertex3f(p->getPosition().getX(), p->getPosition().getY(), p->getPosition().getZ());
 	}
+  if (currentTime < totalTime) {
+    pSystem.update(dt);
+    currentTime += dt;
+  }
 	glEnd();
 	glFlush();
 	glutSwapBuffers();
@@ -354,7 +362,7 @@ void displayFunc() {
 
 void keyboard(unsigned char key, int x, int y) {
   switch(key) {
-    case ' ':
+    case ' ': // allow spacebar to end the program
       exit(0);
       break;
     default:
@@ -363,30 +371,24 @@ void keyboard(unsigned char key, int x, int y) {
   glutPostRedisplay();
 }
 int main(int argc, char** argv) {
-  cout << "//===========================================//" << endl
-    << "// Fluid Simulation Project " << endl
-    << "//===========================================//" << endl;
-  pSystem = ParticleSystem(Vector(0,0,-9.8));
+  pSystem = ParticleSystem(Vector(0,-9.8, 0));
   determineFunction(argc, argv);
-  //testSpatialGrid();
 
-/*  unsigned int i;*/
-  /*cin>>i;*/
   glutInit(&argc, argv);
   glutInitWindowSize(600, 600);
-  glutInitWindowPosition(5, 5);
+  glutInitWindowPosition(0, 0);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
   glutCreateWindow("CS184 Final");
   glClearColor(0.0, 0.0, 0.0, 1.0);
   glEnable(GL_POINT_SMOOTH);
   glHint(GL_POINT_SMOOTH_HINT, GL_FASTEST);
-  glPointSize(15.0f);
+  glPointSize(5.0f);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_BLEND);
   glutKeyboardFunc(keyboard);
 
   glutDisplayFunc(displayFunc);
-  //glutIdleFunc(displayFunc); if we do user interaction
+  glutIdleFunc(displayFunc); //if we do user interaction
   glutMainLoop();
   return 0;
 }
