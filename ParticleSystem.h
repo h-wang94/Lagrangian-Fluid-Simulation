@@ -30,8 +30,14 @@ class ParticleSystem {
     Vector gravityForce(Particle& p);
     Vector pressureForce(Particle& p, unsigned const int& i);
     Vector viscosityForce(Particle& p, unsigned const int& i);
+    Vector tensionForce(Particle& p, unsigned const int& i);
+    float colorFunction(Particle& p, unsigned const int& i);
+    Vector surfaceNormal(Particle& p, unsigned const int& i);
+    float curvature(Particle& p, unsigned const int& i);
 
     float defaultKernel(Vector r);
+    Vector gradientKernel(Vector r);
+    float laplacianKernel(Vector r);
     Vector pressGradientKernel(Vector r);
     float viscLaplacianKernel(Vector r);
 

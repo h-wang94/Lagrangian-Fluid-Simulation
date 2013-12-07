@@ -51,13 +51,14 @@ std::vector<Particle> ParticleSystem::getParticles() {
 // computes the internal and external forces.
 // also sets acceleration
 void ParticleSystem::computeForces(){
-  Vector gravity, pressure, viscosity, force;
+  Vector gravity, pressure, viscosity, tension, force;
   for(unsigned int i = 0; i < particles.size(); i++) {
     gravity = gravityForce(particles[i]);
     pressure = pressureForce(particles[i], i);
     viscosity = viscosityForce(particles[i], i);
+    tension = tensionForce(particles[i], i);
 
-    force = gravity - pressure + viscosity;
+    force = gravity - pressure + viscosity + tension;
     particles[i].setAcceleration(force / particles[i].getDensity()); // intuitively using mass..but slides say density...
   }
 }
@@ -140,13 +141,70 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int& i) {
   return viscosity;
 }
 
-float ParticleSystem::colorFunction(Particle& p, unsigned const int& i) {
-  for(j = 0; j < i; j++) {
+Vector ParticleSystem::tensionForce(Particle& p, unsigned const int& i) {
+  Vector normal = surfaceNormal(p, i);
+  if (normal.getMagnitude() > 7.065) { // threshold
+    normal.normalize();
+    return normal * curvature(p, i) * (-0.0728);
+  }
+  return Vector(0, 0, 0);
+}
 
+float ParticleSystem::colorFunction(Particle& p, unsigned const int& i) {
+  float color = 0;
+  Vector diff;
+  unsigned int j;
+  for(j = 0; j < i; j++) {
+     diff = p.getPosition() - particles[j].getPosition();
+     if (diff.getMagnitude() <= h) {
+        color += particles[j].getMass() / particles[j].getDensity() * defaultKernel(diff);
+     }
   }
   for(j = j + 1; j < particles.size(); j++) {
-
+     diff = p.getPosition() - particles[j].getPosition();
+     if (diff.getMagnitude() <= h) {
+        color += particles[j].getMass() / particles[j].getDensity() * defaultKernel(diff);
+     }
   }
+  return color;
+}
+
+Vector ParticleSystem::surfaceNormal(Particle& p, unsigned const int& i) {
+  Vector normal = Vector(0, 0, 0);
+  Vector diff;
+  unsigned int j;
+  for(j = 0; j < i; j++) {
+     diff = p.getPosition() - particles[j].getPosition();
+     if (diff.getMagnitude() <= h) {
+        normal += gradientKernel(diff) * particles[j].getMass() / particles[j].getDensity();
+     }
+  }
+  for(j = j + 1; j < particles.size(); j++) {
+     diff = p.getPosition() - particles[j].getPosition();
+     if (diff.getMagnitude() <= h) {
+        normal += gradientKernel(diff) * particles[j].getMass() / particles[j].getDensity();
+     }
+  }
+  return normal;
+}
+
+float ParticleSystem::curvature(Particle& p, unsigned const int& i) {
+  float curvature = 0;
+  Vector diff;
+  unsigned int j;
+  for(j = 0; j < i; j++) {
+     diff = p.getPosition() - particles[j].getPosition();
+     if (diff.getMagnitude() <= h) {
+        curvature += particles[j].getMass() / particles[j].getDensity() * laplacianKernel(diff);
+     }
+  }
+  for(j = j + 1; j < particles.size(); j++) {
+     diff = p.getPosition() - particles[j].getPosition();
+     if (diff.getMagnitude() <= h) {
+        curvature += particles[j].getMass() / particles[j].getDensity() * laplacianKernel(diff);
+     }
+  }
+  return curvature;
 }
 
 
@@ -159,6 +217,18 @@ float ParticleSystem::colorFunction(Particle& p, unsigned const int& i) {
 float ParticleSystem::defaultKernel(Vector r) {
   float rMag = r.getMagnitude();
   return (315.0f * pow((pow(h, 2.0f) - pow(rMag, 2.0f)),3.0) / (64.0f * PI * pow(h, 9.0f)));
+}
+
+/* gradient and laplacian of poly6 kernels. prob not needed if we use the spiky and viscosity kernels for other calculations*/
+Vector ParticleSystem::gradientKernel(Vector r) {
+  float rMag = r.getMagnitude();
+  float coeff = pow(pow(h, 2.0f) - pow(rMag, 2.0f), 2.0f) * -945 / (32 * PI * pow(h, 9.0f));
+  return r * coeff;
+}
+
+float ParticleSystem::laplacianKernel(Vector r) {
+  float rMag = r.getMagnitude();
+  return (-945 / (32 * PI * pow(h, 9.0f))) * (pow(h, 2.0f) - pow(rMag, 2.0f)) * (3 * pow(h, 2.0f) - 7 * pow(rMag, 2.0f));
 }
 
 // Spiky Kernel to calculate pressure 
