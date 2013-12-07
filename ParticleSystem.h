@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include "Particle.h"
+#include "SpatialGrid.h"
 
 class ParticleSystem {
   public:
@@ -18,6 +19,9 @@ class ParticleSystem {
     float h;
     float hSq;
     bool debug;
+	SpatialGrid oldGrid;
+	SpatialGrid newGrid;
+	int numRowBoxes;
 
 	  void setDensities();
 	  void computeForces();

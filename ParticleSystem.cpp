@@ -14,6 +14,9 @@ ParticleSystem::ParticleSystem(Vector grav){
   this->h = 0.0457;
   this->hSq = pow(h, 2.0f);
   this->debug = true;
+  this->numRowBoxes = 10;
+  this->oldGrid = SpatialGrid(10, h);
+  this->newGrid = SpatialGrid(10, h);
 }
 
 void ParticleSystem::initialize(float timestep) {
@@ -225,4 +228,6 @@ void ParticleSystem::checkBoundary(Point3D* position, Vector* velocity, Vector* 
 
 void ParticleSystem::addParticle(Particle& p) {
   particles.push_back(p);
+  oldGrid.addParticle(p);
+  newGrid.addParticle(p);
 }

@@ -25,8 +25,12 @@ SpatialGrid::SpatialGrid(int s, float h)//s is the number of boxes for a side, h
 	}
 }
 
-void SpatialGrid::addParticle(Particle* p){
-	Point3D pos = p->getPosition();
+SpatialGrid::SpatialGrid(){
+
+}
+
+void SpatialGrid::addParticle(Particle p){
+	Point3D pos = p.getPosition();
 	float x = pos.getX();
 	float y = pos.getY();
 	float z = pos.getZ();
@@ -41,7 +45,7 @@ void SpatialGrid::addParticle(Particle* p){
 	grid[xindex][yindex][zindex].push_back(p);
 }
 
-std::vector<Particle*> SpatialGrid::getNeighbors(Particle p){
+std::vector<Particle> SpatialGrid::getNeighbors(Particle p){
 	Point3D pos = p.getPosition();
 	float x = pos.getX();
 	float y = pos.getY();
@@ -51,7 +55,7 @@ std::vector<Particle*> SpatialGrid::getNeighbors(Particle p){
 	int zindex = (int)floor((z-this->start.getZ())/(this->boxLength));
 
 	int i = -1;
-	vector<Particle*> list;
+	vector<Particle> list;
 
 	//oh god
 	while(i <= 1){
@@ -62,7 +66,7 @@ std::vector<Particle*> SpatialGrid::getNeighbors(Particle p){
 				if(!(xindex+i < 0 || xindex+i > this->numEdgeBoxes || yindex+j < 0 || yindex+j > this->numEdgeBoxes 
 					|| zindex + k < 0 || zindex + k > this->numEdgeBoxes))
 				{
-					vector<Particle*> thisBox = grid[xindex+i][yindex+j][zindex+k];
+					vector<Particle> thisBox = grid[xindex+i][yindex+j][zindex+k];
 					int l = 0;
 					while(l < thisBox.size()){
 						list.push_back(thisBox[l]);
@@ -80,24 +84,54 @@ std::vector<Particle*> SpatialGrid::getNeighbors(Particle p){
 
 }
 
-void SpatialGrid::updateBoxes(){
-	int i = 0;
-	while (i < this->numEdgeBoxes){
+void SpatialGrid::updateBoxes(std::vector<Particle> particles){
+	int n = 0;
+	while(n < particles.size()){
+		Particle p = particles[n];
+		//cout<<p<<endl;
+		Point3D pos = p.getPosition();
+		float x = pos.getX();
+		float y = pos.getY();
+		float z = pos.getZ();
+		float oldX = p.getOldPosition().getX();
+		float oldY = p.getOldPosition().getY();
+		float oldZ = p.getOldPosition().getZ();
+		if(abs(x) > sideLength || abs(y) > sideLength || abs(z) > sideLength){//moved particle is outside of spatial grid
+			//particle is OOB, bye particle
+			//grid[i][j][k].erase(grid[i][j][k].begin() + l);
+		}
+		else{
+			int xindex = (int)floor((x-this->start.getX())/(this->boxLength));
+			int yindex = (int)floor((y-this->start.getY())/(this->boxLength));
+			int zindex = (int)floor((z-this->start.getZ())/(this->boxLength));
+			int i = (int)floor((oldX-this->start.getX())/(this->boxLength));
+			int j = (int)floor((oldY-this->start.getY())/(this->boxLength));
+			int k = (int)floor((oldZ-this->start.getZ())/(this->boxLength));
+			if(xindex != i || yindex != j || zindex != k){
+				//cout<<"omg"<<endl;
+				grid[i][j][k].erase(grid[i][j][k].begin() + l);
+				grid[xindex][yindex][zindex].push_back(p);
+			}
+		}
+		n++;
+	}
+
+	/*while (i < this->numEdgeBoxes){
 		int j = 0;
 		while(j < this->numEdgeBoxes){
 			int k = 0;
 			while(k < this->numEdgeBoxes){
 				int l = 0;
-				while(l < grid[i][j][k].size()){
-					Particle* p = grid[i][j][k][l];
+				while(l < oldGrid.grid[i][j][k].size()){
+					Particle p = oldGrid.grid[i][j][k][l];
 					//cout<<p<<endl;
-					Point3D pos = p->getPosition();
+					Point3D pos = p.getPosition();
 					float x = pos.getX();
 					float y = pos.getY();
 					float z = pos.getZ();
 					if(abs(x) > sideLength || abs(y) > sideLength || abs(z) > sideLength){//moved particle is outside of spatial grid
 						//particle is OOB, bye particle
-						grid[i][j][k].erase(grid[i][j][k].begin() + l);
+						//grid[i][j][k].erase(grid[i][j][k].begin() + l);
 					}
 					else{
 						int xindex = (int)floor((x-this->start.getX())/(this->boxLength));
@@ -116,6 +150,6 @@ void SpatialGrid::updateBoxes(){
 			j++;
 		}
 		i++;
-	}
+	}*/
 }
 
