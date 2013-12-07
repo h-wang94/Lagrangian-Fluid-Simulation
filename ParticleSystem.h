@@ -24,8 +24,7 @@ class ParticleSystem {
     std::vector<Particle> particles;
 
     bool debug;
-	SpatialGrid oldGrid;
-	SpatialGrid newGrid;
+	SpatialGrid grid;
 	int numRowBoxes;
 
 	  void setDensities();

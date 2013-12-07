@@ -34,14 +34,18 @@ void SpatialGrid::addParticle(Particle p){
 	float x = pos.getX();
 	float y = pos.getY();
 	float z = pos.getZ();
-	if(abs(x) > sideLength || abs(y) > sideLength || abs(z) > sideLength){//added particle is outside of spatial grid
+	if(abs(x) > sideLength/2 || abs(y) > sideLength/2 || abs(z) > sideLength/2){//added particle is outside of spatial grid
+		cout<<"Particle outside of boundary!"<<endl;
 		//cant add the particle!
 		return;
 	}
 	int xindex = (int)floor((x-this->start.getX())/(this->boxLength));
 	int yindex = (int)floor((y-this->start.getY())/(this->boxLength));
 	int zindex = (int)floor((z-this->start.getZ())/(this->boxLength));
-	//cout<<xindex<<", "<<yindex<<", "<<zindex<<"."<<endl;
+	/*cout<<xindex<<", "<<yindex<<", "<<zindex<<"."<<endl;
+	cout<<pos<<endl;
+	cout<<sideLength<<endl;
+	cout<<start<<endl;*/
 	grid[xindex][yindex][zindex].push_back(p);
 }
 
@@ -63,8 +67,9 @@ std::vector<Particle> SpatialGrid::getNeighbors(Particle p){
 		while(j <= 1){
 			int k=-1;
 			while(k <= 1){
-				if(!(xindex+i < 0 || xindex+i > this->numEdgeBoxes || yindex+j < 0 || yindex+j > this->numEdgeBoxes 
-					|| zindex + k < 0 || zindex + k > this->numEdgeBoxes))
+				//cout<<xindex<<", "<<yindex<<", "<<zindex<<endl;
+				if(!(xindex+i < 0 || xindex+i >= this->numEdgeBoxes || yindex+j < 0 || yindex+j >= this->numEdgeBoxes 
+					|| zindex + k < 0 || zindex + k >= this->numEdgeBoxes))
 				{
 					vector<Particle> thisBox = grid[xindex+i][yindex+j][zindex+k];
 					int l = 0;
@@ -96,21 +101,45 @@ void SpatialGrid::updateBoxes(std::vector<Particle> particles){
 		float oldX = p.getOldPosition().getX();
 		float oldY = p.getOldPosition().getY();
 		float oldZ = p.getOldPosition().getZ();
-		if(abs(x) > sideLength || abs(y) > sideLength || abs(z) > sideLength){//moved particle is outside of spatial grid
+
+		int xindex = (int)floor((x-this->start.getX())/(this->boxLength));
+		int yindex = (int)floor((y-this->start.getY())/(this->boxLength));
+		int zindex = (int)floor((z-this->start.getZ())/(this->boxLength));
+		int i = (int)floor((oldX-this->start.getX())/(this->boxLength));
+		int j = (int)floor((oldY-this->start.getY())/(this->boxLength));
+		int k = (int)floor((oldZ-this->start.getZ())/(this->boxLength));
+
+		/*cout<<"--------"<<endl;
+		cout<<i<<", "<<j<<", "<<k<<endl;
+		cout<<xindex<<", "<<yindex<<", "<<zindex<<endl;
+		cout<<"--------"<<endl;*/
+
+		//cout<<p<<endl;
+		//cout<<p.getOldPosition()<<endl;
+		if(abs(x) > sideLength/2 || abs(y) > sideLength/2 || abs(z) > sideLength/2){//moved particle is outside of spatial grid
+			cout<<"Particle outside of boundary!"<<endl;
 			//particle is OOB, bye particle
 			//grid[i][j][k].erase(grid[i][j][k].begin() + l);
 		}
 		else{
-			int xindex = (int)floor((x-this->start.getX())/(this->boxLength));
-			int yindex = (int)floor((y-this->start.getY())/(this->boxLength));
-			int zindex = (int)floor((z-this->start.getZ())/(this->boxLength));
-			int i = (int)floor((oldX-this->start.getX())/(this->boxLength));
-			int j = (int)floor((oldY-this->start.getY())/(this->boxLength));
-			int k = (int)floor((oldZ-this->start.getZ())/(this->boxLength));
+
 			if(xindex != i || yindex != j || zindex != k){
 				//cout<<"omg"<<endl;
-				grid[i][j][k].erase(grid[i][j][k].begin() + l);
-				grid[xindex][yindex][zindex].push_back(p);
+				int l = 0;
+				if(i > numEdgeBoxes || j > numEdgeBoxes || k > numEdgeBoxes){
+					cout<<"wut"<<endl;
+				}
+				else{
+					while (l < grid[i][j][k].size()){
+						if(grid[i][j][k][l].getOldPosition().getX() == oldX 
+							&& grid[i][j][k][l].getOldPosition().getY() == oldY
+							&& grid[i][j][k][l].getOldPosition().getZ() == oldZ){
+							grid[i][j][k].erase(grid[i][j][k].begin() + l);
+						}
+						l++;
+					}
+					grid[xindex][yindex][zindex].push_back(p);
+				}
 			}
 		}
 		n++;

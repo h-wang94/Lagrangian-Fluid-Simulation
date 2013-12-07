@@ -20,6 +20,7 @@ void testSpatialGrid() {
   //Particle p3 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(0,0,1));
   //Particle p4 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(0,-9, -9));
   /*Particle p5 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(11,11, 11));*/
+	std::vector<Particle> listofparts;
   Particle p1 = Particle();
   Particle p2 = Particle();
   Particle p3 = Particle();
@@ -31,6 +32,11 @@ void testSpatialGrid() {
   grid.addParticle(p3);
   grid.addParticle(p4);
   grid.addParticle(p5);
+  listofparts.push_back(p1);
+  listofparts.push_back(p2);
+  listofparts.push_back(p3);
+  listofparts.push_back(p4);
+  listofparts.push_back(p5);
   std::vector<Particle> list = grid.getNeighbors(p1);
   unsigned int j = 0;
   while (j < list.size()){
@@ -41,7 +47,7 @@ void testSpatialGrid() {
   cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
   cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
   cout<<"++++++++++++++++++++++++++++++++++++"<<endl<<endl;
-  grid.updateBoxes();
+  grid.updateBoxes(listofparts);
   cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
   cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
   cout<<"++++++++++++++++++++++++++++++++++++"<<endl<<endl;
@@ -280,7 +286,7 @@ void readInput(std::string fileName) {
 }
 
 void determineFunction(int argc, char *argv[]) {
-  bool objFile;
+  bool objFile = false;
   unsigned int numParticles = 0;
   float dt = 0;
   float time = 0;;
@@ -326,8 +332,8 @@ int main(int argc, char *argv[]) {
   determineFunction(argc, argv);
   //testSpatialGrid();
 
-  /*  unsigned int i;*/
-  /*cin>>i;*/
+    unsigned int i;
+  cin>>i;
 }
 
 

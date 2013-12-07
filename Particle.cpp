@@ -122,6 +122,7 @@ std::ostream& operator <<(ostream& outs, const Particle& particle) {
        << "// Velocity Half: " << particle.getVelocityHalf() << endl
        << "// Acceleration: " << particle.getAcceleration() << endl
        << "// Position: " << particle.getPosition() << endl
+	   << "// Old Position: " << particle.getOldPosition() << endl
        << "//===========================================//" << endl;
   return outs;
 }
