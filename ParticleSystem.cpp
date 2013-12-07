@@ -1,17 +1,25 @@
 #include "ParticleSystem.h"
 
 #define PI 3.14159265
-#define MAX_X 10
-#define MAX_Y 10
-#define MAX_Z 10
-#define MIN_X 0
-#define MIN_Y 0
-#define MIN_Z 0
-#define REST_COEFF 0.7
+#define MAX_X 1
+#define MAX_Y 1
+#define MAX_Z 1
+#define MIN_X -1
+#define MIN_Y -1
+#define MIN_Z -1
+#define REST_COEFF 0.0
+
+ParticleSystem::ParticleSystem() {
+  this->grav = Vector(0,0,-9.8);
+  this->h = 0.0457;
+  this->hSq = pow(h, 2.0f);
+  this->debug = true;
+}
 
 ParticleSystem::ParticleSystem(Vector grav){
   this->grav = grav;
-  this->h = 0.0457;
+  this->h = 0.0457; // doesnt seem to do much interaction for 100ish particles
+  //this->h = 1; // for funky fusion
   this->hSq = pow(h, 2.0f);
   this->debug = true;
   this->numRowBoxes = 10;
@@ -32,6 +40,14 @@ void ParticleSystem::update(float timestep){
   this->computeForces();
   this->leapFrog(timestep);
   //grid.updateBoxes();
+}
+
+Particle* ParticleSystem::getParticle(const unsigned int i) {
+  return &particles[i];
+}
+
+std::vector<Particle> ParticleSystem::getParticles() {
+  return this->particles;
 }
 
 
@@ -60,14 +76,14 @@ void ParticleSystem::computePressure() {
 
 // need to look at this
 void ParticleSystem::setDensities(){
-  //float h = 0.0457;															//CHANGE LATER (smoothing distance)
   float density;
 
   for(unsigned int i = 0; i < particles.size(); i++){
     density = 0;
     for(unsigned int j = 0; j < particles.size(); j++){ // need to use spatial grid	
       Vector dist = particles[i].getPosition() - particles[j].getPosition();
-      if (dist.getMagnitude() <= hSq) {
+      //if (dist.getMagnitude() <= hSq) {
+      if (dist.getMagnitude() <= h) {
         density += defaultKernel(dist) * particles[j].getMass();
       }
     }
@@ -86,14 +102,16 @@ Vector ParticleSystem::pressureForce(Particle& p, unsigned const int& i) {
   // this is so stupid...........but ill think of a better way. i dont wanna do checks cause it might make a difference since this is computed every time for every particle
   for(j = 0; j < i; j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
-    if (diff.getMagnitude() <= hSq) {
+    //if (diff.getMagnitude() <= hSq) {
+    if (diff.getMagnitude() <= h) {
       coeff = (p.getPressure() + particles[j].getPressure()) / 2.0f * particles[j].getVolume();
       pressure += pressGradientKernel(diff) * coeff;
     }
   }
   for(j = j + 1; j < particles.size(); j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
-    if (diff.getMagnitude() <= hSq) {
+    //if (diff.getMagnitude() <= hSq) {
+    if (diff.getMagnitude() <= h) {
       coeff = (p.getPressure() + particles[j].getPressure()) / 2.0f * particles[j].getVolume();
       pressure += pressGradientKernel(diff) * coeff;
     }
@@ -107,14 +125,16 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int& i) {
   unsigned int j;
   for(j = 0; j < i; j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
-    if (diff.getMagnitude() <= hSq) {
+    //if (diff.getMagnitude() <= hSq) {
+    if (diff.getMagnitude() <= h) {
       coeff = (particles[j].getVelocity() - p.getVelocity()) * particles[j].getVolume();
       viscosity += coeff * viscLaplacianKernel(diff);
     }
   }
   for(j = j + 1; j < particles.size(); j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
-    if (diff.getMagnitude() <= hSq) {
+    //if (diff.getMagnitude() <= hSq) {
+    if (diff.getMagnitude() <= h) {
       coeff = (particles[j].getVelocity() - p.getVelocity()) * particles[j].getVolume();
       viscosity += coeff * viscLaplacianKernel(diff);
     }
@@ -160,11 +180,6 @@ float ParticleSystem::viscLaplacianKernel(Vector r) {
 // Can be changed to work with leapfrogging just a certain particle.
 void ParticleSystem::leapFrog(const float& dt) {
   for(unsigned int i = 0; i < particles.size(); i++) {
-    if (debug) {
-      cout << "//===========================================//" << endl
-        << "// Particle Index: " << i << "   Num: " << i+1 << endl
-        << particles[i] << endl;
-    }
     Particle& p = particles[i];
     // get velocity at time t - dt/2. v_{t - dt/2}
     Vector old = p.getVelocityHalf(); 
@@ -174,10 +189,17 @@ void ParticleSystem::leapFrog(const float& dt) {
     Point3D tempPosition = p.getPosition() + (tempVelocityHalf * dt);
     Vector tempVelocity = (old + p.getVelocityHalf()) / 2.0f;
     checkBoundary(&tempPosition, &tempVelocity, &tempVelocityHalf);
+    p.setOldPosition(p.getPosition());
     p.setVelocityHalf(tempVelocityHalf); 
     p.setPosition(tempPosition); 
     // use midpoint approximation for velocity at time t. v_{t} = (v_{t - dt / 2} + v_{t + dt / 2}) / 2.
     p.setVelocity(tempVelocity); 
+
+    if (debug) {
+      cout << "//===========================================//" << endl
+        << "// Particle Index: " << i << "   Num: " << i+1 << endl
+        << particles[i] << endl;
+    }
   }
 }
 

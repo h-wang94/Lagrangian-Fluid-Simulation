@@ -7,17 +7,22 @@
 
 class ParticleSystem {
   public:
+    ParticleSystem();
 	  ParticleSystem(Vector grav);
 
     void initialize(float timestep);
 	  void update(float timestep);
 
     void addParticle(Particle& p);
+    Particle* getParticle(const unsigned int i);
+    std::vector<Particle> getParticles();
 
   private:
     Vector grav;
     float h;
     float hSq;
+    std::vector<Particle> particles;
+
     bool debug;
 	SpatialGrid oldGrid;
 	SpatialGrid newGrid;
@@ -39,7 +44,6 @@ class ParticleSystem {
 
     void checkBoundary(Point3D* position, Vector* velocity, Vector* velocityHalf);
 
-    std::vector<Particle> particles;
 };
 
 #endif
