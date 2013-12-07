@@ -7,7 +7,7 @@
 #define MIN_X -1
 #define MIN_Y -1
 #define MIN_Z -1
-#define REST_COEFF 0.7
+#define REST_COEFF 0.0
 
 ParticleSystem::ParticleSystem() {
   this->grav = Vector(0,0,-9.8);
@@ -18,7 +18,8 @@ ParticleSystem::ParticleSystem() {
 
 ParticleSystem::ParticleSystem(Vector grav){
   this->grav = grav;
-  this->h = 0.0457;
+  this->h = 0.0457; // doesnt seem to do much interaction for 100ish particles
+  //this->h = 1; // for funky fusion
   this->hSq = pow(h, 2.0f);
   this->debug = true;
 }
@@ -78,7 +79,8 @@ void ParticleSystem::setDensities(){
     density = 0;
     for(unsigned int j = 0; j < particles.size(); j++){ // need to use spatial grid	
       Vector dist = particles[i].getPosition() - particles[j].getPosition();
-      if (dist.getMagnitude() <= hSq) {
+      //if (dist.getMagnitude() <= hSq) {
+      if (dist.getMagnitude() <= h) {
         density += defaultKernel(dist) * particles[j].getMass();
       }
     }
@@ -97,14 +99,16 @@ Vector ParticleSystem::pressureForce(Particle& p, unsigned const int& i) {
   // this is so stupid...........but ill think of a better way. i dont wanna do checks cause it might make a difference since this is computed every time for every particle
   for(j = 0; j < i; j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
-    if (diff.getMagnitude() <= hSq) {
+    //if (diff.getMagnitude() <= hSq) {
+    if (diff.getMagnitude() <= h) {
       coeff = (p.getPressure() + particles[j].getPressure()) / 2.0f * particles[j].getVolume();
       pressure += pressGradientKernel(diff) * coeff;
     }
   }
   for(j = j + 1; j < particles.size(); j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
-    if (diff.getMagnitude() <= hSq) {
+    //if (diff.getMagnitude() <= hSq) {
+    if (diff.getMagnitude() <= h) {
       coeff = (p.getPressure() + particles[j].getPressure()) / 2.0f * particles[j].getVolume();
       pressure += pressGradientKernel(diff) * coeff;
     }
@@ -118,14 +122,16 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int& i) {
   unsigned int j;
   for(j = 0; j < i; j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
-    if (diff.getMagnitude() <= hSq) {
+    //if (diff.getMagnitude() <= hSq) {
+    if (diff.getMagnitude() <= h) {
       coeff = (particles[j].getVelocity() - p.getVelocity()) * particles[j].getVolume();
       viscosity += coeff * viscLaplacianKernel(diff);
     }
   }
   for(j = j + 1; j < particles.size(); j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
-    if (diff.getMagnitude() <= hSq) {
+    //if (diff.getMagnitude() <= hSq) {
+    if (diff.getMagnitude() <= h) {
       coeff = (particles[j].getVelocity() - p.getVelocity()) * particles[j].getVolume();
       viscosity += coeff * viscLaplacianKernel(diff);
     }
@@ -180,6 +186,7 @@ void ParticleSystem::leapFrog(const float& dt) {
     Point3D tempPosition = p.getPosition() + (tempVelocityHalf * dt);
     Vector tempVelocity = (old + p.getVelocityHalf()) / 2.0f;
     checkBoundary(&tempPosition, &tempVelocity, &tempVelocityHalf);
+    p.setOldPosition(p.getPosition());
     p.setVelocityHalf(tempVelocityHalf); 
     p.setPosition(tempPosition); 
     // use midpoint approximation for velocity at time t. v_{t} = (v_{t - dt / 2} + v_{t + dt / 2}) / 2.

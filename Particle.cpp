@@ -14,6 +14,7 @@ Particle::Particle(void) {
   float y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
   float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
   this->position = Point3D(x, y, z);
+  this->oldPosition = position;
   //this->velocity = Vector(rand() % 3, rand() % 3, rand() % 3);
   this->velocity = Vector(0, 0, 0);
 
@@ -27,6 +28,7 @@ Particle::Particle(float mass, float pressure, float stiffness, float restDensit
   this->density = density;
   this->viscosity = viscosity;
   this->position = position;
+  this->oldPosition = position;
   this->velocity = velocity;
 }
 
@@ -62,6 +64,10 @@ Point3D Particle::getPosition() const {
   return this->position;
 }
 
+Point3D Particle::getOldPosition() const {
+  return this->oldPosition;
+}
+
 Vector Particle::getVelocity() const {
   return this->velocity;
 }
@@ -88,6 +94,10 @@ void Particle::setPressure(const float pressure) {
 
 void Particle::setPosition(Point3D position) {
   this->position = position;
+}
+
+void Particle::setOldPosition(Point3D oldPosition) {
+  this->oldPosition = oldPosition;
 }
 
 void Particle::setVelocity(Vector velocity) {

@@ -332,10 +332,19 @@ void displayFunc() {
 	// rendering stuff goes here
 	//for each particle
 	glBegin(GL_POINTS);
-	glColor4f(0.8, 0.2, 0.0, 0.5);
+	glColor4f(0.0, 0.2, 1.0, 1.0);
   Particle* p;
 	for (unsigned int i = 0; i < pSystem.getParticles().size(); i+=1) {
+    if (i == pSystem.getParticles().size() - 1) {
+      glColor4f(1.0, 1.0, 1.0, 1.0);
+    }
     p = pSystem.getParticle(i);
+    //if (p->getPosition().getZ() < 0.5) {
+      //glColor4f(1.0, 0.0, 0.0, 1.0);
+    //}
+    //else if (p->getPosition().getZ() >= 0.5) {
+      //glColor4f(0.0, 1.0, 0.0, 1.0);
+    //}
     glVertex3f(p->getPosition().getX(), p->getPosition().getY(), p->getPosition().getZ());
 	}
   if (currentTime < totalTime) {
