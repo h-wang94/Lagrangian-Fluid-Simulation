@@ -27,9 +27,11 @@ std::vector<Point3D> vertexes, vt;
 std::vector<Vector>normals;
 std::vector< std::vector<int> > vertexIndexes;
 ParticleSystem pSystem;
+bool objFile = false;
+unsigned int numParticles;
 float currentTime = 0;
-float dt;
-float totalTime;
+float dt = 0;
+float totalTime = 0;
 
 void testSpatialGrid() {
   /*Particle p1 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(0,0,0));*/
@@ -69,10 +71,9 @@ void testSpatialGrid() {
     cout << *list2[j] << endl;
     j++;
   }
-
 }
 
-void testParticleSystem(unsigned const int numParticles, const float dt, const float totalTime, const bool objFile) {
+void createParticles() {
   Particle p1 = Particle();
   unsigned int i;
   srand(time(NULL)); // for rand function
@@ -87,15 +88,7 @@ void testParticleSystem(unsigned const int numParticles, const float dt, const f
       pSystem.addParticle(p1);
     }
   }
-  pSystem.initialize(dt);
-  // dont need this now that we have opengl.
-  // but we can use this if we don't want to display...i guess
-  /*for(float j = 0; j < totalTime; j+=dt) {*/
-    //cout << "//===========================================//" << endl
-      //<< "// totalTime: " << j << "                                 //" << endl
-      //<< "//===========================================//" << endl;
-    //pSystem.update(dt);
-  /*}*/
+  
 }
 
 //==============================================================================
@@ -165,7 +158,6 @@ void parseObjLine(std::vector<std::string>& splitline, std::vector<int>& temp) {
     // ==============================
     // Not using normals
     // ==============================
-    //unsigned normalA, normalB, normalC, normal
     unsigned pointA, pointB, pointC, pointD;
     unsigned int position;
     if (numSlashes == 0) { // in the form "f v v v" with possibility of 4th
@@ -297,10 +289,6 @@ void readInput(std::string fileName) {
 }
 
 void determineFunction(int argc, char *argv[]) {
-  bool objFile = false;
-  unsigned int numParticles = 0;
-  dt = 0;
-  totalTime = 0;;
   std::string fileName;
   if (argc == 1) {
     numParticles = 1;
@@ -332,7 +320,6 @@ void determineFunction(int argc, char *argv[]) {
     cout << "Incorrect number of parameters!" << endl;
     exit(1);
   }
-  testParticleSystem(numParticles, dt, totalTime, objFile);
 }
 
 
@@ -373,7 +360,16 @@ void keyboard(unsigned char key, int x, int y) {
 int main(int argc, char** argv) {
   pSystem = ParticleSystem(Vector(0,-9.8, 0));
   determineFunction(argc, argv);
-
+  createParticles();
+  pSystem.initialize(dt);
+  // dont need this now that we have opengl.
+  // but we can use this if we don't want to display...i guess
+  /*for(float j = 0; j < totalTime; j+=dt) {*/
+    //cout << "//===========================================//" << endl
+      //<< "// totalTime: " << j << "                                 //" << endl
+      //<< "//===========================================//" << endl;
+    //pSystem.update(dt);
+  /*}*/
   glutInit(&argc, argv);
   glutInitWindowSize(600, 600);
   glutInitWindowPosition(0, 0);

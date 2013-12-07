@@ -72,7 +72,6 @@ void ParticleSystem::computePressure() {
 
 // need to look at this
 void ParticleSystem::setDensities(){
-  //float h = 0.0457;															//CHANGE LATER (smoothing distance)
   float density;
 
   for(unsigned int i = 0; i < particles.size(); i++){
@@ -187,9 +186,9 @@ void ParticleSystem::leapFrog(const float& dt) {
     p.setVelocity(tempVelocity); 
 
     if (debug) {
-      /*cout << "//===========================================//" << endl*/
-        //<< "// Particle Index: " << i << "   Num: " << i+1 << endl
-        /*<< particles[i] << endl;*/
+      cout << "//===========================================//" << endl
+        << "// Particle Index: " << i << "   Num: " << i+1 << endl
+        << particles[i] << endl;
     }
   }
 }
