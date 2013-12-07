@@ -9,6 +9,13 @@
 #define MIN_Z 0
 #define REST_COEFF 0.7
 
+ParticleSystem::ParticleSystem() {
+  this->grav = Vector(0,0,-9.8);
+  this->h = 0.0457;
+  this->hSq = pow(h, 2.0f);
+  this->debug = true;
+}
+
 ParticleSystem::ParticleSystem(Vector grav){
   this->grav = grav;
   this->h = 0.0457;
@@ -29,6 +36,14 @@ void ParticleSystem::update(float timestep){
   this->computeForces();
   this->leapFrog(timestep);
   //grid.updateBoxes();
+}
+
+Particle* ParticleSystem::getParticle(const unsigned int i) {
+  return &particles[i];
+}
+
+std::vector<Particle> ParticleSystem::getParticles() {
+  return this->particles;
 }
 
 
@@ -157,11 +172,6 @@ float ParticleSystem::viscLaplacianKernel(Vector r) {
 // Can be changed to work with leapfrogging just a certain particle.
 void ParticleSystem::leapFrog(const float& dt) {
   for(unsigned int i = 0; i < particles.size(); i++) {
-    if (debug) {
-      cout << "//===========================================//" << endl
-        << "// Particle Index: " << i << "   Num: " << i+1 << endl
-        << particles[i] << endl;
-    }
     Particle& p = particles[i];
     // get velocity at time t - dt/2. v_{t - dt/2}
     Vector old = p.getVelocityHalf(); 
@@ -175,6 +185,12 @@ void ParticleSystem::leapFrog(const float& dt) {
     p.setPosition(tempPosition); 
     // use midpoint approximation for velocity at time t. v_{t} = (v_{t - dt / 2} + v_{t + dt / 2}) / 2.
     p.setVelocity(tempVelocity); 
+
+    if (debug) {
+      cout << "//===========================================//" << endl
+        << "// Particle Index: " << i << "   Num: " << i+1 << endl
+        << particles[i].getAcceleration() << endl;
+    }
   }
 }
 

@@ -280,7 +280,7 @@ void readInput(std::string fileName) {
 }
 
 void determineFunction(int argc, char *argv[]) {
-  bool objFile;
+  bool objFile = false;
   unsigned int numParticles = 0;
   float dt = 0;
   float time = 0;;
@@ -326,7 +326,7 @@ int main(int argc, char *argv[]) {
   determineFunction(argc, argv);
   //testSpatialGrid();
 
-  /*  unsigned int i;*/
+  /*unsigned int i;*/
   /*cin>>i;*/
 }
 

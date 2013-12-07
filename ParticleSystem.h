@@ -6,12 +6,15 @@
 
 class ParticleSystem {
   public:
+    ParticleSystem();
 	  ParticleSystem(Vector grav);
 
     void initialize(float timestep);
 	  void update(float timestep);
 
     void addParticle(Particle& p);
+    Particle* getParticle(const unsigned int i);
+    std::vector<Particle> getParticles();
 
   private:
     Vector grav;
