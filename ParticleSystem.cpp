@@ -11,7 +11,7 @@
 
 ParticleSystem::ParticleSystem() {
   this->grav = Vector(0,0,-9.8);
-  this->h = 2.0457;
+  this->h = 0.0457;
   this->hSq = pow(h, 2.0f);
   this->debug = true;
 }
@@ -39,6 +39,14 @@ void ParticleSystem::update(float timestep){
   this->computeForces();
   this->leapFrog(timestep);
   grid.updateBoxes(particles);
+}
+
+Particle* ParticleSystem::getParticle(const unsigned int i) {
+  return &particles[i];
+}
+
+std::vector<Particle> ParticleSystem::getParticles() {
+  return this->particles;
 }
 
 Particle* ParticleSystem::getParticle(const unsigned int i) {
@@ -229,34 +237,48 @@ void ParticleSystem::checkBoundary(Point3D* position, Vector* velocity, Vector* 
   // if goes past boundaries, reflect back.
   if(position->getX() > MAX_X) {
     position->setX(MAX_X);
-    velocity->setX(-REST_COEFF * velocity->getX());
-    velocityHalf->setX(-REST_COEFF * velocityHalf->getX());
+    bouncebackVelocity(velocity, Vector(-1, 0, 0));
+    bouncebackVelocity(velocityHalf, Vector(-1, 0, 0));
   }
   else if (position->getX() < MIN_X) {
     position->setX(MIN_X);
-    velocity->setX(-REST_COEFF * velocity->getX());
-    velocityHalf->setX(-REST_COEFF * velocityHalf->getX());
+    bouncebackVelocity(velocity, Vector(1, 0, 0));
+    bouncebackVelocity(velocityHalf, Vector(1, 0, 0));
+    /*velocity->setX(-REST_COEFF * velocity->getX());*/
+    /*velocityHalf->setX(-REST_COEFF * velocityHalf->getX());*/
   }
   if(position->getY() > MAX_Y) {
     position->setY(MAX_Y);
-    velocity->setY(-REST_COEFF * velocity->getY());
-    velocityHalf->setY(-REST_COEFF * velocityHalf->getY());
+    bouncebackVelocity(velocity, Vector(0, -1, 0));
+    bouncebackVelocity(velocityHalf, Vector(0, -1, 0));
+    /*velocity->setY(-REST_COEFF * velocity->getY());*/
+    /*velocityHalf->setY(-REST_COEFF * velocityHalf->getY());*/
   }
   else if (position->getY() < MIN_Y) {
     position->setY(MIN_Y);
-    velocity->setY(-REST_COEFF * velocity->getY());
-    velocityHalf->setY(-REST_COEFF * velocityHalf->getY());
+    bouncebackVelocity(velocity, Vector(0, 1, 0));
+    bouncebackVelocity(velocityHalf, Vector(0, 1, 0));
+    /*velocity->setY(-REST_COEFF * velocity->getY());*/
+    /*velocityHalf->setY(-REST_COEFF * velocityHalf->getY());*/
   }
   if(position->getZ() > MAX_Z) {
     position->setZ(MAX_Z);
-    velocity->setZ(-REST_COEFF* velocity->getZ());
-    velocityHalf->setZ(-REST_COEFF * velocityHalf->getZ());
+    bouncebackVelocity(velocity, Vector(0, 0, -1));
+    bouncebackVelocity(velocityHalf, Vector(0, 0, -1));
+    /*velocity->setZ(-REST_COEFF* velocity->getZ());*/
+    /*velocityHalf->setZ(-REST_COEFF * velocityHalf->getZ());*/
   }
   else if (position->getZ() < MIN_Z) {
     position->setZ(MIN_Z);
-    velocity->setZ(-REST_COEFF* velocity->getZ());
-    velocityHalf->setZ(-REST_COEFF * velocityHalf->getZ());
+    bouncebackVelocity(velocity, Vector(0, 0, 1));
+    bouncebackVelocity(velocityHalf, Vector(0, 0, 1));
+    /*velocity->setZ(-REST_COEFF* velocity->getZ());*/
+    /*velocityHalf->setZ(-REST_COEFF * velocityHalf->getZ());*/
   }
+}
+
+void ParticleSystem::bouncebackVelocity(Vector* velocity, Vector normal) {
+  *velocity = *velocity - (normal * (*velocity).dotProduct(normal) * (1 + REST_COEFF));
 }
 
 
