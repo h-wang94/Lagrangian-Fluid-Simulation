@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include "Particle.h"
+#include "SpatialGrid.h"
 
 class ParticleSystem {
   public:
@@ -23,6 +24,8 @@ class ParticleSystem {
     std::vector<Particle> particles;
 
     bool debug;
+	SpatialGrid grid;
+	int numRowBoxes;
 
 	  void setDensities();
 	  void computeForces();

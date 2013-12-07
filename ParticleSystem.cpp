@@ -11,7 +11,7 @@
 
 ParticleSystem::ParticleSystem() {
   this->grav = Vector(0,0,-9.8);
-  this->h = 0.0457;
+  this->h = 2.0457;
   this->hSq = pow(h, 2.0f);
   this->debug = true;
 }
@@ -22,6 +22,8 @@ ParticleSystem::ParticleSystem(Vector grav){
   //this->h = 1; // for funky fusion
   this->hSq = pow(h, 2.0f);
   this->debug = true;
+  this->numRowBoxes = 10;
+  this->grid = SpatialGrid(100, h);
 }
 
 void ParticleSystem::initialize(float timestep) {
@@ -36,7 +38,7 @@ void ParticleSystem::update(float timestep){
   this->computePressure(); // now compute each particle's pressure. randomly put in numbers.
   this->computeForces();
   this->leapFrog(timestep);
-  //grid.updateBoxes();
+  grid.updateBoxes(particles);
 }
 
 Particle* ParticleSystem::getParticle(const unsigned int i) {
@@ -77,13 +79,26 @@ void ParticleSystem::setDensities(){
 
   for(unsigned int i = 0; i < particles.size(); i++){
     density = 0;
-    for(unsigned int j = 0; j < particles.size(); j++){ // need to use spatial grid	
+
+	std::vector<Particle> list = grid.getNeighbors(particles[i]);
+	for(unsigned int j = 0; j < list.size(); j++){ 
+      Vector dist = particles[i].getPosition() - list[j].getPosition();
+      //if (dist.getMagnitude() <= hSq) {
+      if (dist.getMagnitude() <= h) {
+        density += defaultKernel(dist) * list[j].getMass();
+      }
+
+    /*for(unsigned int j = 0; j < particles.size(); j++){ // need to use spatial grid	
       Vector dist = particles[i].getPosition() - particles[j].getPosition();
       //if (dist.getMagnitude() <= hSq) {
       if (dist.getMagnitude() <= h) {
         density += defaultKernel(dist) * particles[j].getMass();
-      }
-    }
+      }*/
+	}
+	if(density == 0){
+		density = particles[i].getMass() / .00000001;
+	}
+
     particles[i].setDensity(density);											//set the particle[i]'s density to particle[i]
   }
 }
@@ -247,4 +262,5 @@ void ParticleSystem::checkBoundary(Point3D* position, Vector* velocity, Vector* 
 
 void ParticleSystem::addParticle(Particle& p) {
   particles.push_back(p);
+  grid.addParticle(p);
 }
