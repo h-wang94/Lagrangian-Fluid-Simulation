@@ -140,6 +140,15 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int& i) {
   return viscosity;
 }
 
+float ParticleSystem::colorFunction(Particle& p, unsigned const int& i) {
+  for(j = 0; j < i; j++) {
+
+  }
+  for(j = j + 1; j < particles.size(); j++) {
+
+  }
+}
+
 
 // Smoothing distance h is half of the difference between particle i's most distant nearest neighbor and i
 // Poly6 Kernels used for everything except pressure and viscosity forces 
