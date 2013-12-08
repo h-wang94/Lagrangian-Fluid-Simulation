@@ -1,6 +1,6 @@
 CC = g++
-CFLAGS= -g -Wall -I. -DGL_GLEXT_PROTOTYPES -Iglut-3.7.6-bin
-LDFLAGS= -g -Wall
+CFLAGS= -g -Wall -I. -DGL_GLEXT_PROTOTYPES -Iglut-3.7.6-bin -fopenmp
+LDFLAGS= -g -Wall -fopenmp
 
 #Libraries
 CCOPTS = -c

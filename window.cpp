@@ -14,7 +14,6 @@
 #include <sstream>
 #include <cstdlib>
 #include <vector>
-
 #include <GL/glut.h>
 #ifdef _WIN32
 #include <windows.h>
@@ -370,6 +369,8 @@ void displayFunc() {
   if (currentTime < totalTime) {
     pSystem.update(dt);
     currentTime += dt;
+  } else {
+    exit(1);
   }
   glDisable(GL_LIGHTING);
 	glEnd();

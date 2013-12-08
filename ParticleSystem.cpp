@@ -1,4 +1,6 @@
 #include "ParticleSystem.h"
+#include <omp.h>
+#include <time.h>
 
 #define PI 3.14159265
 #define MAX_X 1
@@ -52,19 +54,22 @@ std::vector<Particle> ParticleSystem::getParticles() {
 // computes the internal and external forces.
 // also sets acceleration
 void ParticleSystem::computeForces(){
-  Vector gravity, pressure, viscosity, force;
+  Vector gravity, pressure, viscosity, tension, force;
+#pragma omp parallel for firstprivate(gravity, pressure, viscosity, tension, force)
   for(unsigned int i = 0; i < particles.size(); i++) {
     gravity = gravityForce(particles[i]);
     pressure = pressureForce(particles[i], i);
     viscosity = viscosityForce(particles[i], i);
+    tension = tensionForce(particles[i], i);
 
-    force = gravity - pressure + viscosity;
+    force = gravity - pressure + viscosity + tension;
     particles[i].setAcceleration(force / particles[i].getDensity()); // intuitively using mass..but slides say density...
   }
 }
 
 void ParticleSystem::computePressure() {
-  float pressure;
+  float pressure = 0;
+#pragma omp parallel for firstprivate(pressure)
   for(unsigned int i = 0; i < particles.size(); i++) {
     // p = k ( (p / p0)^7 - 1)
     pressure = particles[i].getStiffness() * (pow((particles[i].getDensity() / particles[i].getRestDensity()), 7.0f) - 1.0f);
@@ -74,29 +79,29 @@ void ParticleSystem::computePressure() {
 
 // need to look at this
 void ParticleSystem::setDensities(){
-  float density;
-
+  float density = 0;
+#pragma omp parallel for firstprivate(density)
   for(unsigned int i = 0; i < particles.size(); i++){
     density = 0;
 
-	std::vector<Particle> list = grid.getNeighbors(particles[i]);
-	for(unsigned int j = 0; j < list.size(); j++){ 
+    std::vector<Particle> list = grid.getNeighbors(particles[i]);
+    for(unsigned int j = 0; j < list.size(); j++){ 
       Vector dist = particles[i].getPosition() - list[j].getPosition();
       //if (dist.getMagnitude() <= hSq) {
       if (dist.getMagnitude() <= h) {
         density += defaultKernel(dist) * list[j].getMass();
       }
 
-    /*for(unsigned int j = 0; j < particles.size(); j++){ // need to use spatial grid	
-      Vector dist = particles[i].getPosition() - particles[j].getPosition();
+      /*for(unsigned int j = 0; j < particles.size(); j++){ // need to use spatial grid	
+        Vector dist = particles[i].getPosition() - particles[j].getPosition();
       //if (dist.getMagnitude() <= hSq) {
       if (dist.getMagnitude() <= h) {
-        density += defaultKernel(dist) * particles[j].getMass();
+      density += defaultKernel(dist) * particles[j].getMass();
       }*/
-	}
-	if(density == 0){
-		density = particles[i].getMass() / .00000001;
-	}
+    }
+    if(density == 0){
+      density = particles[i].getMass() / .00000001;
+    }
 
     particles[i].setDensity(density);											//set the particle[i]'s density to particle[i]
   }
@@ -108,9 +113,10 @@ Vector ParticleSystem::gravityForce(Particle& p) {
 
 Vector ParticleSystem::pressureForce(Particle& p, unsigned const int& i) {
   Vector pressure;
-  float coeff;
-  unsigned int j;
+  float coeff = 0;
+  unsigned int j = 0;
   // this is so stupid...........but ill think of a better way. i dont wanna do checks cause it might make a difference since this is computed every time for every particle
+#pragma omp parallel for firstprivate(pressure, coeff)
   for(j = 0; j < i; j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
     //if (diff.getMagnitude() <= hSq) {
@@ -152,6 +158,72 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int& i) {
   }
   viscosity = viscosity * p.getViscosity(); 
   return viscosity;
+  }
+
+  Vector ParticleSystem::tensionForce(Particle& p, unsigned const int& i) {
+    Vector normal = surfaceNormal(p, i);
+    if (normal.getMagnitude() > 7.065) { // threshold
+      normal.normalize();
+      return normal * curvature(p, i) * (-0.0728); // surface tension constant for water
+    }
+    return Vector(0, 0, 0);
+  }
+
+float ParticleSystem::colorFunction(Particle& p, unsigned const int& i) {
+  float color = 0;
+  Vector diff;
+  unsigned int j;
+  for(j = 0; j < i; j++) {
+    diff = p.getPosition() - particles[j].getPosition();
+    if (diff.getMagnitude() <= h) {
+      color += particles[j].getMass() / particles[j].getDensity() * defaultKernel(diff);
+    }
+  }
+  for(j = j + 1; j < particles.size(); j++) {
+    diff = p.getPosition() - particles[j].getPosition();
+    if (diff.getMagnitude() <= h) {
+      color += particles[j].getMass() / particles[j].getDensity() * defaultKernel(diff);
+    }
+  }
+  return color;
+}
+
+Vector ParticleSystem::surfaceNormal(Particle& p, unsigned const int& i) {
+  Vector normal = Vector(0, 0, 0);
+  Vector diff;
+  unsigned int j;
+  for(j = 0; j < i; j++) {
+    diff = p.getPosition() - particles[j].getPosition();
+    if (diff.getMagnitude() <= h) {
+      normal += gradientKernel(diff) * particles[j].getMass() / particles[j].getDensity();
+    }
+  }
+  for(j = j + 1; j < particles.size(); j++) {
+    diff = p.getPosition() - particles[j].getPosition();
+    if (diff.getMagnitude() <= h) {
+      normal += gradientKernel(diff) * particles[j].getMass() / particles[j].getDensity();
+    }
+  }
+  return normal;
+}
+
+float ParticleSystem::curvature(Particle& p, unsigned const int& i) {
+  float curvature = 0;
+  Vector diff;
+  unsigned int j;
+  for(j = 0; j < i; j++) {
+    diff = p.getPosition() - particles[j].getPosition();
+    if (diff.getMagnitude() <= h) {
+      curvature += particles[j].getMass() / particles[j].getDensity() * laplacianKernel(diff);
+    }
+  }
+  for(j = j + 1; j < particles.size(); j++) {
+    diff = p.getPosition() - particles[j].getPosition();
+    if (diff.getMagnitude() <= h) {
+      curvature += particles[j].getMass() / particles[j].getDensity() * laplacianKernel(diff);
+    }
+  }
+  return curvature;
 }
 
 
@@ -164,6 +236,18 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int& i) {
 float ParticleSystem::defaultKernel(Vector r) {
   float rMag = r.getMagnitude();
   return (315.0f * pow((pow(h, 2.0f) - pow(rMag, 2.0f)),3.0) / (64.0f * PI * pow(h, 9.0f)));
+}
+
+/* gradient and laplacian of poly6 kernels. prob not needed if we use the spiky and viscosity kernels for other calculations*/
+Vector ParticleSystem::gradientKernel(Vector r) {
+  float rMag = r.getMagnitude();
+  float coeff = pow(pow(h, 2.0f) - pow(rMag, 2.0f), 2.0f) * -945 / (32 * PI * pow(h, 9.0f));
+  return r * coeff;
+}
+
+float ParticleSystem::laplacianKernel(Vector r) {
+  float rMag = r.getMagnitude();
+  return (-945 / (32 * PI * pow(h, 9.0f))) * (pow(h, 2.0f) - pow(rMag, 2.0f)) * (3 * pow(h, 2.0f) - 7 * pow(rMag, 2.0f));
 }
 
 // Spiky Kernel to calculate pressure 
@@ -206,11 +290,11 @@ void ParticleSystem::leapFrog(const float& dt) {
     // use midpoint approximation for velocity at time t. v_{t} = (v_{t - dt / 2} + v_{t + dt / 2}) / 2.
     p.setVelocity(tempVelocity); 
 
-    if (debug) {
-      cout << "//===========================================//" << endl
-        << "// Particle Index: " << i << "   Num: " << i+1 << endl
-        << particles[i] << endl;
-    }
+    /*if (debug) {*/
+    //cout << "//===========================================//" << endl
+    //<< "// Particle Index: " << i << "   Num: " << i+1 << endl
+    //<< particles[i] << endl;
+    /*}*/
   }
 }
 
@@ -271,7 +355,6 @@ void ParticleSystem::checkBoundary(Point3D* position, Vector* velocity, Vector* 
 void ParticleSystem::bouncebackVelocity(Vector* velocity, Vector normal) {
   *velocity = *velocity - (normal * (*velocity).dotProduct(normal) * (1 + REST_COEFF));
 }
-
 
 void ParticleSystem::addParticle(Particle& p) {
   particles.push_back(p);
