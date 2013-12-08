@@ -1,6 +1,7 @@
 #include "ParticleSystem.h"
 #include <omp.h>
 #include <time.h>
+#include <iostream>
 
 #define PI 3.14159265
 #define MAX_X .08
@@ -9,7 +10,7 @@
 #define MIN_X -.08
 #define MIN_Y -1
 #define MIN_Z -.08
-#define REST_COEFF 0.7
+#define REST_COEFF 0.3
 
 ParticleSystem::ParticleSystem() {
   this->grav = Vector(0,0,-9.8);
@@ -63,6 +64,7 @@ void ParticleSystem::computeForces(){
     tension = tensionForce(particles[i], i);
 
     force = gravity - pressure + viscosity;
+    //force = gravity - pressure + viscosity + tension; // i wonder what tension is doing on bigger area
     particles[i].setAcceleration(force / particles[i].getDensity()); // intuitively using mass..but slides say density...
   }
 }
@@ -79,7 +81,6 @@ void ParticleSystem::computePressure() {
 
 // need to look at this
 void ParticleSystem::setDensities(){
-
   float density = 0;
 #pragma omp parallel for firstprivate(density)
   for(unsigned int i = 0; i < particles.size(); i++){
@@ -127,7 +128,7 @@ Vector ParticleSystem::pressureForce(Particle& p, unsigned const int& i) {
       pressure += pressGradientKernel(diff) * coeff;
     }
   }
- #pragma omp parallel for firstprivate(pressure, coeff)
+ //#pragma omp parallel for firstprivate(pressure, coeff)
   for(j = j + 1; j < particles.size(); j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
     //if (diff.getMagnitude() <= hSq) {
@@ -143,6 +144,7 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int& i) {
   Vector viscosity;
   Vector coeff;
   unsigned int j;
+#pragma omp parallel for firstprivate(viscosity, coeff)
   for(j = 0; j < i; j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
     //if (diff.getMagnitude() <= hSq) {
@@ -151,6 +153,7 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int& i) {
       viscosity += coeff * viscLaplacianKernel(diff);
     }
   }
+//#pragma omp parallel for firstprivate(viscosity, coeff)
   for(j = j + 1; j < particles.size(); j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
     //if (diff.getMagnitude() <= hSq) {
@@ -161,27 +164,29 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int& i) {
   }
   viscosity = viscosity * p.getViscosity(); 
   return viscosity;
-  }
+}
 
-  Vector ParticleSystem::tensionForce(Particle& p, unsigned const int& i) {
-    Vector normal = surfaceNormal(p, i);
-    if (normal.getMagnitude() > 7.065) { // threshold
-      normal.normalize();
-      return normal * curvature(p, i) * (-0.0728); // surface tension constant for water
-    }
-    return Vector(0, 0, 0);
+Vector ParticleSystem::tensionForce(Particle& p, unsigned const int& i) {
+  Vector normal = surfaceNormal(p, i);
+  if (normal.getMagnitude() > 7.065) { // threshold
+    normal.normalize();
+    return normal * curvature(p, i) * (-0.0728); // surface tension constant for water
   }
+  return Vector(0, 0, 0);
+}
 
 float ParticleSystem::colorFunction(Particle& p, unsigned const int& i) {
   float color = 0;
   Vector diff;
   unsigned int j;
+#pragma omp parallel for firstprivate(color, diff)
   for(j = 0; j < i; j++) {
     diff = p.getPosition() - particles[j].getPosition();
     if (diff.getMagnitude() <= h) {
       color += particles[j].getMass() / particles[j].getDensity() * defaultKernel(diff);
     }
   }
+//#pragma omp parallel for firstprivate(color, diff)
   for(j = j + 1; j < particles.size(); j++) {
     diff = p.getPosition() - particles[j].getPosition();
     if (diff.getMagnitude() <= h) {
@@ -195,12 +200,14 @@ Vector ParticleSystem::surfaceNormal(Particle& p, unsigned const int& i) {
   Vector normal = Vector(0, 0, 0);
   Vector diff;
   unsigned int j;
+#pragma omp parallel for firstprivate(normal, diff)
   for(j = 0; j < i; j++) {
     diff = p.getPosition() - particles[j].getPosition();
     if (diff.getMagnitude() <= h) {
       normal += gradientKernel(diff) * particles[j].getMass() / particles[j].getDensity();
     }
   }
+//#pragma omp parallel for firstprivate(normal, diff)
   for(j = j + 1; j < particles.size(); j++) {
     diff = p.getPosition() - particles[j].getPosition();
     if (diff.getMagnitude() <= h) {
@@ -214,12 +221,14 @@ float ParticleSystem::curvature(Particle& p, unsigned const int& i) {
   float curvature = 0;
   Vector diff;
   unsigned int j;
+#pragma omp parallel for firstprivate(curvature, diff)
   for(j = 0; j < i; j++) {
     diff = p.getPosition() - particles[j].getPosition();
     if (diff.getMagnitude() <= h) {
       curvature += particles[j].getMass() / particles[j].getDensity() * laplacianKernel(diff);
     }
   }
+//#pragma omp parallel for firstprivate(curvature, diff)
   for(j = j + 1; j < particles.size(); j++) {
     diff = p.getPosition() - particles[j].getPosition();
     if (diff.getMagnitude() <= h) {
@@ -277,6 +286,7 @@ float ParticleSystem::viscLaplacianKernel(Vector r) {
 // Leap frog integration. Takes in a dt and will loop through all the particles in our system.
 // Can be changed to work with leapfrogging just a certain particle.
 void ParticleSystem::leapFrog(const float& dt) {
+#pragma omp parallel for
   for(unsigned int i = 0; i < particles.size(); i++) {
     Particle& p = particles[i];
     // get velocity at time t - dt/2. v_{t - dt/2}
@@ -303,6 +313,7 @@ void ParticleSystem::leapFrog(const float& dt) {
 
 // initialize. v_{-dt/2} = v_{0} - a_{0} * dt / 2
 void ParticleSystem::initializeLeapFrog(const float& dt) {
+#pragma omp parallel for
   for(unsigned int i = 0; i < particles.size(); i++) {
     particles[i].setVelocityHalf(particles[i].getVelocity() - ((this->grav + particles[i].getAcceleration()) * dt) / 2.0f);
   }
@@ -315,51 +326,50 @@ void ParticleSystem::checkBoundary(Point3D* position, Vector* velocity, Vector* 
   // if goes past boundaries, reflect back.
   if(position->getX() > MAX_X) {
     position->setX(MAX_X);
-    bouncebackVelocity(velocity, Vector(-1, 0, 0));
-    bouncebackVelocity(velocityHalf, Vector(-1, 0, 0));
-	velocity->setX(-REST_COEFF * velocity->getX());
+    /*bouncebackVelocity(velocity, Vector(-1, 0, 0));*/
+    /*bouncebackVelocity(velocityHalf, Vector(-1, 0, 0));*/
+    velocity->setX(-REST_COEFF * velocity->getX());
     velocityHalf->setX(-REST_COEFF * velocityHalf->getX());
   }
   else if (position->getX() < MIN_X) {
     position->setX(MIN_X);
-    bouncebackVelocity(velocity, Vector(1, 0, 0));
-    bouncebackVelocity(velocityHalf, Vector(1, 0, 0));
+    /*bouncebackVelocity(velocity, Vector(1, 0, 0));*/
+    /*bouncebackVelocity(velocityHalf, Vector(1, 0, 0));*/
     velocity->setX(-REST_COEFF * velocity->getX());
     velocityHalf->setX(-REST_COEFF * velocityHalf->getX());
   }
   if(position->getY() > MAX_Y) {
     position->setY(MAX_Y);
-    bouncebackVelocity(velocity, Vector(0, -1, 0));
-    bouncebackVelocity(velocityHalf, Vector(0, -1, 0));
+    /*bouncebackVelocity(velocity, Vector(0, -1, 0));*/
+    /*bouncebackVelocity(velocityHalf, Vector(0, -1, 0));*/
     velocity->setY(-REST_COEFF * velocity->getY());
     velocityHalf->setY(-REST_COEFF * velocityHalf->getY());
   }
   else if (position->getY() < MIN_Y) {
     position->setY(MIN_Y);
-    bouncebackVelocity(velocity, Vector(0, 1, 0));
-    bouncebackVelocity(velocityHalf, Vector(0, 1, 0));
+    /*bouncebackVelocity(velocity, Vector(0, 1, 0));*/
+    /*bouncebackVelocity(velocityHalf, Vector(0, 1, 0));*/
     velocity->setY(-REST_COEFF * velocity->getY());
     velocityHalf->setY(-REST_COEFF * velocityHalf->getY());
   }
   if(position->getZ() > MAX_Z) {
     position->setZ(MAX_Z);
-    bouncebackVelocity(velocity, Vector(0, 0, -1));
-    bouncebackVelocity(velocityHalf, Vector(0, 0, -1));
+    /*bouncebackVelocity(velocity, Vector(0, 0, -1));*/
+    /*bouncebackVelocity(velocityHalf, Vector(0, 0, -1));*/
     velocity->setZ(-REST_COEFF* velocity->getZ());
     velocityHalf->setZ(-REST_COEFF * velocityHalf->getZ());
   }
   else if (position->getZ() < MIN_Z) {
     position->setZ(MIN_Z);
-    bouncebackVelocity(velocity, Vector(0, 0, 1));
-    bouncebackVelocity(velocityHalf, Vector(0, 0, 1));
+    /*bouncebackVelocity(velocity, Vector(0, 0, 1));*/
+    /*bouncebackVelocity(velocityHalf, Vector(0, 0, 1));*/
     velocity->setZ(-REST_COEFF* velocity->getZ());
     velocityHalf->setZ(-REST_COEFF * velocityHalf->getZ());
   }
 }
 
 void ParticleSystem::bouncebackVelocity(Vector* velocity, Vector normal) {
-
-  //*velocity = *velocity - (normal * (*velocity).dotProduct(normal) * (1 + REST_COEFF));
+  *velocity = *velocity - (normal * (*velocity).dotProduct(normal) * (1 + REST_COEFF));
 }
 
 void ParticleSystem::addParticle(Particle& p) {
