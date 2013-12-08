@@ -166,7 +166,7 @@ vector<int> Cube::getVertexNumsFromEdge(int edge) {
 
 }
 
-vector<Point3D> Cube::getTriangles(const double &isolevel, const __int8 &cutV) {
+vector<Point3D> Cube::getTriangles(const float &isolevel, const __int8 &cutV) {
 	//__int8 cutV = getCutVertices(); if we make a Mesh class of Cubes so we don't recalc vertices?
 	int cutE = getCutEdges(cutV);
 	vector<Point3D> triangles;

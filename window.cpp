@@ -92,6 +92,32 @@ void createParticles() {
       p1 = Particle();
       pSystem.addParticle(p1);
     }
+	  /*float maxX = .08f;
+	  float minX = -.08f;
+	  float maxY = .08f;
+	  float minY = 0.0f;
+	  float maxZ = .08f;
+	  float minZ = -.08f;
+	  float n = minX;
+	  float m = minY;
+	  float o = minZ;
+	  
+	  while(n < maxX){
+		  m=minY;
+		  while(m < maxY){
+			  o = minZ;
+			  while(o < maxZ){
+				  Point3D pos = Point3D(n,m,o);
+				  //cout<<pos<<endl;
+				p1 = Particle(0.02, 0.0, 3.0, 998.29, 0, 3.5, Point3D(n,m,o), Vector(0, 0, 0));
+				pSystem.addParticle(p1);
+				o+=.014;
+			  }
+			  m+=.014;
+		  }
+		  n+=.014;
+	  }*/
+
   }  
 }
 

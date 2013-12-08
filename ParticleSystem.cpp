@@ -3,13 +3,13 @@
 #include <time.h>
 
 #define PI 3.14159265
-#define MAX_X .08
+#define MAX_X .1
 #define MAX_Y 1
-#define MAX_Z .08
-#define MIN_X -.08
+#define MAX_Z .1
+#define MIN_X -.1
 #define MIN_Y -1
-#define MIN_Z -.08
-#define REST_COEFF 0.7
+#define MIN_Z -.1
+#define REST_COEFF 0.8
 
 ParticleSystem::ParticleSystem() {
   this->grav = Vector(0,0,-9.8);
@@ -254,12 +254,12 @@ float ParticleSystem::laplacianKernel(Vector r) {
 }
 
 // Spiky Kernel to calculate pressure 
-// Give more repulsive pressure at short distance and thus avoids clustering.
+// Give more repulsive pressure at float distance and thus avoids clustering.
 Vector ParticleSystem::pressGradientKernel(Vector r) {
   float rMag = r.getMagnitude();
-  if (rMag == 0) {
+  /*if (rMag == 0) {
     return Vector(0,0,0);
-  }
+  }*/
   float coeff = (-45 * pow((h - rMag), 2.0f)) / (PI * pow(h, 6.0f));
   //r.normalize();
   return r * coeff;

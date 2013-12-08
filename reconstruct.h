@@ -16,7 +16,7 @@ public:
 	Cube(const vector<Point3D> &);
 	vector<Point3D> getVertices();
 	void setVertices(const vector<Point3D> &);
-	vector<Point3D> getTriangles(const double &isolevel, const __int8 &vertices);
+	vector<Point3D> getTriangles(const float &isolevel, const __int8 &vertices);
 	float colorFunction(const ParticleSystem &ps, const vector<Particle> &neighbors, const float neighborRadius, const Point3D &position);
 
 private:
