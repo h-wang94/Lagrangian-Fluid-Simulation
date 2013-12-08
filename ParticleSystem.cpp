@@ -3,12 +3,12 @@
 #include <time.h>
 
 #define PI 3.14159265
-#define MAX_X .05
+#define MAX_X .08
 #define MAX_Y 1
-#define MAX_Z .05
-#define MIN_X -.05
+#define MAX_Z .08
+#define MIN_X -.08
 #define MIN_Y -1
-#define MIN_Z -.05
+#define MIN_Z -.08
 #define REST_COEFF 0.7
 
 ParticleSystem::ParticleSystem() {

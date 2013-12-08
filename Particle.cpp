@@ -2,6 +2,10 @@
 #include <cstdlib>
 #include "Particle.h"
 
+#define MAX_X .05
+#define MAX_Y 1
+#define MAX_Z .05
+
 // Constructor for a water particle in random locations
 Particle::Particle(void) {
   this->mass = 0.02f;
@@ -10,9 +14,9 @@ Particle::Particle(void) {
   this->restDensity = 998.29;
   this->density = 0;
   this->viscosity = 3.5;
-  float x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-  float y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-  float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+  float x = MAX_X*((2*(static_cast <float> (rand()) / static_cast <float> (RAND_MAX)))-1);
+  float y = MAX_Y*((2*(static_cast <float> (rand()) / static_cast <float> (RAND_MAX)))-1);
+  float z = MAX_Z*((2*(static_cast <float> (rand()) / static_cast <float> (RAND_MAX)))-1);
   this->position = Point3D(x, y, z);
   this->oldPosition = position;
   //this->velocity = Vector(rand() % 3, rand() % 3, rand() % 3);
