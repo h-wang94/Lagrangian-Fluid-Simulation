@@ -3,7 +3,7 @@
 #include <cmath>
 
 
-SpatialGrid::SpatialGrid(int s, float h)//s is the number of boxes for a side, h is the smoothing radius of our weighting function
+SpatialGrid::SpatialGrid(const int s, const float h)//s is the number of boxes for a side, h is the smoothing radius of our weighting function
 {
 	this->sideLength = s * h;
 	this->boxLength = h;
