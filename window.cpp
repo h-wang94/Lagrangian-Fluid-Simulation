@@ -14,7 +14,6 @@
 #include <sstream>
 #include <cstdlib>
 #include <vector>
-
 #include <GL/glut.h>
 #ifdef _WIN32
 #include <windows.h>
@@ -88,7 +87,6 @@ void createParticles() {
       pSystem.addParticle(p1);
     }
   }
-  
 }
 
 //==============================================================================
