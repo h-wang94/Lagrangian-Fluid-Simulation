@@ -1,6 +1,7 @@
 #ifndef _ParticleSystem_h_
 #define _ParticleSystem_h_
 #include <vector>
+#include <iostream>
 #include "Particle.h"
 #include "SpatialGrid.h"
 
@@ -23,8 +24,8 @@ class ParticleSystem {
     std::vector<Particle> particles;
 
     bool debug;
-    SpatialGrid grid;
-    int numRowBoxes;
+	SpatialGrid grid;
+	int numRowBoxes;
 
 	  void setDensities();
 	  void computeForces();
