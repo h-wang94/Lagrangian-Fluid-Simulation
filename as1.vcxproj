@@ -11,7 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-<<<<<<< HEAD
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="Point3D.cpp" />
@@ -19,23 +18,12 @@
     <ClCompile Include="SpatialGrid.cpp" />
     <ClCompile Include="Vector.cpp" />
     <ClCompile Include="window.cpp" />
-=======
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Particle.cpp" />
-    <ClCompile Include="ParticleSystem.cpp" />
-    <ClCompile Include="Point3D.cpp" />
-    <ClCompile Include="SpatialGrid.cpp" />
-    <ClCompile Include="Vector.cpp" />
->>>>>>> surface-and-opengl
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Point3D.h" />
-<<<<<<< HEAD
     <ClInclude Include="reconstruct.h" />
-=======
->>>>>>> surface-and-opengl
     <ClInclude Include="SpatialGrid.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>
