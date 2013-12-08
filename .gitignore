@@ -2,6 +2,7 @@
 fluid
 *.sdf
 *.opensdf
+*.avi
 
 # Compiled Object files
 *.slo
