@@ -337,8 +337,8 @@ void displayFunc() {
 	// Reset transformations
 	glLoadIdentity();
 	// Set the camera
-	gluLookAt(	0.0f, 10.0f, 10.0f,
-				0.0f, 0.0f,  0.0f,
+	gluLookAt(	0.0f, 0.3f, 2.0f,
+				0.0f, -.5f,  0.0f,
 				0.0f, 1.0f,  0.0f);
 
 	glRotatef(angle, 0.0f, 1.0f, 0.0f);
@@ -355,7 +355,7 @@ void displayFunc() {
 		glVertex3f( -1.0f, -1.0f, -1.0);
 	glEnd();
 
-	angle+=0.1f;
+	angle+=0.3f;
 
 
 	/*glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

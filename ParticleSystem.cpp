@@ -3,13 +3,13 @@
 #include <time.h>
 
 #define PI 3.14159265
-#define MAX_X 1
+#define MAX_X .05
 #define MAX_Y 1
-#define MAX_Z 1
-#define MIN_X -1
+#define MAX_Z .05
+#define MIN_X -.05
 #define MIN_Y -1
-#define MIN_Z -1
-#define REST_COEFF 0.0
+#define MIN_Z -.05
+#define REST_COEFF 0.7
 
 ParticleSystem::ParticleSystem() {
   this->grav = Vector(0,0,-9.8);
@@ -62,7 +62,7 @@ void ParticleSystem::computeForces(){
     viscosity = viscosityForce(particles[i], i);
     tension = tensionForce(particles[i], i);
 
-    force = gravity - pressure + viscosity + tension;
+    force = gravity - pressure + viscosity;
     particles[i].setAcceleration(force / particles[i].getDensity()); // intuitively using mass..but slides say density...
   }
 }
@@ -127,6 +127,7 @@ Vector ParticleSystem::pressureForce(Particle& p, unsigned const int& i) {
       pressure += pressGradientKernel(diff) * coeff;
     }
   }
+ #pragma omp parallel for firstprivate(pressure, coeff)
   for(j = j + 1; j < particles.size(); j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
     //if (diff.getMagnitude() <= hSq) {
@@ -260,7 +261,7 @@ Vector ParticleSystem::pressGradientKernel(Vector r) {
     return Vector(0,0,0);
   }
   float coeff = (-45 * pow((h - rMag), 2.0f)) / (PI * pow(h, 6.0f));
-  r.normalize();
+  //r.normalize();
   return r * coeff;
 }
 
@@ -316,46 +317,49 @@ void ParticleSystem::checkBoundary(Point3D* position, Vector* velocity, Vector* 
     position->setX(MAX_X);
     bouncebackVelocity(velocity, Vector(-1, 0, 0));
     bouncebackVelocity(velocityHalf, Vector(-1, 0, 0));
+	velocity->setX(-REST_COEFF * velocity->getX());
+    velocityHalf->setX(-REST_COEFF * velocityHalf->getX());
   }
   else if (position->getX() < MIN_X) {
     position->setX(MIN_X);
     bouncebackVelocity(velocity, Vector(1, 0, 0));
     bouncebackVelocity(velocityHalf, Vector(1, 0, 0));
-    /*velocity->setX(-REST_COEFF * velocity->getX());*/
-    /*velocityHalf->setX(-REST_COEFF * velocityHalf->getX());*/
+    velocity->setX(-REST_COEFF * velocity->getX());
+    velocityHalf->setX(-REST_COEFF * velocityHalf->getX());
   }
   if(position->getY() > MAX_Y) {
     position->setY(MAX_Y);
     bouncebackVelocity(velocity, Vector(0, -1, 0));
     bouncebackVelocity(velocityHalf, Vector(0, -1, 0));
-    /*velocity->setY(-REST_COEFF * velocity->getY());*/
-    /*velocityHalf->setY(-REST_COEFF * velocityHalf->getY());*/
+    velocity->setY(-REST_COEFF * velocity->getY());
+    velocityHalf->setY(-REST_COEFF * velocityHalf->getY());
   }
   else if (position->getY() < MIN_Y) {
     position->setY(MIN_Y);
     bouncebackVelocity(velocity, Vector(0, 1, 0));
     bouncebackVelocity(velocityHalf, Vector(0, 1, 0));
-    /*velocity->setY(-REST_COEFF * velocity->getY());*/
-    /*velocityHalf->setY(-REST_COEFF * velocityHalf->getY());*/
+    velocity->setY(-REST_COEFF * velocity->getY());
+    velocityHalf->setY(-REST_COEFF * velocityHalf->getY());
   }
   if(position->getZ() > MAX_Z) {
     position->setZ(MAX_Z);
     bouncebackVelocity(velocity, Vector(0, 0, -1));
     bouncebackVelocity(velocityHalf, Vector(0, 0, -1));
-    /*velocity->setZ(-REST_COEFF* velocity->getZ());*/
-    /*velocityHalf->setZ(-REST_COEFF * velocityHalf->getZ());*/
+    velocity->setZ(-REST_COEFF* velocity->getZ());
+    velocityHalf->setZ(-REST_COEFF * velocityHalf->getZ());
   }
   else if (position->getZ() < MIN_Z) {
     position->setZ(MIN_Z);
     bouncebackVelocity(velocity, Vector(0, 0, 1));
     bouncebackVelocity(velocityHalf, Vector(0, 0, 1));
-    /*velocity->setZ(-REST_COEFF* velocity->getZ());*/
-    /*velocityHalf->setZ(-REST_COEFF * velocityHalf->getZ());*/
+    velocity->setZ(-REST_COEFF* velocity->getZ());
+    velocityHalf->setZ(-REST_COEFF * velocityHalf->getZ());
   }
 }
 
 void ParticleSystem::bouncebackVelocity(Vector* velocity, Vector normal) {
-  *velocity = *velocity - (normal * (*velocity).dotProduct(normal) * (1 + REST_COEFF));
+
+  //*velocity = *velocity - (normal * (*velocity).dotProduct(normal) * (1 + REST_COEFF));
 }
 
 void ParticleSystem::addParticle(Particle& p) {
