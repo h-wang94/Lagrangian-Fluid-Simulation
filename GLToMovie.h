@@ -27,7 +27,6 @@ public:
 		DWORD dwFrameRate = 60)		/*Frames Per Second (FPS)*/
 		: m_MovieFile(lpszOutputMovieFileName, dwCodec, dwFrameRate)
 	{
-		cout << GetSystemMetrics(SM_CXSCREEN);
 		m_nWidth = nFrameWidth;
 		m_nHeight = nFrameHeight;
 		m_nBitsPerPixel = nBitsPerPixel;
