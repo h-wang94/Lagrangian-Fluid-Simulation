@@ -1,8 +1,9 @@
 #include "SpatialGrid.h"
+#include <omp.h>
 #include <cmath>
 
 
-SpatialGrid::SpatialGrid(int s, float h)//s is the number of boxes for a side, h is the smoothing radius of our weighting function
+SpatialGrid::SpatialGrid(const int s, const float h)//s is the number of boxes for a side, h is the smoothing radius of our weighting function
 {
 	this->sideLength = s * h;
 	this->boxLength = h;
@@ -72,7 +73,7 @@ std::vector<Particle> SpatialGrid::getNeighbors(Particle p){
 					|| zindex + k < 0 || zindex + k >= this->numEdgeBoxes))
 				{
 					vector<Particle> thisBox = grid[xindex+i][yindex+j][zindex+k];
-					int l = 0;
+					unsigned int l = 0;
 					while(l < thisBox.size()){
 						list.push_back(thisBox[l]);
 						l++;
@@ -90,7 +91,7 @@ std::vector<Particle> SpatialGrid::getNeighbors(Particle p){
 }
 
 void SpatialGrid::updateBoxes(std::vector<Particle> particles){
-	int n = 0;
+	unsigned int n = 0;
 	while(n < particles.size()){
 		Particle p = particles[n];
 		//cout<<p<<endl;
@@ -122,9 +123,9 @@ void SpatialGrid::updateBoxes(std::vector<Particle> particles){
 			//grid[i][j][k].erase(grid[i][j][k].begin() + l);
 		}
 		else{
-
 			if(xindex != i || yindex != j || zindex != k){
 				//cout<<"omg"<<endl;
+<<<<<<< HEAD
 				int l = 0;
 					while (l < grid[i][j][k].size()){
 						if(grid[i][j][k][l].getPosition().getX() == oldX 
@@ -135,6 +136,18 @@ void SpatialGrid::updateBoxes(std::vector<Particle> particles){
 						l++;
 					grid[xindex][yindex][zindex].push_back(p);
 				}
+=======
+				unsigned int l = 0;
+        while (l < grid[i][j][k].size()){
+          if(grid[i][j][k][l].getPosition().getX() == oldX 
+            && grid[i][j][k][l].getPosition().getY() == oldY
+            && grid[i][j][k][l].getPosition().getZ() == oldZ){
+            grid[i][j][k].erase(grid[i][j][k].begin() + l);
+          }
+          l++;
+        }
+        grid[xindex][yindex][zindex].push_back(p);
+>>>>>>> dca21c2622180d8668203ea1225ad7da445687e7
 			}
 		}
 		n++;

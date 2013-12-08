@@ -6,7 +6,7 @@
 class SpatialGrid
 {
 public:
-	SpatialGrid(int s, float h);//establish grid with h box lengths of s*h side lengths of a huge cube grid thingy at point 0,0,0
+	SpatialGrid(const int s, const float h);//establish grid with h box lengths of s*h side lengths of a huge cube grid thingy at point 0,0,0
 	SpatialGrid();
 	void addParticle(Particle p); //add particle to list of particles in box
 	void updateBoxes(std::vector<Particle> particles); //when particles move, they might change boxes, so we need to update boxes

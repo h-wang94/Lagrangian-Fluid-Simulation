@@ -14,7 +14,6 @@
 #include <sstream>
 #include <cstdlib>
 #include <vector>
-
 #include <GL/glut.h>
 #ifdef _WIN32
 #include <windows.h>
@@ -94,9 +93,13 @@ void createParticles() {
       pSystem.addParticle(p1);
     }
   }
+<<<<<<< HEAD
   
 }
 
+=======
+}
+>>>>>>> dca21c2622180d8668203ea1225ad7da445687e7
 
 //==============================================================================
 // Count the number of slashes to determine format of obj file inputs for faces
@@ -410,6 +413,8 @@ void displayFunc() {
   if (currentTime < totalTime) {
     pSystem.update(dt);
     currentTime += dt;
+  } else {
+    exit(1);
   }
   glDisable(GL_LIGHTING);
 	glEnd();
