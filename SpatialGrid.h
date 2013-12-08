@@ -1,6 +1,7 @@
 #ifndef _SpatialGrid_h_
 #define _SpatialGrid_h_
 #include <vector>
+#include <map>
 #include "Particle.h"
 
 class SpatialGrid
@@ -17,7 +18,10 @@ private:
 	float sideLength;
 	float boxLength;
 	int numEdgeBoxes;
+	int numEdgeBoxesCubed;
 	Point3D start;
+	std::map<int, std::vector<Particle>> hashMap;// x pos * large prime (XOR) y pos * large prime (XOR) z pos * large prime MOD numofboxes
+	
 
 };
 

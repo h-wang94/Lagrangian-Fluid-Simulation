@@ -13,7 +13,7 @@ ParticleSystem::ParticleSystem() {
   this->grav = Vector(0,0,-9.8);
   this->h = 0.0457;
   this->hSq = pow(h, 2.0f);
-  this->debug = true;
+  this->debug = false;
 }
 
 ParticleSystem::ParticleSystem(Vector grav){
@@ -21,7 +21,7 @@ ParticleSystem::ParticleSystem(Vector grav){
   this->h = 0.0457; // doesnt seem to do much interaction for 100ish particles
   //this->h = 1; // for funky fusion
   this->hSq = pow(h, 2.0f);
-  this->debug = true;
+  this->debug = false;
   this->numRowBoxes = 10;
   this->grid = SpatialGrid(100, h);
 }
@@ -39,14 +39,6 @@ void ParticleSystem::update(float timestep){
   this->computeForces();
   this->leapFrog(timestep);
   grid.updateBoxes(particles);
-}
-
-Particle* ParticleSystem::getParticle(const unsigned int i) {
-  return &particles[i];
-}
-
-std::vector<Particle> ParticleSystem::getParticles() {
-  return this->particles;
 }
 
 Particle* ParticleSystem::getParticle(const unsigned int i) {

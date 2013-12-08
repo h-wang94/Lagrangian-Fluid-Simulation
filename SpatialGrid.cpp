@@ -8,6 +8,7 @@ SpatialGrid::SpatialGrid(int s, float h)//s is the number of boxes for a side, h
 	this->boxLength = h;
 	this->start = Point3D(-s * h/2, -s * h/2, -s * h/2); //the start of the boxes (corner of grid[0][0][0])
 	this->numEdgeBoxes = s;
+	this->numEdgeBoxesCubed = s*s*s;
 	//cout<<start<<endl;
 	//is at the left bottom far corner of the grid
 
@@ -23,6 +24,7 @@ SpatialGrid::SpatialGrid(int s, float h)//s is the number of boxes for a side, h
 				grid[i][j].resize(s);
 			}
 	}
+
 }
 
 SpatialGrid::SpatialGrid(){
@@ -42,11 +44,10 @@ void SpatialGrid::addParticle(Particle p){
 	int xindex = (int)floor((x-this->start.getX())/(this->boxLength));
 	int yindex = (int)floor((y-this->start.getY())/(this->boxLength));
 	int zindex = (int)floor((z-this->start.getZ())/(this->boxLength));
-	/*cout<<xindex<<", "<<yindex<<", "<<zindex<<"."<<endl;
-	cout<<pos<<endl;
-	cout<<sideLength<<endl;
-	cout<<start<<endl;*/
 	grid[xindex][yindex][zindex].push_back(p);
+
+	/*int id = (xindex*63061489 ^ yindex*53471161 ^ zindex*56598313) % this->numEdgeBoxesCubed; 
+	hashMap[id].push_back(p);*/
 }
 
 std::vector<Particle> SpatialGrid::getNeighbors(Particle p){
@@ -85,6 +86,30 @@ std::vector<Particle> SpatialGrid::getNeighbors(Particle p){
 		i++;
 	}
 
+	/*while(i <= 1){
+		int j=-1;
+		while(j <= 1){
+			int k=-1;
+			while(k <= 1){
+				//cout<<xindex<<", "<<yindex<<", "<<zindex<<endl;
+				if(!(xindex+i < 0 || xindex+i >= this->numEdgeBoxes || yindex+j < 0 || yindex+j >= this->numEdgeBoxes 
+					|| zindex + k < 0 || zindex + k >= this->numEdgeBoxes))
+				{
+					int id = ((xindex+i)*63061489 ^ (yindex+j)*53471161 ^ (zindex+k)*56598313) % this->numEdgeBoxesCubed; 
+					vector<Particle> thisBox = hashMap[id];
+					int l = 0;
+					while(l < thisBox.size()){
+						list.push_back(thisBox[l]);
+						l++;
+					}
+				}
+				k++;
+			}
+			j++;
+		}
+		i++;
+	}*/
+
 	return list;
 
 }
@@ -102,12 +127,7 @@ void SpatialGrid::updateBoxes(std::vector<Particle> particles){
 		float oldY = p.getOldPosition().getY();
 		float oldZ = p.getOldPosition().getZ();
 
-		int xindex = (int)floor((x-this->start.getX())/(this->boxLength));
-		int yindex = (int)floor((y-this->start.getY())/(this->boxLength));
-		int zindex = (int)floor((z-this->start.getZ())/(this->boxLength));
-		int i = (int)floor((oldX-this->start.getX())/(this->boxLength));
-		int j = (int)floor((oldY-this->start.getY())/(this->boxLength));
-		int k = (int)floor((oldZ-this->start.getZ())/(this->boxLength));
+
 
 		/*cout<<"--------"<<endl;
 		cout<<i<<", "<<j<<", "<<k<<endl;
@@ -116,21 +136,32 @@ void SpatialGrid::updateBoxes(std::vector<Particle> particles){
 
 		//cout<<p<<endl;
 		//cout<<p.getOldPosition()<<endl;
-		if(abs(x) > sideLength/2 || abs(y) > sideLength/2 || abs(z) > sideLength/2){//moved particle is outside of spatial grid
+		if(abs(x) > sideLength/2 || abs(y) > sideLength/2 || abs(z) > sideLength/2
+			||abs(oldX) > sideLength/2 || abs(oldY) > sideLength/2 || abs(oldZ) > sideLength/2){//moved particle is outside of spatial grid
 			cout<<"Particle outside of boundary!"<<endl;
 			//particle is OOB, bye particle
 			//grid[i][j][k].erase(grid[i][j][k].begin() + l);
 		}
 		else{
 
+			int xindex = (int)floor((x-this->start.getX())/(this->boxLength));
+			int yindex = (int)floor((y-this->start.getY())/(this->boxLength));
+			int zindex = (int)floor((z-this->start.getZ())/(this->boxLength));
+			int i = (int)floor((oldX-this->start.getX())/(this->boxLength));
+			int j = (int)floor((oldY-this->start.getY())/(this->boxLength));
+			int k = (int)floor((oldZ-this->start.getZ())/(this->boxLength));
+
 			if(xindex != i || yindex != j || zindex != k){
 				//cout<<"omg"<<endl;
-				int l = 0;
 				if(i > numEdgeBoxes || j > numEdgeBoxes || k > numEdgeBoxes){
 					cout<<"wut"<<endl;
 				}
 				else{
+
+					int l = 0;
+
 					while (l < grid[i][j][k].size()){
+						
 						if(grid[i][j][k][l].getOldPosition().getX() == oldX 
 							&& grid[i][j][k][l].getOldPosition().getY() == oldY
 							&& grid[i][j][k][l].getOldPosition().getZ() == oldZ){
@@ -139,6 +170,20 @@ void SpatialGrid::updateBoxes(std::vector<Particle> particles){
 						l++;
 					}
 					grid[xindex][yindex][zindex].push_back(p);
+
+					/*int l = 0;
+					int id = (xindex*63061489 ^ yindex*53471161 ^ zindex*56598313) % this->numEdgeBoxesCubed; 
+					while (l < hashMap[id].size()){
+						
+						if(hashMap[id][l].getOldPosition().getX() == oldX 
+							&& hashMap[id][l].getOldPosition().getY() == oldY
+							&& hashMap[id][l].getOldPosition().getZ() == oldZ){
+							hashMap[id].erase(hashMap[id].begin() + l);
+						}
+						l++;
+					}
+					hashMap[id].push_back(p);*/
+
 				}
 			}
 		}
