@@ -20,7 +20,7 @@ private:
 	int numEdgeBoxes;
 	int numEdgeBoxesCubed;
 	Point3D start;
-	std::map<int, std::vector<Particle>> hashMap;// x pos * large prime (XOR) y pos * large prime (XOR) z pos * large prime MOD numofboxes
+	std::map<int, std::vector<Particle> > hashMap;// x pos * large prime (XOR) y pos * large prime (XOR) z pos * large prime MOD numofboxes
 	
 
 };
