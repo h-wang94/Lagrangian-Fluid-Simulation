@@ -365,6 +365,8 @@ void displayFunc() {
   if (currentTime < totalTime) {
     pSystem.update(dt);
     currentTime += dt;
+  } else {
+    exit(1);
   }
   glDisable(GL_LIGHTING);
 	glEnd();
