@@ -22,7 +22,7 @@ ParticleSystem::ParticleSystem(Vector grav){
   //this->h = 1; // for funky fusion
   this->hSq = pow(h, 2.0f);
   this->debug = true;
-  this->numRowBoxes = 10;
+  this->numRowBoxes = 100;
   this->grid = SpatialGrid(100, h);
 }
 
@@ -39,14 +39,6 @@ void ParticleSystem::update(float timestep){
   this->computeForces();
   this->leapFrog(timestep);
   grid.updateBoxes(particles);
-}
-
-Particle* ParticleSystem::getParticle(const unsigned int i) {
-  return &particles[i];
-}
-
-std::vector<Particle> ParticleSystem::getParticles() {
-  return this->particles;
 }
 
 Particle* ParticleSystem::getParticle(const unsigned int i) {
@@ -84,24 +76,24 @@ void ParticleSystem::computePressure() {
 // need to look at this
 void ParticleSystem::setDensities(){
   float density;
-
+  cout << particles.size()<<endl;
   for(unsigned int i = 0; i < particles.size(); i++){
     density = 0;
 
-	std::vector<Particle> list = grid.getNeighbors(particles[i]);
+	/*std::vector<Particle> list = grid.getNeighbors(particles[i]);
 	for(unsigned int j = 0; j < list.size(); j++){ 
       Vector dist = particles[i].getPosition() - list[j].getPosition();
       //if (dist.getMagnitude() <= hSq) {
       if (dist.getMagnitude() <= h) {
         density += defaultKernel(dist) * list[j].getMass();
-      }
+      }*/
 
-    /*for(unsigned int j = 0; j < particles.size(); j++){ // need to use spatial grid	
+    for(unsigned int j = 0; j < particles.size(); j++){ // need to use spatial grid	
       Vector dist = particles[i].getPosition() - particles[j].getPosition();
       //if (dist.getMagnitude() <= hSq) {
       if (dist.getMagnitude() <= h) {
         density += defaultKernel(dist) * particles[j].getMass();
-      }*/
+      }
 	}
 	if(density == 0){
 		density = particles[i].getMass() / .00000001;
@@ -215,11 +207,11 @@ void ParticleSystem::leapFrog(const float& dt) {
     // use midpoint approximation for velocity at time t. v_{t} = (v_{t - dt / 2} + v_{t + dt / 2}) / 2.
     p.setVelocity(tempVelocity); 
 
-    if (debug) {
+    /*if (debug) {
       cout << "//===========================================//" << endl
         << "// Particle Index: " << i << "   Num: " << i+1 << endl
         << particles[i] << endl;
-    }
+    }*/
   }
 }
 

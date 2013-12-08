@@ -126,18 +126,13 @@ void SpatialGrid::updateBoxes(std::vector<Particle> particles){
 			if(xindex != i || yindex != j || zindex != k){
 				//cout<<"omg"<<endl;
 				int l = 0;
-				if(i > numEdgeBoxes || j > numEdgeBoxes || k > numEdgeBoxes){
-					cout<<"wut"<<endl;
-				}
-				else{
 					while (l < grid[i][j][k].size()){
-						if(grid[i][j][k][l].getOldPosition().getX() == oldX 
-							&& grid[i][j][k][l].getOldPosition().getY() == oldY
-							&& grid[i][j][k][l].getOldPosition().getZ() == oldZ){
+						if(grid[i][j][k][l].getPosition().getX() == oldX 
+							&& grid[i][j][k][l].getPosition().getY() == oldY
+							&& grid[i][j][k][l].getPosition().getZ() == oldZ){
 							grid[i][j][k].erase(grid[i][j][k].begin() + l);
 						}
 						l++;
-					}
 					grid[xindex][yindex][zindex].push_back(p);
 				}
 			}

@@ -97,23 +97,6 @@ void createParticles() {
   
 }
 
-void createParticles() {
-  Particle p1 = Particle();
-  unsigned int i;
-  srand(time(NULL)); // for rand function
-  if (objFile) {
-    for(i = 0; i < numParticles; i++) {
-      p1 = Particle(0.02, 0.0, 3.0, 998.29, 0, 3.5, vertexes[i], Vector(0, 0, 0));
-      pSystem.addParticle(p1);
-    }
-  } else {
-    for(i = 0; i < numParticles; i++) {
-      p1 = Particle();
-      pSystem.addParticle(p1);
-    }
-  }
-  
-}
 
 //==============================================================================
 // Count the number of slashes to determine format of obj file inputs for faces
@@ -346,13 +329,46 @@ void determineFunction(int argc, char *argv[]) {
   }
 }
 
-
+float angle = 0;
 /* Display is updated/rendered here. */
 void displayFunc() {
+
+		// Clear Color and Depth Buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Reset transformations
+	glLoadIdentity();
+	// Set the camera
+	gluLookAt(	0.0f, 10.0f, 10.0f,
+				0.0f, 0.0f,  0.0f,
+				0.0f, 1.0f,  0.0f);
+
+	glRotatef(angle, 0.0f, 1.0f, 0.0f);
+
+	glBegin(GL_TRIANGLES);
+		glVertex3f( -1.0f, -1.0f, -1.0f);
+		glVertex3f( 1.0f, -1.0f, -1.0);
+		glVertex3f( 1.0f, -1.0f, 1.0);
+	glEnd();
+	
+	glBegin(GL_TRIANGLES);
+		glVertex3f( 1.0f, -1.0f, 1.0f);
+		glVertex3f( -1.0f, -1.0f, 1.0);
+		glVertex3f( -1.0f, -1.0f, -1.0);
+	glEnd();
+
+	angle+=0.1f;
+
+
+	/*glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glLoadIdentity();
+	gluLookAt(	0.0f, 0.0f, 10.0f,
+			-1.0f, -1.0f,  -1.0f,
+			0.0f, 1.0f,  0.0f);
   glEnable(GL_DEPTH_TEST);
 	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	glLoadIdentity();*/
+
 
 	// rendering stuff goes here
 	//for each particle
@@ -370,6 +386,11 @@ void displayFunc() {
   //glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
   //glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
   //glMaterialfv(GL_FRONT, GL_SHININESS, &shininess);
+
+
+
+
+
 	glBegin(GL_POINTS);
 	glColor4f(0.0, 0.2, 1.0, 1.0);
   Particle* p;
@@ -406,6 +427,32 @@ void keyboard(unsigned char key, int x, int y) {
   }
   glutPostRedisplay();
 }
+
+void changeSize(int w, int h) {
+
+	// Prevent a divide by zero, when window is too short
+	// (you cant make a window of zero width).
+	if (h == 0)
+		h = 1;
+
+	float ratio =  w * 1.0 / h;
+
+	// Use the Projection Matrix
+	glMatrixMode(GL_PROJECTION);
+
+	// Reset Matrix
+	glLoadIdentity();
+
+	// Set the viewport to be the entire window
+	glViewport(0, 0, w, h);
+
+	// Set the correct perspective.
+	gluPerspective(45.0f, ratio, 0.1f, 100.0f);
+
+	// Get Back to the Modelview
+	glMatrixMode(GL_MODELVIEW);
+}
+
 int main(int argc, char** argv) {
   pSystem = ParticleSystem(Vector(0,-9.8, 0));
   determineFunction(argc, argv);
@@ -434,6 +481,7 @@ int main(int argc, char** argv) {
 
   glutDisplayFunc(displayFunc);
   glutIdleFunc(displayFunc); //if we do user interaction
+  glutReshapeFunc(changeSize);
   glutMainLoop();
   return 0;
 }
