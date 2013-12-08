@@ -51,10 +51,6 @@ std::vector<Particle> ParticleSystem::getParticles() {
   return this->particles;
 }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> dca21c2622180d8668203ea1225ad7da445687e7
 // computes the internal and external forces.
 // also sets acceleration
 void ParticleSystem::computeForces(){
@@ -83,52 +79,31 @@ void ParticleSystem::computePressure() {
 
 // need to look at this
 void ParticleSystem::setDensities(){
-<<<<<<< HEAD
-  float density;
-  cout << particles.size()<<endl;
-  for(unsigned int i = 0; i < particles.size(); i++){
-    density = 0;
 
-	/*std::vector<Particle> list = grid.getNeighbors(particles[i]);
-	for(unsigned int j = 0; j < list.size(); j++){ 
-=======
   float density = 0;
 #pragma omp parallel for firstprivate(density)
   for(unsigned int i = 0; i < particles.size(); i++){
     density = 0;
 
-    std::vector<Particle> list = grid.getNeighbors(particles[i]);
+    /*std::vector<Particle> list = grid.getNeighbors(particles[i]);
     for(unsigned int j = 0; j < list.size(); j++){ 
->>>>>>> dca21c2622180d8668203ea1225ad7da445687e7
       Vector dist = particles[i].getPosition() - list[j].getPosition();
       //if (dist.getMagnitude() <= hSq) {
       if (dist.getMagnitude() <= h) {
         density += defaultKernel(dist) * list[j].getMass();
       }*/
 
-<<<<<<< HEAD
-    for(unsigned int j = 0; j < particles.size(); j++){ // need to use spatial grid	
-      Vector dist = particles[i].getPosition() - particles[j].getPosition();
-      //if (dist.getMagnitude() <= hSq) {
-      if (dist.getMagnitude() <= h) {
-        density += defaultKernel(dist) * particles[j].getMass();
-      }
-	}
-	if(density == 0){
-		density = particles[i].getMass() / .00000001;
-	}
-=======
-      /*for(unsigned int j = 0; j < particles.size(); j++){ // need to use spatial grid	
+      for(unsigned int j = 0; j < particles.size(); j++){ // need to use spatial grid	
         Vector dist = particles[i].getPosition() - particles[j].getPosition();
       //if (dist.getMagnitude() <= hSq) {
       if (dist.getMagnitude() <= h) {
       density += defaultKernel(dist) * particles[j].getMass();
-      }*/
+      }
+
     }
     if(density == 0){
       density = particles[i].getMass() / .00000001;
     }
->>>>>>> dca21c2622180d8668203ea1225ad7da445687e7
 
     particles[i].setDensity(density);											//set the particle[i]'s density to particle[i]
   }
@@ -317,19 +292,11 @@ void ParticleSystem::leapFrog(const float& dt) {
     // use midpoint approximation for velocity at time t. v_{t} = (v_{t - dt / 2} + v_{t + dt / 2}) / 2.
     p.setVelocity(tempVelocity); 
 
-<<<<<<< HEAD
     /*if (debug) {
       cout << "//===========================================//" << endl
         << "// Particle Index: " << i << "   Num: " << i+1 << endl
         << particles[i] << endl;
     }*/
-=======
-    /*if (debug) {*/
-    //cout << "//===========================================//" << endl
-    //<< "// Particle Index: " << i << "   Num: " << i+1 << endl
-    //<< particles[i] << endl;
-    /*}*/
->>>>>>> dca21c2622180d8668203ea1225ad7da445687e7
   }
 }
 

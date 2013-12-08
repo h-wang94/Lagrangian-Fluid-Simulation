@@ -125,29 +125,17 @@ void SpatialGrid::updateBoxes(std::vector<Particle> particles){
 		else{
 			if(xindex != i || yindex != j || zindex != k){
 				//cout<<"omg"<<endl;
-<<<<<<< HEAD
-				int l = 0;
-					while (l < grid[i][j][k].size()){
-						if(grid[i][j][k][l].getPosition().getX() == oldX 
-							&& grid[i][j][k][l].getPosition().getY() == oldY
-							&& grid[i][j][k][l].getPosition().getZ() == oldZ){
-							grid[i][j][k].erase(grid[i][j][k].begin() + l);
-						}
-						l++;
-					grid[xindex][yindex][zindex].push_back(p);
-				}
-=======
+
 				unsigned int l = 0;
-        while (l < grid[i][j][k].size()){
-          if(grid[i][j][k][l].getPosition().getX() == oldX 
-            && grid[i][j][k][l].getPosition().getY() == oldY
-            && grid[i][j][k][l].getPosition().getZ() == oldZ){
-            grid[i][j][k].erase(grid[i][j][k].begin() + l);
-          }
-          l++;
-        }
-        grid[xindex][yindex][zindex].push_back(p);
->>>>>>> dca21c2622180d8668203ea1225ad7da445687e7
+				while (l < grid[i][j][k].size()){
+					if(grid[i][j][k][l].getPosition().getX() == oldX 
+					&& grid[i][j][k][l].getPosition().getY() == oldY
+					&& grid[i][j][k][l].getPosition().getZ() == oldZ){
+					grid[i][j][k].erase(grid[i][j][k].begin() + l);
+					}
+					l++;
+				}
+				grid[xindex][yindex][zindex].push_back(p);
 			}
 		}
 		n++;

@@ -11,21 +11,32 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Particle.cpp" />
-    <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="Point3D.cpp" />
+    <ClCompile Include="ParticleSystem.cpp" />
+    <ClCompile Include="Ray.cpp" />
     <ClCompile Include="reconstruct.cpp" />
+    <ClCompile Include="Sample.cpp" />
+    <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="SpatialGrid.cpp" />
     <ClCompile Include="Vector.cpp" />
     <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Point3D.h" />
+    <ClInclude Include="Ray.h" />
     <ClInclude Include="reconstruct.h" />
+    <ClInclude Include="Sample.h" />
+    <ClInclude Include="Sampler.h" />
     <ClInclude Include="SpatialGrid.h" />
     <ClInclude Include="Vector.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="as4.sdf" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{64BE2362-A67D-4AC1-B115-A65C568A2EAE}</ProjectGuid>

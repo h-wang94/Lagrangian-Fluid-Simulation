@@ -92,14 +92,9 @@ void createParticles() {
       p1 = Particle();
       pSystem.addParticle(p1);
     }
-  }
-<<<<<<< HEAD
-  
+  }  
 }
 
-=======
-}
->>>>>>> dca21c2622180d8668203ea1225ad7da445687e7
 
 //==============================================================================
 // Count the number of slashes to determine format of obj file inputs for faces
