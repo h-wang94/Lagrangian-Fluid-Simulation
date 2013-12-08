@@ -373,6 +373,9 @@ void displayFunc() {
     pSystem.update(dt);
     currentTime += dt;
   }
+  else {
+    exit(1);
+  }
   glDisable(GL_LIGHTING);
 	glEnd();
 	glFlush();
