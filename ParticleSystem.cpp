@@ -49,15 +49,6 @@ std::vector<Particle> ParticleSystem::getParticles() {
   return this->particles;
 }
 
-Particle* ParticleSystem::getParticle(const unsigned int i) {
-  return &particles[i];
-}
-
-std::vector<Particle> ParticleSystem::getParticles() {
-  return this->particles;
-}
-
-
 // computes the internal and external forces.
 // also sets acceleration
 void ParticleSystem::computeForces(){

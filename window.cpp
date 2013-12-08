@@ -94,25 +94,6 @@ void createParticles() {
       pSystem.addParticle(p1);
     }
   }
-  
-}
-
-void createParticles() {
-  Particle p1 = Particle();
-  unsigned int i;
-  srand(time(NULL)); // for rand function
-  if (objFile) {
-    for(i = 0; i < numParticles; i++) {
-      p1 = Particle(0.02, 0.0, 3.0, 998.29, 0, 3.5, vertexes[i], Vector(0, 0, 0));
-      pSystem.addParticle(p1);
-    }
-  } else {
-    for(i = 0; i < numParticles; i++) {
-      p1 = Particle();
-      pSystem.addParticle(p1);
-    }
-  }
-  
 }
 
 //==============================================================================
