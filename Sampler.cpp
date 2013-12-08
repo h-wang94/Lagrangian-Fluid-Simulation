@@ -66,7 +66,7 @@ Ray Sampler::getRayThroughSample() {
 Sample Sampler::getPixelRGBA(SpatialGrid &sg, float stepSize) {
 	Ray r = getRayThroughSample();
 	Particle p = Particle();
-	vector<Particle*> neighbors;
+	vector<Particle> neighbors;
 	Sample newSample;
 	Point3D testPoint;
 	for (int i = 0; i < 1000 && s.opacity < 1.0; i++) { //while the color is still opaque...probably want to set i to something else later btw
