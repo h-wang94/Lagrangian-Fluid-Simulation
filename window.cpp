@@ -25,7 +25,7 @@ using namespace std;
 
 
 int frameWidth = 600, frameHeight = 600;
-CGLToMovie recorder(_T("Output.avi"), frameWidth, frameHeight, 24, mmioFOURCC('D', 'I', 'B', ' '), 30);
+CGLToMovie recorder;
 std::vector<Point3D> vertexes, vt;
 std::vector<Vector>normals;
 std::vector< std::vector<int> > vertexIndexes;
@@ -498,7 +498,7 @@ int main(int argc, char** argv) {
     //pSystem.update(dt);
   /*}*/
   glutInit(&argc, argv);
-  glutInitWindowSize(600, 600);
+  glutInitWindowSize(frameWidth, frameHeight);
   glutInitWindowPosition(0, 0);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
   glutCreateWindow("CS184 Final");

@@ -20,11 +20,11 @@ class CGLToMovie
 public:
 
 	CGLToMovie(LPCTSTR lpszOutputMovieFileName = _T("Output.avi"), 
-		int nFrameWidth = GetSystemMetrics(SM_CXSCREEN),	/*Movie Frame Width*/
-		int nFrameHeight = GetSystemMetrics(SM_CYSCREEN),	/*Movie Frame Height*/
+		int nFrameWidth = 600,	/*Movie Frame Width*/
+		int nFrameHeight = 600,	/*Movie Frame Height*/
 		int nBitsPerPixel = 24,		/*Bits Per Pixel*/
-		DWORD dwCodec = mmioFOURCC('M','S','V','C'),	/*Video Codec for Frame Compression*/
-		DWORD dwFrameRate = 60)		/*Frames Per Second (FPS)*/
+		DWORD dwCodec = mmioFOURCC('D','I','B',' '),	/*Video Codec for Frame Compression*/
+		DWORD dwFrameRate = 30)		/*Frames Per Second (FPS)*/
 		: m_MovieFile(lpszOutputMovieFileName, dwCodec, dwFrameRate)
 	{
 		m_nWidth = nFrameWidth;
