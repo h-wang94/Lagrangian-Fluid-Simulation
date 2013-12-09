@@ -32,7 +32,12 @@ public:
 		m_nBitsPerPixel = nBitsPerPixel;
 		m_pBits = malloc(m_nWidth * m_nHeight * m_nBitsPerPixel/8);	/*create the required memory to hold the frame content*/
 	}
-
+	void setWidth(int width) {
+		m_nWidth = width;
+	}
+	void setHeight(int height) {
+		m_nHeight = height;
+	}
 	~CGLToMovie(void)
 	{
 		if(m_pBits)
