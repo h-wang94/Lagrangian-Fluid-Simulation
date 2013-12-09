@@ -3,19 +3,14 @@
 #include <time.h>
 
 #define PI 3.14159265
-#define MAX_X .1
-#define MAX_Y 1
-#define MAX_Z .1
-#define MIN_X -.1
-#define MIN_Y -1
-#define MIN_Z -.1
-#define REST_COEFF 0.8
 
 ParticleSystem::ParticleSystem() {
   this->grav = Vector(0,0,-9.8);
   this->h = 0.0457;
   this->hSq = pow(h, 2.0f);
   this->debug = true;
+  setRestCoeff(0.8f);
+  setBoundaries(-.1, -.1, -.1, .1, .1, .1);
 }
 
 ParticleSystem::ParticleSystem(Vector grav){
@@ -26,6 +21,20 @@ ParticleSystem::ParticleSystem(Vector grav){
   this->debug = true;
   this->numRowBoxes = 100;
   this->grid = SpatialGrid(100, h);
+  setBoundaries(-.1, -.1, -.1, .1, .1, .1);
+  setRestCoeff(0.8f);
+}
+
+ParticleSystem::ParticleSystem(Vector grav, float min_x, float min_y, float min_z, float max_x, float max_y, float max_z, float restCoeff) {
+  this->grav = grav;
+  this->h = 0.0457; // doesnt seem to do much interaction for 100ish particles
+  //this->h = 1; // for funky fusion
+  this->hSq = pow(h, 2.0f);
+  this->debug = true;
+  this->numRowBoxes = 100;
+  this->grid = SpatialGrid(100, h);
+  setRestCoeff(restCoeff);
+  setBoundaries(min_x, min_y, min_z, max_x, max_y, max_z);
 }
 
 void ParticleSystem::initialize(float timestep) {
@@ -41,6 +50,19 @@ void ParticleSystem::update(float timestep){
   this->computeForces();
   this->leapFrog(timestep);
   grid.updateBoxes(particles);
+}
+
+void ParticleSystem::setBoundaries(float min_x, float min_y, float min_z, float max_x, float max_y, float max_z) {
+  this->MIN_X = min_x;
+  this->MIN_Y = min_y;
+  this->MIN_Z = min_z;
+  this->MAX_X = max_x;
+  this->MAX_Y = max_y;
+  this->MAX_Z = max_z;
+}
+
+void ParticleSystem::setRestCoeff(float restCoeff) {
+  this->REST_COEFF = restCoeff;
 }
 
 Particle* ParticleSystem::getParticle(const unsigned int i) {
