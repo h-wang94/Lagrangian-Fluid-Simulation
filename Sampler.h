@@ -12,7 +12,9 @@
 #include "Camera.h"
 #include "Ray.h"
 #include "SpatialGrid.h"
+#include "ParticleSystem.h"
 
+extern ParticleSystem pSystem;
 
 class Sampler {
 	Sampler();

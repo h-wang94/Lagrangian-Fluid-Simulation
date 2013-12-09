@@ -49,7 +49,7 @@ public:
 	/// </Summary>
 	inline HRESULT RecordFrame()
 	{
-		glFlush(); glFinish();
+		glFinish();
 		glReadPixels(0, 0, m_nWidth, m_nHeight, GL_BGR_EXT, GL_UNSIGNED_BYTE, m_pBits);
 		return m_MovieFile.AppendNewFrame(m_nWidth, m_nHeight, m_pBits, m_nBitsPerPixel);
 	}
