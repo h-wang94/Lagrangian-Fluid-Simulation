@@ -88,6 +88,7 @@ Sample Sampler::getPixelRGBA(SpatialGrid &sg, float stepSize) {
 		newSample.colorVals = newSample.colorVals / (float) neighbors.size();
 		newSample.opacity /= (float) neighbors.size();
 		s.addRGBAVals(newSample);
+		dist = stepSize * (i + 1);
 	}
 	return s;
 }
