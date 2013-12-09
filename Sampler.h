@@ -17,6 +17,7 @@
 extern ParticleSystem pSystem;
 
 class Sampler {
+public:
 	Sampler();
 	Sampler(Camera c);
 	bool hasNext();

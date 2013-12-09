@@ -27,3 +27,13 @@ void Film::commitSample(Sample s) {
 unsigned char* Film::getBMP() {
 	return &(pixelRGBAs[0]);
 }
+
+void Film::renderScene(Camera &c, SpatialGrid &sg, float stepSize) {
+	Sampler sampler = Sampler(c);
+	Sample s;
+	while (sampler.hasNext()) {
+		sampler.next();
+		s = sampler.getPixelRGBA(sg, stepSize);
+		commitSample(s);
+	}
+}

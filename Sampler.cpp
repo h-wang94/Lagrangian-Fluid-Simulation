@@ -65,7 +65,7 @@ Ray Sampler::getRayThroughSample() {
  * Maybe edit this later so it commits to an array or put this somewhere else or idk. */
 Sample Sampler::getPixelRGBA(SpatialGrid &sg, float stepSize) {
 	Ray r = getRayThroughSample();
-	Particle p = Particle(), temp;
+	Particle p, temp;
 	vector<Particle> neighbors;
 	Sample newSample;
 	Point3D testPoint;
@@ -73,7 +73,8 @@ Sample Sampler::getPixelRGBA(SpatialGrid &sg, float stepSize) {
 	for (int i = 0; dist < farClip && s.opacity < 1.0; i++) { //while the color is still opaque...probably want to set i to something else later btw
 		testPoint = r.getPointAtT(stepSize * i);
 		p.setPosition(testPoint);
-		neighbors = sg.getNeighbors(p);
+		//neighbors = sg.getNeighbors(p); until spatial grid works
+		neighbors = pSystem.getNeighbors(p);
 		if (neighbors.empty() || pSystem.colorFunction(p) < .5) {
 			continue; //if there are no neighbors, we're outside the fluid. Probably.
 		}
