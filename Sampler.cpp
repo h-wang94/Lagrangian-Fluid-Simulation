@@ -65,7 +65,7 @@ Ray Sampler::getRayThroughSample() {
  * Maybe edit this later so it commits to an array or put this somewhere else or idk. */
 Sample Sampler::getPixelRGBA(SpatialGrid &sg, float stepSize) {
 	Ray r = getRayThroughSample();
-	Particle p = Particle(), temp;
+	Particle p, temp;
 	vector<Particle> neighbors;
 	Sample newSample;
 	Point3D testPoint;
