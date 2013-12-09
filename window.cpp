@@ -9,6 +9,7 @@
 #include "Point3D.h"
 #include "ParticleSystem.h"
 #include "SpatialGrid.h"
+#include "GLToMovie.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -321,6 +322,7 @@ void determineFunction(int argc, char *argv[]) {
 }
 
 
+CGLToMovie recorder(_T("Output.avi"), 600, 600, 24, mmioFOURCC('D','I','B',' '), 60);
 /* Display is updated/rendered here. */
 void displayFunc() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -349,7 +351,7 @@ void displayFunc() {
   Particle* p;
 	for (unsigned int i = 0; i < pSystem.getParticles().size(); i+=1) {
     if (i == pSystem.getParticles().size() - 1) {
-      glColor4f(1.0, 1.0, 1.0, 1.0);
+      glColor4f(1.0, 1.0, 1.0, 0.3);
     }
     p = pSystem.getParticle(i);
     //if (p->getPosition().getZ() < 0.5) {
@@ -368,7 +370,7 @@ void displayFunc() {
   }
   glDisable(GL_LIGHTING);
 	glEnd();
-	glFlush();
+	recorder.RecordFrame();
 	glutSwapBuffers();
 }
 
