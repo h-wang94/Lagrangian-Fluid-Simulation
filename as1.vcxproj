@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AviFile.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="Point3D.cpp" />
@@ -20,11 +21,14 @@
     <ClCompile Include="Sample.cpp" />
     <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="SpatialGrid.cpp" />
+    <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Vector.cpp" />
     <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AviFile.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="GLToMovie.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Point3D.h" />
@@ -33,6 +37,7 @@
     <ClInclude Include="Sample.h" />
     <ClInclude Include="Sampler.h" />
     <ClInclude Include="SpatialGrid.h" />
+    <ClInclude Include="stdafx.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
@@ -106,6 +111,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>glut-3.7.6-bin</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vfw32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

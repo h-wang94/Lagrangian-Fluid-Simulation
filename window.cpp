@@ -9,6 +9,7 @@
 #include "Point3D.h"
 #include "ParticleSystem.h"
 #include "SpatialGrid.h"
+#include "GLToMovie.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -22,6 +23,9 @@
 #endif
 using namespace std;
 
+
+int frameWidth = 600, frameHeight = 600;
+CGLToMovie recorder(_T("Output.avi"), frameWidth, frameHeight, 24, mmioFOURCC('D', 'I', 'B', ' '), 30);
 std::vector<Point3D> vertexes, vt;
 std::vector<Vector>normals;
 std::vector< std::vector<int> > vertexIndexes;
@@ -352,6 +356,7 @@ void determineFunction(int argc, char *argv[]) {
     exit(1);
   }
 }
+
 
 float angle = 0;
 /* Display is updated/rendered here. */
