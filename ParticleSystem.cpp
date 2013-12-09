@@ -161,14 +161,14 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int& i) {
   return viscosity;
   }
 
-Vector ParticleSystem::tensionForce(Particle& p, unsigned const int& i) {
-  Vector normal = surfaceNormal(p, i);
-  if (normal.getMagnitude() > 7.065) { // threshold
-    normal.normalize();
-    return normal * curvature(p, i) * (-0.0728); // surface tension constant for water
+  Vector ParticleSystem::tensionForce(Particle& p, unsigned const int& i) {
+    Vector normal = surfaceNormal(p, i);
+    if (normal.getMagnitude() > 7.065) { // threshold
+      normal.normalize();
+      return normal * curvature(p, i) * (-0.0728); // surface tension constant for water
+    }
+    return Vector(0, 0, 0);
   }
-  return Vector(0, 0, 0);
-}
 
 float ParticleSystem::colorFunction(Particle& p) {
   float color = 0;
