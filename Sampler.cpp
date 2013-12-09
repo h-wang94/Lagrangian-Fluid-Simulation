@@ -73,7 +73,8 @@ Sample Sampler::getPixelRGBA(SpatialGrid &sg, float stepSize) {
 	for (int i = 0; dist < farClip && s.opacity < 1.0; i++) { //while the color is still opaque...probably want to set i to something else later btw
 		testPoint = r.getPointAtT(stepSize * i);
 		p.setPosition(testPoint);
-		neighbors = sg.getNeighbors(p);
+		//neighbors = sg.getNeighbors(p); until spatial grid works
+		neighbors = pSystem.getNeighbors(p);
 		if (neighbors.empty() || pSystem.colorFunction(p) < .5) {
 			continue; //if there are no neighbors, we're outside the fluid. Probably.
 		}

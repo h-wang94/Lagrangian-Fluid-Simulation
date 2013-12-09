@@ -8,41 +8,29 @@
 class ParticleSystem {
   public:
     ParticleSystem();
-    ParticleSystem(Vector grav);
-    ParticleSystem(Vector grav, float min_x, float min_y, float min_z, float max_x, float max_y, float max_z, float restCoeff);
+	  ParticleSystem(Vector grav);
 
     void initialize(float timestep);
-    void update(float timestep);
-    void setBoundaries(float min_x, float min_y, float min_z, float max_x, float max_y, float max_z);
-    void setRestCoeff(float restCoeff);
+	  void update(float timestep);
 
     void addParticle(Particle& p);
     Particle* getParticle(const unsigned int i);
     std::vector<Particle> getParticles();
     float colorFunction(Particle& p);
+    std::vector<Particle> getNeighbors(Particle &p);
 
   private:
     Vector grav;
     float h;
     float hSq;
     std::vector<Particle> particles;
-    
-    // boundaries
-    float MIN_X;
-    float MIN_Y;
-    float MIN_Z;
-    float MAX_X;
-    float MAX_Y;
-    float MAX_Z;
-
-    float REST_COEFF;
 
     bool debug;
-    SpatialGrid grid;
-    int numRowBoxes;
+	SpatialGrid grid;
+	int numRowBoxes;
 
-    void setDensities();
-    void computeForces();
+	  void setDensities();
+	  void computeForces();
     void computePressure();
     Vector gravityForce(Particle& p);
     Vector pressureForce(Particle& p, unsigned const int& i);
