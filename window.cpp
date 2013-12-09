@@ -460,6 +460,9 @@ void keyboard(unsigned char key, int x, int y) {
 	case ' ': // allow spacebar to end the program
 		exit(0);
 		break;
+  case 'b':
+    pSystem.setBoundaries(-1, -1, -1, 1, 1, 1);
+    break;
 	default:
 		break;
 	}
