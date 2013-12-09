@@ -82,7 +82,7 @@ void ParticleSystem::computeForces(){
     gravity = gravityForce(particles[i]);
     pressure = pressureForce(particles[i], i);
     viscosity = viscosityForce(particles[i], i);
-    tension = tensionForce(particles[i], i);
+    //tension = tensionForce(particles[i], i);
 
     force = gravity - pressure + viscosity;
     particles[i].setAcceleration(force / particles[i].getDensity()); // intuitively using mass..but slides say density...
@@ -195,8 +195,8 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int& i) {
 float ParticleSystem::colorFunction(Particle& p) {
   float color = 0;
   Vector diff;
-  unsigned int j;
-  for(j = j + 1; j < particles.size(); j++) {
+  unsigned int j = 0;
+  for(j = 0; j < particles.size(); j++) {
     diff = p.getPosition() - particles[j].getPosition();
     if (diff.getMagnitude() <= h) {
       color += particles[j].getMass() / particles[j].getDensity() * defaultKernel(diff);
