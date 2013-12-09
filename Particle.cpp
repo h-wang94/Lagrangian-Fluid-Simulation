@@ -21,10 +21,12 @@ Particle::Particle(void) {
   this->oldPosition = position;
   //this->velocity = Vector(rand() % 3, rand() % 3, rand() % 3);
   this->velocity = Vector(0, 0, 0);
+  this->color = Vector(0, 0, .8f);
+  this->opacity = 0.5f;
 
 }
 
-Particle::Particle(float mass, float pressure, float stiffness, float restDensity, float density, float viscosity, Point3D position, Vector velocity) {
+Particle::Particle(float mass, float pressure, float stiffness, float restDensity, float density, float viscosity, Point3D position, Vector velocity, Vector color, float opacity) {
   this->mass = mass;
   this->pressure = pressure;
   this->stiffness = stiffness;
@@ -34,6 +36,8 @@ Particle::Particle(float mass, float pressure, float stiffness, float restDensit
   this->position = position;
   this->oldPosition = position;
   this->velocity = velocity;
+  this->color = color;
+  this->opacity = opacity;
 }
 
 float Particle::getMass() const {
@@ -84,6 +88,14 @@ Vector Particle::getAcceleration() const {
   return this->acceleration;
 }
 
+Vector Particle::getColor() const {
+  return this->color;
+}
+
+float Particle::getOpacity() const {
+  return this->opacity;
+}
+
 void Particle::setMass(const float mass) {
   this->mass = mass;
 }
@@ -114,6 +126,14 @@ void Particle::setVelocityHalf(Vector velocityHalf) {
 
 void Particle::setAcceleration(Vector acceleration) {
   this->acceleration = acceleration;
+}
+
+void Particle::setColor(const Vector color) {
+  this->color = color;
+}
+
+void Particle::setOpacity(const float opacity) {
+  this->opacity = opacity;
 }
 
 std::ostream& operator <<(ostream& outs, const Particle& particle) {
