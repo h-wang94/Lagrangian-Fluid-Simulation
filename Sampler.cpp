@@ -68,14 +68,16 @@ Sample Sampler::getPixelRGBA(SpatialGrid &sg, float stepSize) {
 	Particle p = Particle();
 	vector<Particle> neighbors;
 	Sample newSample;
+	Point3D testPoint;
 	for (int i = 0; i < 1000 && s.opacity < 1.0; i++) { //while the color is still opaque...probably want to set i to something else later btw
-		Point3D testPoint = r.getPointAtT(stepSize * i);
+		testPoint = r.getPointAtT(stepSize * i);
 		p.setPosition(testPoint);
 		neighbors = sg.getNeighbors(p);
-		if (neighbors.empty()) {
+		if (neighbors.empty()) {// || pSystem.colorFunction(p, some i here) < .5) {
 			continue; //if there are no neighbors, we're outside the fluid. Probably.
 		}
 		//find some way to average the opacities and color at this "particle"
+		//should these be weighted somehow?
 		newSample = Sample();
 		/*for (int j = 0; j < (int) neighbors.size(); j++) {
 			newSample.colorVals += neighbors[j]'s color values';
