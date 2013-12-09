@@ -118,7 +118,6 @@ Vector ParticleSystem::pressureForce(Particle& p, unsigned const int& i) {
   float coeff = 0;
   unsigned int j = 0;
   // this is so stupid...........but ill think of a better way. i dont wanna do checks cause it might make a difference since this is computed every time for every particle
-#pragma omp parallel for firstprivate(pressure, coeff)
   for(j = 0; j < i; j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
     //if (diff.getMagnitude() <= hSq) {
@@ -127,7 +126,6 @@ Vector ParticleSystem::pressureForce(Particle& p, unsigned const int& i) {
       pressure += pressGradientKernel(diff) * coeff;
     }
   }
- #pragma omp parallel for firstprivate(pressure, coeff)
   for(j = j + 1; j < particles.size(); j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
     //if (diff.getMagnitude() <= hSq) {
@@ -277,6 +275,7 @@ float ParticleSystem::viscLaplacianKernel(Vector r) {
 // Leap frog integration. Takes in a dt and will loop through all the particles in our system.
 // Can be changed to work with leapfrogging just a certain particle.
 void ParticleSystem::leapFrog(const float& dt) {
+#pragma omp parallel for
   for(unsigned int i = 0; i < particles.size(); i++) {
     Particle& p = particles[i];
     // get velocity at time t - dt/2. v_{t - dt/2}
@@ -315,51 +314,50 @@ void ParticleSystem::checkBoundary(Point3D* position, Vector* velocity, Vector* 
   // if goes past boundaries, reflect back.
   if(position->getX() > MAX_X) {
     position->setX(MAX_X);
-    bouncebackVelocity(velocity, Vector(-1, 0, 0));
-    bouncebackVelocity(velocityHalf, Vector(-1, 0, 0));
+    /*bouncebackVelocity(velocity, Vector(-1, 0, 0));*/
+    /*bouncebackVelocity(velocityHalf, Vector(-1, 0, 0));*/
 	velocity->setX(-REST_COEFF * velocity->getX());
     velocityHalf->setX(-REST_COEFF * velocityHalf->getX());
   }
   else if (position->getX() < MIN_X) {
     position->setX(MIN_X);
-    bouncebackVelocity(velocity, Vector(1, 0, 0));
-    bouncebackVelocity(velocityHalf, Vector(1, 0, 0));
+    /*bouncebackVelocity(velocity, Vector(1, 0, 0));*/
+    /*bouncebackVelocity(velocityHalf, Vector(1, 0, 0));*/
     velocity->setX(-REST_COEFF * velocity->getX());
     velocityHalf->setX(-REST_COEFF * velocityHalf->getX());
   }
   if(position->getY() > MAX_Y) {
     position->setY(MAX_Y);
-    bouncebackVelocity(velocity, Vector(0, -1, 0));
-    bouncebackVelocity(velocityHalf, Vector(0, -1, 0));
+    /*bouncebackVelocity(velocity, Vector(0, -1, 0));*/
+    /*bouncebackVelocity(velocityHalf, Vector(0, -1, 0));*/
     velocity->setY(-REST_COEFF * velocity->getY());
     velocityHalf->setY(-REST_COEFF * velocityHalf->getY());
   }
   else if (position->getY() < MIN_Y) {
     position->setY(MIN_Y);
-    bouncebackVelocity(velocity, Vector(0, 1, 0));
-    bouncebackVelocity(velocityHalf, Vector(0, 1, 0));
+    /*bouncebackVelocity(velocity, Vector(0, 1, 0));*/
+    /*bouncebackVelocity(velocityHalf, Vector(0, 1, 0));*/
     velocity->setY(-REST_COEFF * velocity->getY());
     velocityHalf->setY(-REST_COEFF * velocityHalf->getY());
   }
   if(position->getZ() > MAX_Z) {
     position->setZ(MAX_Z);
-    bouncebackVelocity(velocity, Vector(0, 0, -1));
-    bouncebackVelocity(velocityHalf, Vector(0, 0, -1));
+    /*bouncebackVelocity(velocity, Vector(0, 0, -1));*/
+    /*bouncebackVelocity(velocityHalf, Vector(0, 0, -1));*/
     velocity->setZ(-REST_COEFF* velocity->getZ());
     velocityHalf->setZ(-REST_COEFF * velocityHalf->getZ());
   }
   else if (position->getZ() < MIN_Z) {
     position->setZ(MIN_Z);
-    bouncebackVelocity(velocity, Vector(0, 0, 1));
-    bouncebackVelocity(velocityHalf, Vector(0, 0, 1));
+    /*bouncebackVelocity(velocity, Vector(0, 0, 1));*/
+    /*bouncebackVelocity(velocityHalf, Vector(0, 0, 1));*/
     velocity->setZ(-REST_COEFF* velocity->getZ());
     velocityHalf->setZ(-REST_COEFF * velocityHalf->getZ());
   }
 }
 
 void ParticleSystem::bouncebackVelocity(Vector* velocity, Vector normal) {
-
-  //*velocity = *velocity - (normal * (*velocity).dotProduct(normal) * (1 + REST_COEFF));
+  *velocity = *velocity - (normal * (*velocity).dotProduct(normal) * (1 + REST_COEFF));
 }
 
 void ParticleSystem::addParticle(Particle& p) {
