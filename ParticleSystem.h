@@ -16,6 +16,7 @@ class ParticleSystem {
     void addParticle(Particle& p);
     Particle* getParticle(const unsigned int i);
     std::vector<Particle> getParticles();
+    float colorFunction(Particle& p);
 
   private:
     Vector grav;
@@ -34,7 +35,6 @@ class ParticleSystem {
     Vector pressureForce(Particle& p, unsigned const int& i);
     Vector viscosityForce(Particle& p, unsigned const int& i);
     Vector tensionForce(Particle& p, unsigned const int& i);
-    float colorFunction(Particle& p, unsigned const int& i);
     Vector surfaceNormal(Particle& p, unsigned const int& i);
     float curvature(Particle& p, unsigned const int& i);
 

@@ -73,7 +73,7 @@ Sample Sampler::getPixelRGBA(SpatialGrid &sg, float stepSize) {
 		testPoint = r.getPointAtT(stepSize * i);
 		p.setPosition(testPoint);
 		neighbors = sg.getNeighbors(p);
-		if (neighbors.empty()) {// || pSystem.colorFunction(p, some i here) < .5) {
+		if (neighbors.empty() || pSystem.colorFunction(p) < .5) {
 			continue; //if there are no neighbors, we're outside the fluid. Probably.
 		}
 		//find some way to average the opacities and color at this "particle"

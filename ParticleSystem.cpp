@@ -170,16 +170,10 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int& i) {
     return Vector(0, 0, 0);
   }
 
-float ParticleSystem::colorFunction(Particle& p, unsigned const int& i) {
+float ParticleSystem::colorFunction(Particle& p) {
   float color = 0;
   Vector diff;
   unsigned int j;
-  for(j = 0; j < i; j++) {
-    diff = p.getPosition() - particles[j].getPosition();
-    if (diff.getMagnitude() <= h) {
-      color += particles[j].getMass() / particles[j].getDensity() * defaultKernel(diff);
-    }
-  }
   for(j = j + 1; j < particles.size(); j++) {
     diff = p.getPosition() - particles[j].getPosition();
     if (diff.getMagnitude() <= h) {
