@@ -345,6 +345,14 @@ void determineFunction(int argc, char *argv[]) {
 			i++;
 			objFile = true;
 			readInput(string(argv[i]));
+		} else if (strcmp(argv[i], "-width") == 0) {
+			i++;
+			frameWidth = std::atoi(argv[i]);
+			recorder.setWidth(frameWidth);
+		} else if (strcmp(argv[i], "-height") == 0) {
+			i++;
+			frameHeight = std::atoi(argv[i]);
+			recorder.setHeight(frameHeight);
 		} else if (strcmp(argv[i], "-record") == 0) {
 			record = true;
 		} else {
