@@ -15,11 +15,11 @@ class Film {
 public:
 	Film();
 	Film(float imgW, float imgH);
-	__int8* getBMP();
+	unsigned char* getBMP();
 	void commitSample(Sample s);
 
 private:
-	vector<__int8> pixelRGBAs;
+	vector<unsigned char> pixelRGBAs;
 	float imgWidth, imgHeight;
 };
 
