@@ -87,56 +87,25 @@ void testSpatialGrid() {
 }
 
 void createParticles() {
-  Particle p1 = Particle();
-  unsigned int i;
-  srand(time(NULL)); // for rand function
-  if (objFile) {
-    for(i = 0; i < numParticles; i++) {
-      p1 = Particle(0.02, 0.0, 3.0, 998.29, 0, 3.5, vertexes[i], Vector(0, 0, 0));
+	Particle p1 = Particle();
+	unsigned int i;
+	srand(time(NULL)); // for rand function
+	if (objFile) {
+		for(i = 0; i < numParticles; i++) {
+			//p1 = Particle(0.02, 0.0, 3.0, 998.29, 0, 3.5, vertexes[i], Vector(0, 0, 0));
+			pSystem.addParticle(p1);
+		}
+	} else {
+		for(i = 0; i < numParticles/2; i++) {
+			p1 = Water();
+			pSystem.addParticle(p1);
+		}
+    for(; i < numParticles; i++) {
+      p1 = Mucus();
       pSystem.addParticle(p1);
     }
-  } else {
-    for(i = 0; i < numParticles; i++) {
-		if(i <= numParticles/2){
-			p1 = Particle();
-			pSystem.addParticle(p1);
-		}
-		if(i > numParticles/2){
-			p1 = Particle();
-			//p1.setViscosity(10);
-			//p1.setColor(Point3D(0,1,.2));
-			pSystem.addParticle(p1);
-		}
-    }
-	  /*float maxX = .08f;
-	  float minX = -.08f;
-	  float maxY = .08f;
-	  float minY = 0.0f;
-	  float maxZ = .08f;
-	  float minZ = -.08f;
-	  float n = minX;
-	  float m = minY;
-	  float o = minZ;
-	  
-	  while(n < maxX){
-		  m=minY;
-		  while(m < maxY){
-			  o = minZ;
-			  while(o < maxZ){
-				  Point3D pos = Point3D(n,m,o);
-				  //cout<<pos<<endl;
-				p1 = Particle(0.02, 0.0, 3.0, 998.29, 0, 3.5, Point3D(n,m,o), Vector(0, 0, 0));
-				pSystem.addParticle(p1);
-				o+=.015;
-			  }
-			  m+=.015;
-		  }
-		  n+=.015;
-	  }*/
-
-  }  
+	}  
 }
-
 
 //==============================================================================
 // Count the number of slashes to determine format of obj file inputs for faces

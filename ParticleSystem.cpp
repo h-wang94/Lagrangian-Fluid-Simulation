@@ -101,6 +101,7 @@ void ParticleSystem::setDensities(){
     }
     particles[i].setDensity(density);											//set the particle[i]'s density to particle[i]
   }
+  //cout<<"STOP"<<endl;
 }
 
 Vector ParticleSystem::gravityForce(Particle& p) {
