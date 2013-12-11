@@ -44,7 +44,6 @@ void testSpatialGrid() {
 	//Particle p4 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(0,-9, -9));
 	/*Particle p5 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(11,11, 11));*/
 	std::vector<Particle> listofparts;
-<<<<<<< HEAD
   Particle p1 = Particle();
   Particle p2 = Particle();
   Particle p3 = Particle();

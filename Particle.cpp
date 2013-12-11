@@ -36,7 +36,7 @@ Particle::Particle(float mass, float pressure, float stiffness, float restDensit
   this->position = position;
   this->oldPosition = position;
   this->velocity = velocity;
-  this->color = Point3D(.2,0,1);
+  this->color = Vector(.2,0,1);
 }
 
 void Particle::setColor(const Point3D c){
