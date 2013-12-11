@@ -365,7 +365,7 @@ void ParticleSystem::checkBoundary(Particle& p, Point3D* position, Vector* veloc
   else if (position->getY() < MIN_Y) {
 	  Vector normal = Vector(0,1,0);
 	  Point3D cp = Point3D(position->getX(), MIN_Y, position->getZ());
-	  float d = abs(MIN_Y - position->getY());
+		//float d = abs(MIN_Y - position->getY());
 
 	  /*Vector vel = *velocity;
 	  Vector v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
@@ -386,7 +386,7 @@ void ParticleSystem::checkBoundary(Particle& p, Point3D* position, Vector* veloc
   if(position->getZ() > MAX_Z) {
 	  Vector normal = Vector(0,0,-1);
 	  Point3D cp = Point3D(position->getX(), position->getY(), MAX_Z);
-	  float d = abs(MAX_Z - position->getZ());
+		//float d = abs(MAX_Z - position->getZ());
 
 	  /*Vector vel = *velocity;
 	  Vector v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
@@ -407,7 +407,7 @@ void ParticleSystem::checkBoundary(Particle& p, Point3D* position, Vector* veloc
   else if (position->getZ() < MIN_Z) {
 	  Vector normal = Vector(0,0,1);
 	  Point3D cp = Point3D(position->getX(), position->getY(), MIN_Z);
-	  float d = abs(MIN_Z - position->getZ());
+		//float d = abs(MIN_Z - position->getZ());
 
 	  /*Vector vel = *velocity;
 	  Vector v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
