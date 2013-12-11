@@ -125,25 +125,25 @@ std::vector<Particle> SpatialGrid::getNeighbors(Particle p){
 
 }
 
-std::vector<Particle> SpatialGrid::updateBoxes(std::vector<Particle> particles){
+Particle SpatialGrid::updateBoxes(Particle partc){
 	
-	if(newPositionsSet == false){//haven't even initialized the new positions yet
+	//if(newPositionsSet == false){//haven't even initialized the new positions yet
 		unsigned int c = 0;
-		while(c < particles.size()){
-			Point3D pos = particles[c].getPosition();//particle now has a new position
+		//while(c < particles.size()){
+			Point3D pos = partc.getPosition();//particle now has a new position
 			float x = pos.getX();
 			float y = pos.getY();
 			float z = pos.getZ();
-			Point3D OLDpos = particles[c].getOldPosition();
+			Point3D OLDpos = partc.getOldPosition();
 			float OLDx = OLDpos.getX();
 			float OLDy = OLDpos.getY();
 			float OLDz = OLDpos.getZ();
 			int xindex = (int)floor((x+10)/(this->boxLength));//these are now new position indices
 			int yindex = (int)floor((y+10)/(this->boxLength));
 			int zindex = (int)floor((z+10)/(this->boxLength));
-			int thisid = particles[c].getHashID();//((OLDxindex*p1) ^ (OLDyindex*p2) ^ (OLDzindex*p3));//this is the OLD HASH ID
+			int thisid = partc.getHashID();//((OLDxindex*p1) ^ (OLDyindex*p2) ^ (OLDzindex*p3));//this is the OLD HASH ID
 			int newid = ((xindex*p1) ^ (yindex*p2) ^ (zindex*p3));//this is the NEW HASH ID we need to set
-			particles[c].setHashID(newid);
+			partc.setHashID(newid);
 			
 			/*cout<<"the list parts hash id: "<<thisid<<endl;
 			cout<<"the calculated new position hash id: "<<newid<<endl;
@@ -154,17 +154,17 @@ std::vector<Particle> SpatialGrid::updateBoxes(std::vector<Particle> particles){
 			cin >> breakpoint;*/
 
 			if(thisid != newid){
-				particles[c].setHashID(newid);
+				partc.setHashID(newid);
 				//need to put the particle into the new bucket and erase the other particle
 				//add particle in new position
 				if(this->hashMap.find(newid) != this->hashMap.end()){//such a bucket exists
 					std::map<int,Bucket>::iterator it;
 					it = this->hashMap.find(newid);
-					it->second.addParticle(particles[c]);
+					it->second.addParticle(partc);
 				}
 				else{//the bucket does not exist
 					Bucket b =Bucket(Point3D(xindex, yindex, zindex));
-					b.addParticle(particles[c]);
+					b.addParticle(partc);
 					hashMap.insert ( std::pair<int, Bucket>(newid,b) );
 				}
 
@@ -252,7 +252,7 @@ std::vector<Particle> SpatialGrid::updateBoxes(std::vector<Particle> particles){
 					if(list[d].getPosition().getX() == OLDx &&
 						list[d].getPosition().getY() == OLDy &&
 						list[d].getPosition().getZ() == OLDz){
-							list[d]=particles[c];
+							list[d]=partc;
 						}
 					
 					d++;
@@ -262,8 +262,8 @@ std::vector<Particle> SpatialGrid::updateBoxes(std::vector<Particle> particles){
 
 			c++;
 			
-		}
-	}
-	return particles;
+		//}
+	//}
+	return partc;
 }
 

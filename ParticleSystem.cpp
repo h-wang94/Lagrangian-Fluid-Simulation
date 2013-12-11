@@ -3,6 +3,7 @@
 #include <time.h>
 
 #define PI 3.14159265
+#define MAX_NAIVE 10000
 
 ParticleSystem::ParticleSystem() {
   this->grav = Vector(0,0,-9.8);
@@ -44,7 +45,6 @@ void ParticleSystem::update(float timestep){
   this->computePressure(); // now compute each particle's pressure
   this->computeForces(); // compute forces and set acceleration of the particles
   this->leapFrog(timestep); // utilize leapfrog integration to figure out position and new velocity
-  this->particles = this->grid.updateBoxes(this->particles); // update the boxes of the particles in spatialgrid
 }
 
 Particle* ParticleSystem::getParticle(const unsigned int i) {
@@ -88,13 +88,24 @@ void ParticleSystem::setDensities(){
 #pragma omp parallel for firstprivate(density)
   for(unsigned int i = 0; i < particles.size(); i++){
     density = 0;
-    list = grid.getNeighbors(particles[i]);
-    for(unsigned int j = 0; j < list.size(); j++){ 
-      Vector diff = particles[i].getPosition() - list[j].getPosition();
-      if (diff.getMagnitude() <= particles[i].getSupportRadius()) {
-        density += defaultKernel(diff, particles[i].getSupportRadius()) * list[j].getMass();
-      }
-    }
+
+	if(particles.size() > MAX_NAIVE){
+		list = grid.getNeighbors(particles[i]);
+		for(unsigned int j = 0; j < list.size(); j++){ 
+		  Vector diff = particles[i].getPosition() - list[j].getPosition();
+		  if (diff.getMagnitude() <= particles[i].getSupportRadius()) {
+			density += defaultKernel(diff, particles[i].getSupportRadius()) * list[j].getMass();
+		  }
+		}
+	}
+	else{
+		for(unsigned int j = 0; j < particles.size(); j++){ 
+		  Vector diff = particles[i].getPosition() - particles[j].getPosition();
+		  if (diff.getMagnitude() <= particles[i].getSupportRadius()) {
+			density += defaultKernel(diff, particles[i].getSupportRadius()) * particles[j].getMass();
+		  }
+		}
+	}
     if(density == 0){
       density = particles[i].getMass() / .00000001;
     }
@@ -284,6 +295,10 @@ void ParticleSystem::leapFrog(const float& dt) {
     p.setPosition(tempPosition); 
     // use midpoint approximation for velocity at time t. v_{t} = (v_{t - dt / 2} + v_{t + dt / 2}) / 2.
     p.setVelocity(tempVelocity); 
+
+	if(particles.size() > MAX_NAIVE){
+		p = this->grid.updateBoxes(p); // update the boxes of the particles in spatialgrid
+	}
   }
 }
 

@@ -71,7 +71,11 @@ void testSpatialGrid() {
 	cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
 	cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
 	cout<<"++++++++++++++++++++++++++++++++++++"<<endl<<endl;
-	grid.updateBoxes(listofparts);
+	int k = 0;
+	while(k<listofparts.size()){
+	listofparts[k] = grid.updateBoxes(listofparts[k]);
+	k++;
+	}
 	cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
 	cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
 	cout<<"++++++++++++++++++++++++++++++++++++"<<endl<<endl;
@@ -400,7 +404,6 @@ void displayFunc() {
 	//glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
 	//glMaterialfv(GL_FRONT, GL_SHININESS, &shininess);
 
-
 		glClearDepth(1);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
@@ -442,7 +445,7 @@ void displayFunc() {
 	} else {
 		exit(1);
 	}
-	glDisable(GL_LIGHTING);
+	//glDisable(GL_LIGHTING);
 	glFlush();
 	if(record) {
 		recorder.RecordFrame();
@@ -608,8 +611,8 @@ int main(int argc, char** argv) {
 	glEnable(GL_BLEND);
 	glutKeyboardFunc(keyboard);
 
-	glutDisplayFunc(displayFunc1);
-	glutIdleFunc(displayFunc1); //if we do user interaction
+	glutDisplayFunc(displayFunc);
+	glutIdleFunc(displayFunc); //if we do user interaction
 	glutReshapeFunc(changeSize);
 	glutMainLoop();
 	return 0;
