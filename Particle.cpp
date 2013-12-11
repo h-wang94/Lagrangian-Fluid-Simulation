@@ -82,14 +82,6 @@ Particle::Particle(float mass, float pressure, float stiffness, float restDensit
   this->color = Vector(.2,0,1);
 }
 
-int Particle::getHashID() const {
-	
-  return this->hashID;
-}
-
-void Particle::setHashID(const int i){
-  this->hashID = i;
-}
 
 float Particle::getMass() const {
   return this->mass;
@@ -139,14 +131,6 @@ Vector Particle::getAcceleration() const {
   return this->acceleration;
 }
 
-Vector Particle::getColor() const {
-  return this->color;
-}
-
-float Particle::getOpacity() const {
-  return this->opacity;
-}
-
 float Particle::getRestCoeff() const {
   return this->restCoeff;
 }
@@ -161,6 +145,19 @@ float Particle::getThreshold() const {
 
 float Particle::getSurfTension() const {
   return this->surfTension;
+}
+
+Vector Particle::getColor() const {
+  return this->color;
+}
+
+float Particle::getOpacity() const {
+  return this->opacity;
+}
+
+int Particle::getHashID() const {
+	
+  return this->hashID;
 }
 
 void Particle::setMass(const float mass) {
@@ -184,7 +181,6 @@ void Particle::setPosition(Point3D position) {
 }
 
 void Particle::setOldPosition(Point3D oldPosition) {
-	
   this->oldPosition = oldPosition;
 }
 
@@ -206,6 +202,10 @@ void Particle::setColor(const Vector color) {
 
 void Particle::setOpacity(const float opacity) {
   this->opacity = opacity;
+}
+
+void Particle::setHashID(const int i){
+  this->hashID = i;
 }
 
 std::ostream& operator <<(ostream& outs, const Particle& particle) {

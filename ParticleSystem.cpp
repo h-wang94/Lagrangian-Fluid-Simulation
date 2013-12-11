@@ -21,7 +21,6 @@ ParticleSystem::ParticleSystem(Vector grav, float min_x, float min_y, float min_
   this->numRowBoxes = 100;
   this->grid = SpatialGrid(0.0457);
   setBoundaries(min_x, min_y, min_z, max_x, max_y, max_z);
-  this->grid = SpatialGrid(0.0457);
 }
 
 void ParticleSystem::setBoundaries(float min_x, float min_y, float min_z, float max_x, float max_y, float max_z) {
@@ -42,10 +41,10 @@ void ParticleSystem::initialize(float timestep) {
 
 void ParticleSystem::update(float timestep){
   this->setDensities();//for each particle, compute particle's density
-  this->computePressure(); // now compute each particle's pressure. randomly put in numbers.
-  this->computeForces();
-  this->leapFrog(timestep);
-  this->particles = this->grid.updateBoxes(this->particles);
+  this->computePressure(); // now compute each particle's pressure
+  this->computeForces(); // compute forces and set acceleration of the particles
+  this->leapFrog(timestep); // utilize leapfrog integration to figure out position and new velocity
+  this->particles = this->grid.updateBoxes(this->particles); // update the boxes of the particles in spatialgrid
 }
 
 Particle* ParticleSystem::getParticle(const unsigned int i) {
@@ -69,7 +68,7 @@ void ParticleSystem::computeForces(){
 
     force = gravity - pressure + viscosity;
     Vector acceleration = force / particles[i].getDensity();
-    particles[i].setAcceleration(acceleration); // intuitively using mass..but slides say density...
+    particles[i].setAcceleration(acceleration);
   }
 }
 
@@ -77,7 +76,7 @@ void ParticleSystem::computePressure() {
   float pressure = 0;
 #pragma omp parallel for firstprivate(pressure)
   for(unsigned int i = 0; i < particles.size(); i++) {
-    // p = k ( (p / p0)^7 - 1)
+    // Equation: p = k ( (p / p0)^7 - 1)
     pressure = particles[i].getStiffness() * (pow((particles[i].getDensity() / particles[i].getRestDensity()), 7.0f) - 1.0f);
     particles[i].setPressure(pressure);
   }
@@ -86,7 +85,7 @@ void ParticleSystem::computePressure() {
 void ParticleSystem::setDensities(){
   float density = 0;
   std::vector<Particle> list;
-//#pragma omp parallel for firstprivate(density)
+#pragma omp parallel for firstprivate(density)
   for(unsigned int i = 0; i < particles.size(); i++){
     density = 0;
     list = grid.getNeighbors(particles[i]);
@@ -99,7 +98,7 @@ void ParticleSystem::setDensities(){
     if(density == 0){
       density = particles[i].getMass() / .00000001;
     }
-    particles[i].setDensity(density);											//set the particle[i]'s density to particle[i]
+    particles[i].setDensity(density);
   }
 }
 
@@ -174,16 +173,16 @@ float ParticleSystem::colorFunction(Particle& p) {
 }
 
 vector<Particle> ParticleSystem::getNeighbors(Particle &p) {
-	Vector diff;
-	vector<Particle> neighbors;
-	unsigned int j;
-	for(j = 0; j < particles.size(); j++) {
-	    diff = p.getPosition() - particles[j].getPosition();
-      if (diff.getMagnitude() <= p.getSupportRadius()) {
-	        neighbors.push_back(particles[j]);
-	    }
-	}
-	return neighbors;
+  Vector diff;
+  vector<Particle> neighbors;
+  unsigned int j;
+  for(j = 0; j < particles.size(); j++) {
+    diff = p.getPosition() - particles[j].getPosition();
+    if (diff.getMagnitude() <= p.getSupportRadius()) {
+      neighbors.push_back(particles[j]);
+    }
+  }
+  return neighbors;
 }
 
 Vector ParticleSystem::surfaceNormal(Particle& p, unsigned const int& i) {
@@ -211,14 +210,12 @@ float ParticleSystem::curvature(Particle& p, unsigned const int& i) {
   unsigned int j;
   for(j = 0; j < i; j++) {
     diff = p.getPosition() - particles[j].getPosition();
-    //if (diff.getMagnitude() <= h) {
     if (diff.getMagnitude() <= p.getSupportRadius()) {
       curvature += particles[j].getMass() / particles[j].getDensity() * laplacianKernel(diff, p.getSupportRadius());
     }
   }
   for(j = j + 1; j < particles.size(); j++) {
     diff = p.getPosition() - particles[j].getPosition();
-    //if (diff.getMagnitude() <= h) {
     if (diff.getMagnitude() <= p.getSupportRadius()) {
       curvature += particles[j].getMass() / particles[j].getDensity() * laplacianKernel(diff, p.getSupportRadius());
     }
@@ -254,9 +251,6 @@ float ParticleSystem::laplacianKernel(Vector r, const float h) {
 // Give more repulsive pressure at float distance and thus avoids clustering.
 Vector ParticleSystem::pressGradientKernel(Vector r, const float h) {
   float rMag = r.getMagnitude();
-  /*if (rMag == 0) {
-    return Vector(0,0,0);
-  }*/
   float coeff = (-45 * pow((h - rMag), 2.0f)) / (PI * pow(h, 6.0f));
   //r.normalize();
   return r * coeff;
@@ -337,7 +331,6 @@ void ParticleSystem::checkBoundary(Particle& p, Point3D* position, Vector* veloc
 }
 
 void ParticleSystem::addParticle(Particle& p) {
-
   long id = grid.addParticle(p);
   p.setHashID(id);
 
