@@ -82,44 +82,6 @@ void testSpatialGrid() {
 		cout << list2[j] << endl;
 		j++;
 	}
-  Particle p1 = Particle();
-  Particle p2 = Particle();
-  Particle p3 = Particle();
-  Particle p4 = Particle();
-  Particle p5 = Particle();
-  SpatialGrid grid = SpatialGrid(1);
-  
-  grid.addParticle(p2);
-  grid.addParticle(p3);
-  grid.addParticle(p4);
-  grid.addParticle(p5);
-  grid.addParticle(p1);
-  listofparts.push_back(p1);
-  listofparts.push_back(p2);
-  listofparts.push_back(p3);
-  listofparts.push_back(p4);
-  listofparts.push_back(p5);
-  std::vector<Particle> list = grid.getNeighbors(p1);
-  unsigned int j = 0;
-  while (j < list.size()){
-    cout << list[j] << endl;
-    j++;
-  }
-  listofparts[4].setPosition(Point3D(10,10,10));
-  cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
-  cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
-  cout<<"++++++++++++++++++++++++++++++++++++"<<endl<<endl;
-  grid.updateBoxes(listofparts);
-  cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
-  cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
-  cout<<"++++++++++++++++++++++++++++++++++++"<<endl<<endl;
-  //cout<<p4<<endl;
-  std::vector<Particle> list2 = grid.getNeighbors(p1);
-  j = 0;
-  while (j < list2.size()){
-    cout << list2[j] << endl;
-    j++;
-  }
   int breakpoint = 0;
   cin>>breakpoint;
 }
@@ -395,7 +357,7 @@ void displayFunc() {
 		0.0f, 1.0f,  0.0f);
 
 	glRotatef(angle, 0.0f, 1.0f, 0.0f);
-
+	glColor4f(1.0, 1.0, 1.0, 1.0);
 	glBegin(GL_TRIANGLES);
 	glVertex3f( -1.0f, -1.0f, -1.0f);
 	glVertex3f( 1.0f, -1.0f, -1.0);
@@ -439,7 +401,23 @@ void displayFunc() {
 	//glMaterialfv(GL_FRONT, GL_SHININESS, &shininess);
 
 
+		glClearDepth(1);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_COLOR_MATERIAL);
 
+	   GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	   GLfloat mat_shininess[] = { 50.0 };
+	   GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
+	   glClearColor (0.0, 0.0, 0.0, 0.0);
+	   glShadeModel (GL_SMOOTH);
+
+	   glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	   glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+	   glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+
+	   glEnable(GL_LIGHT0);
 
 
 	glBegin(GL_POINTS);
@@ -560,13 +538,19 @@ void displayFunc1() {
 }
 
 void keyboard(unsigned char key, int x, int y) {
+	Particle p1;
 	switch(key) {
 	case ' ': // allow spacebar to end the program
 		exit(0);
 		break;
-  case 'b':
-    pSystem.setBoundaries(-1, -1, -1, 1, 1, 1);
-    break;
+	  case 'b':
+		pSystem.setBoundaries(-1, -1, -1, 1, 1, 1);
+		break;
+	 case 'p':
+		p1 = Water();
+		p1.setPosition(Point3D(0,.1,0));
+		pSystem.addParticle(p1);
+		break;
 	default:
 		break;
 	}
