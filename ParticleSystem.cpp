@@ -67,11 +67,12 @@ void ParticleSystem::computeForces(){
     /*pressure = pressureForce(particles[i], i);*/
     //viscosity = viscosityForce(particles[i], i);
     total = press_visc(particles[i], i);
-    tension = tensionForce(particles[i], i);
+    //tension = tensionForce(particles[i], i);
 
     //force = gravity - pressure + viscosity;
     //force = gravity - pressure + viscosity + tension;
-    force = gravity + total + tension;
+    //force = gravity + total + tension;
+    force = gravity + total;
     Vector acceleration = force / particles[i].getDensity();
     particles[i].setAcceleration(acceleration);
   }
@@ -124,8 +125,7 @@ Vector ParticleSystem::gravityForce(Particle& p) {
 
 Vector ParticleSystem::press_visc(Particle& p , unsigned const int& i) {
   unsigned int j = 0;
-  Vector pressure, viscosity;
-  Vector diff;
+  Vector pressure, viscosity, diff;
   float pCoeff;
   Vector vCoeff;
   for(j = 0; j < i; j++) {
@@ -136,7 +136,6 @@ Vector ParticleSystem::press_visc(Particle& p , unsigned const int& i) {
       vCoeff = (particles[j].getVelocity() - p.getVelocity()) * particles[j].getVolume();
       viscosity += vCoeff * viscLaplacianKernel(diff, p.getSupportRadius());
     }
-
   }
   for(j = j + 1; j < particles.size(); j++) {
     diff = p.getPosition() - particles[j].getPosition();
@@ -330,9 +329,9 @@ void ParticleSystem::leapFrog(const float& dt) {
     // use midpoint approximation for velocity at time t. v_{t} = (v_{t - dt / 2} + v_{t + dt / 2}) / 2.
     p.setVelocity(tempVelocity); 
 
-	if(particles.size() > MAX_NAIVE){
-		p = this->grid.updateBoxes(p); // update the boxes of the particles in spatialgrid
-	}
+    if(particles.size() > MAX_NAIVE){
+      p = this->grid.updateBoxes(p); // update the boxes of the particles in spatialgrid
+    }
   }
 }
 
