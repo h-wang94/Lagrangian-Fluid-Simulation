@@ -39,6 +39,9 @@ class ParticleSystem {
 	  void computeForces();
     void computePressure();
     Vector gravityForce(Particle& p);
+    // replace pressure and viscosity force calculation functions
+    Vector press_visc(Particle&p, unsigned const int& i);
+
     Vector pressureForce(Particle& p, unsigned const int& i);
     Vector viscosityForce(Particle& p, unsigned const int& i);
     Vector tensionForce(Particle& p, unsigned const int& i);

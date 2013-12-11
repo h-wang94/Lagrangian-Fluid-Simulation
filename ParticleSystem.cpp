@@ -58,15 +58,20 @@ std::vector<Particle> ParticleSystem::getParticles() {
 // computes the internal and external forces.
 // also sets acceleration
 void ParticleSystem::computeForces(){
-  Vector gravity, pressure, viscosity, tension, force;
-#pragma omp parallel for firstprivate(gravity, pressure, viscosity, tension, force)
+  //Vector gravity, pressure, viscosity, tension, force;
+  Vector gravity, force, total, tension;
+//#pragma omp parallel for firstprivate(gravity, pressure, viscosity, tension, force)
+#pragma omp parallel for firstprivate(gravity, total, force, tension)
   for(unsigned int i = 0; i < particles.size(); i++) {
     gravity = gravityForce(particles[i]);
-    pressure = pressureForce(particles[i], i);
-    viscosity = viscosityForce(particles[i], i);
-    //tension = tensionForce(particles[i], i);
+    /*pressure = pressureForce(particles[i], i);*/
+    //viscosity = viscosityForce(particles[i], i);
+    total = press_visc(particles[i], i);
+    tension = tensionForce(particles[i], i);
 
-    force = gravity - pressure + viscosity;
+    //force = gravity - pressure + viscosity;
+    //force = gravity - pressure + viscosity + tension;
+    force = gravity + total + tension;
     Vector acceleration = force / particles[i].getDensity();
     particles[i].setAcceleration(acceleration);
   }
@@ -104,6 +109,35 @@ void ParticleSystem::setDensities(){
 
 Vector ParticleSystem::gravityForce(Particle& p) {
   return grav * p.getDensity(); 
+}
+
+Vector ParticleSystem::press_visc(Particle& p , unsigned const int& i) {
+  unsigned int j = 0;
+  Vector pressure, viscosity;
+  Vector diff;
+  float pCoeff;
+  Vector vCoeff;
+  for(j = 0; j < i; j++) {
+    diff = p.getPosition() - particles[j].getPosition();
+    if(diff.getMagnitude() <= p.getSupportRadius()) {
+      pCoeff = (p.getPressure() + particles[j].getPressure()) / 2.0 * particles[j].getVolume();
+      pressure += pressGradientKernel(diff, p.getSupportRadius()) * pCoeff;
+      vCoeff = (particles[j].getVelocity() - p.getVelocity()) * particles[j].getVolume();
+      viscosity += vCoeff * viscLaplacianKernel(diff, p.getSupportRadius());
+    }
+
+  }
+  for(j = j + 1; j < particles.size(); j++) {
+    diff = p.getPosition() - particles[j].getPosition();
+    if(diff.getMagnitude() <= p.getSupportRadius()) {
+      pCoeff = (p.getPressure() + particles[j].getPressure()) / 2.0 * particles[j].getVolume();
+      pressure += pressGradientKernel(diff, p.getSupportRadius()) * pCoeff;
+      vCoeff = (particles[j].getVelocity() - p.getVelocity()) * particles[j].getVolume();
+      viscosity += vCoeff * viscLaplacianKernel(diff, p.getSupportRadius());
+    }
+  }
+  viscosity = viscosity * p.getViscosity();
+  return viscosity - pressure;
 }
 
 Vector ParticleSystem::pressureForce(Particle& p, unsigned const int& i) {
@@ -363,8 +397,8 @@ void ParticleSystem::checkBoundary(Particle& p, Point3D* position, Vector* veloc
     velocityHalf->setY(-p.getRestCoeff() * velocityHalf->getY());
   }
   else if (position->getY() < MIN_Y) {
-	  Vector normal = Vector(0,1,0);
-	  Point3D cp = Point3D(position->getX(), MIN_Y, position->getZ());
+		/*Vector normal = Vector(0,1,0);*/
+		/*Point3D cp = Point3D(position->getX(), MIN_Y, position->getZ());*/
 		//float d = abs(MIN_Y - position->getY());
 
 	  /*Vector vel = *velocity;
@@ -384,8 +418,8 @@ void ParticleSystem::checkBoundary(Particle& p, Point3D* position, Vector* veloc
     velocityHalf->setY(-p.getRestCoeff() * velocityHalf->getY());
   }
   if(position->getZ() > MAX_Z) {
-	  Vector normal = Vector(0,0,-1);
-	  Point3D cp = Point3D(position->getX(), position->getY(), MAX_Z);
+		/*Vector normal = Vector(0,0,-1);*/
+		/*Point3D cp = Point3D(position->getX(), position->getY(), MAX_Z);*/
 		//float d = abs(MAX_Z - position->getZ());
 
 	  /*Vector vel = *velocity;
@@ -405,8 +439,8 @@ void ParticleSystem::checkBoundary(Particle& p, Point3D* position, Vector* veloc
     velocityHalf->setZ(-p.getRestCoeff() * velocityHalf->getZ());
   }
   else if (position->getZ() < MIN_Z) {
-	  Vector normal = Vector(0,0,1);
-	  Point3D cp = Point3D(position->getX(), position->getY(), MIN_Z);
+	  /*Vector normal = Vector(0,0,1);*/
+		/*Point3D cp = Point3D(position->getX(), position->getY(), MIN_Z);*/
 		//float d = abs(MIN_Z - position->getZ());
 
 	  /*Vector vel = *velocity;
