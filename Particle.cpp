@@ -2,9 +2,9 @@
 #include <cstdlib>
 #include "Particle.h"
 
-#define MAX_X .08
-#define MAX_Y .08
-#define MAX_Z .08
+#define MAX_X .18
+#define MAX_Y .18
+#define MAX_Z .18
 
 // Constructor for a water particle in random locations
 Particle::Particle(void) {
@@ -19,14 +19,57 @@ Particle::Particle(void) {
   float z = MAX_Z*((2*(static_cast <float> (rand()) / static_cast <float> (RAND_MAX)))-1);
   this->position = Point3D(x, y, z);
   this->oldPosition = position;
-  //this->velocity = Vector(rand() % 3, rand() % 3, rand() % 3);
+  this->supportRadius = 0.0457f;
   this->velocity = Vector(0, 0, 0);
   this->color = Vector(0, 0, .8f);
-  this->opacity = 0.5f;
-
+  this->opacity = 0.8f;
+  this->threshold = 7.065f;
+  this->surfTension = 0.0728f;
 }
 
-Particle::Particle(float mass, float pressure, float stiffness, float restDensity, float density, float viscosity, Point3D position, Vector velocity, Vector color, float opacity) {
+Water::Water(void) {
+  this->mass = 0.02f;
+  this->pressure = 0.0f;
+  this->stiffness = 3.0f;
+  this->restDensity = 998.29f;
+  this->density = 0.0f;
+  this->viscosity = 3.5f;
+  float x = MAX_X*((2*(static_cast <float> (rand()) / static_cast <float> (RAND_MAX)))-1);
+  float y = MAX_Y*((2*(static_cast <float> (rand()) / static_cast <float> (RAND_MAX)))-1)-.5;
+  float z = MAX_Z*((2*(static_cast <float> (rand()) / static_cast <float> (RAND_MAX)))-1);
+  this->position = Point3D(x, y, z);
+  this->oldPosition = position;
+  this->supportRadius = 0.0457f;
+  this->velocity = Vector(0,0,0);
+  this->color = Vector(0, 0, .8f);
+  this->opacity = 0.5f;
+  this->restCoeff = 0.8;
+  this->threshold = 7.065f;
+  this->surfTension = 0.0728f;
+}
+
+Mucus::Mucus(void) {
+  this->mass = 0.04f;
+  this->pressure = 0.0f;
+  this->stiffness = 5.0f;
+  this->restDensity = 1000.0f;
+  this->density = 0.0f;
+  this->viscosity = 36.0f;
+  float x = MAX_X*((2*(static_cast <float> (rand()) / static_cast <float> (RAND_MAX)))-1);
+  float y = MAX_Y*((2*(static_cast <float> (rand()) / static_cast <float> (RAND_MAX)))-1)-.5;
+  float z = MAX_Z*((2*(static_cast <float> (rand()) / static_cast <float> (RAND_MAX)))-1);
+  this->position = Point3D(x, y, z);
+  this->oldPosition = position;
+  this->supportRadius = 0.0726f;
+  this->velocity = Vector(0, 0, 0);
+  this->color = Vector(0, .8f, 0);
+  this->opacity = 0.5f;
+  this->restCoeff = 0.2;
+  this->threshold = 5.0f;
+  this->surfTension = 6.0f;
+}
+
+Particle::Particle(float mass, float pressure, float stiffness, float restDensity, float density, float viscosity, float restCoeff, float threshold, float surfTension, Point3D position, Vector velocity, Vector color, float opacity) {
   this->mass = mass;
   this->pressure = pressure;
   this->stiffness = stiffness;
@@ -38,6 +81,10 @@ Particle::Particle(float mass, float pressure, float stiffness, float restDensit
   this->velocity = velocity;
   this->color = color;
   this->opacity = opacity;
+  this->supportRadius = supportRadius;
+  this->restCoeff = restCoeff;
+  this->threshold = threshold;
+  this->surfTension = surfTension;
 }
 
 float Particle::getMass() const {
@@ -94,6 +141,22 @@ Vector Particle::getColor() const {
 
 float Particle::getOpacity() const {
   return this->opacity;
+}
+
+float Particle::getRestCoeff() const {
+  return this->restCoeff;
+}
+
+float Particle::getSupportRadius() const {
+  return this->supportRadius;
+}
+
+float Particle::getThreshold() const {
+  return this->threshold;
+}
+
+float Particle::getSurfTension() const {
+  return this->surfTension;
 }
 
 void Particle::setMass(const float mass) {

@@ -6,40 +6,24 @@
 
 ParticleSystem::ParticleSystem() {
   this->grav = Vector(0,0,-9.8);
-  this->h = 0.0457;
-  this->hSq = pow(h, 2.0f);
-  this->debug = true;
-  setRestCoeff(0.8f);
   setBoundaries(-.1, -1, -.1, .1, 1, .1);
 }
 
 ParticleSystem::ParticleSystem(Vector grav){
   this->grav = grav;
-  this->h = 0.0457; // doesnt seem to do much interaction for 100ish particles
   //this->h = 1; // for funky fusion
-  this->hSq = pow(h, 2.0f);
-  this->debug = true;
   this->numRowBoxes = 100;
-  this->grid = SpatialGrid(100, h);
-  setRestCoeff(0.8f);
+  this->grid = SpatialGrid(100, 0.0457f);
   setBoundaries(-.1, -1, -.1, .1, 1, .1);
 }
 
-ParticleSystem::ParticleSystem(Vector grav, float min_x, float min_y, float min_z, float max_x, float max_y, float max_z, float restCoeff) {
+ParticleSystem::ParticleSystem(Vector grav, float min_x, float min_y, float min_z, float max_x, float max_y, float max_z) {
   this->grav = grav;
-  this->h = 0.0457; // doesnt seem to do much interaction for 100ish particles
   //this->h = 1; // for funky fusion
-  this->hSq = pow(h, 2.0f);
-  this->debug = true;
   this->numRowBoxes = 100;
-  this->grid = SpatialGrid(100, h);
-  setRestCoeff(restCoeff);
+  this->grid = SpatialGrid(100, 0.0457f);
   setBoundaries(min_x, min_y, min_z, max_x, max_y, max_z);
 
-}
-
-void ParticleSystem::setRestCoeff(float restCoeff) {
-  this->REST_COEFF = restCoeff;
 }
 
 void ParticleSystem::setBoundaries(float min_x, float min_y, float min_z, float max_x, float max_y, float max_z) {
@@ -111,18 +95,16 @@ void ParticleSystem::setDensities(){
     /*std::vector<Particle> list = grid.getNeighbors(particles[i]);
     for(unsigned int j = 0; j < list.size(); j++){ 
       Vector dist = particles[i].getPosition() - list[j].getPosition();
-      //if (dist.getMagnitude() <= hSq) {
       if (dist.getMagnitude() <= h) {
         density += defaultKernel(dist) * list[j].getMass();
       }*/
 
-      for(unsigned int j = 0; j < particles.size(); j++){ // need to use spatial grid	
-        Vector dist = particles[i].getPosition() - particles[j].getPosition();
-      //if (dist.getMagnitude() <= hSq) {
-      if (dist.getMagnitude() <= h) {
-      density += defaultKernel(dist) * particles[j].getMass();
+    for(unsigned int j = 0; j < particles.size(); j++){ // need to use spatial grid	
+      Vector diff = particles[i].getPosition() - particles[j].getPosition();
+    //if (diff.getMagnitude() <= h) {
+      if (diff.getMagnitude() <= particles[i].getSupportRadius()) {
+        density += defaultKernel(diff, particles[i].getSupportRadius()) * particles[j].getMass();
       }
-
     }
     if(density == 0){
       density = particles[i].getMass() / .00000001;
@@ -143,18 +125,18 @@ Vector ParticleSystem::pressureForce(Particle& p, unsigned const int& i) {
   // this is so stupid...........but ill think of a better way. i dont wanna do checks cause it might make a difference since this is computed every time for every particle
   for(j = 0; j < i; j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
-    //if (diff.getMagnitude() <= hSq) {
-    if (diff.getMagnitude() <= h) {
+    //if (diff.getMagnitude() <= h) {
+    if (diff.getMagnitude() <= p.getSupportRadius()) {
       coeff = (p.getPressure() + particles[j].getPressure()) / 2.0f * particles[j].getVolume();
-      pressure += pressGradientKernel(diff) * coeff;
+      pressure += pressGradientKernel(diff, p.getSupportRadius()) * coeff;
     }
   }
   for(j = j + 1; j < particles.size(); j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
-    //if (diff.getMagnitude() <= hSq) {
-    if (diff.getMagnitude() <= h) {
+    //if (diff.getMagnitude() <= h) {
+    if (diff.getMagnitude() <= p.getSupportRadius()) {
       coeff = (p.getPressure() + particles[j].getPressure()) / 2.0f * particles[j].getVolume();
-      pressure += pressGradientKernel(diff) * coeff;
+      pressure += pressGradientKernel(diff, p.getSupportRadius()) * coeff;
     }
   }
   return pressure;
@@ -166,18 +148,18 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int& i) {
   unsigned int j;
   for(j = 0; j < i; j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
-    //if (diff.getMagnitude() <= hSq) {
-    if (diff.getMagnitude() <= h) {
+    //if (diff.getMagnitude() <= h) {
+    if (diff.getMagnitude() <= p.getSupportRadius()) {
       coeff = (particles[j].getVelocity() - p.getVelocity()) * particles[j].getVolume();
-      viscosity += coeff * viscLaplacianKernel(diff);
+      viscosity += coeff * viscLaplacianKernel(diff, p.getSupportRadius());
     }
   }
   for(j = j + 1; j < particles.size(); j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
-    //if (diff.getMagnitude() <= hSq) {
-    if (diff.getMagnitude() <= h) {
+    //if (diff.getMagnitude() <= h) {
+    if (diff.getMagnitude() <= p.getSupportRadius()) {
       coeff = (particles[j].getVelocity() - p.getVelocity()) * particles[j].getVolume();
-      viscosity += coeff * viscLaplacianKernel(diff);
+      viscosity += coeff * viscLaplacianKernel(diff, p.getSupportRadius());
     }
   }
   viscosity = viscosity * p.getViscosity(); 
@@ -186,9 +168,9 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int& i) {
 
 Vector ParticleSystem::tensionForce(Particle& p, unsigned const int& i) {
   Vector normal = surfaceNormal(p, i);
-  if (normal.getMagnitude() > 7.065) { // threshold
+  if (normal.getMagnitude() > p.getThreshold()) { // threshold
     normal.normalize();
-    return normal * curvature(p, i) * (-0.0728); // surface tension constant for water
+    return normal * curvature(p, i) * (p.getSurfTension()); // surface tension constant for water
   }
   return Vector(0, 0, 0);
 }
@@ -199,8 +181,9 @@ float ParticleSystem::colorFunction(Particle& p) {
   unsigned int j;
   for(j = 0; j < particles.size(); j++) {
     diff = p.getPosition() - particles[j].getPosition();
-    if (diff.getMagnitude() <= h) {
-      color += particles[j].getMass() / particles[j].getDensity() * defaultKernel(diff);
+    //if (diff.getMagnitude() <= h) {
+    if (diff.getMagnitude() <= p.getSupportRadius()) {
+      color += particles[j].getMass() / particles[j].getDensity() * defaultKernel(diff, p.getSupportRadius());
     }
   }
   return color;
@@ -212,7 +195,8 @@ vector<Particle> ParticleSystem::getNeighbors(Particle &p) {
 	unsigned int j;
 	for(j = 0; j < particles.size(); j++) {
 	    diff = p.getPosition() - particles[j].getPosition();
-	    if (diff.getMagnitude() <= h) {
+			//if (diff.getMagnitude() <= h) {
+      if (diff.getMagnitude() <= p.getSupportRadius()) {
 	        neighbors.push_back(particles[j]);
 	    }
 	}
@@ -225,14 +209,16 @@ Vector ParticleSystem::surfaceNormal(Particle& p, unsigned const int& i) {
   unsigned int j;
   for(j = 0; j < i; j++) {
     diff = p.getPosition() - particles[j].getPosition();
-    if (diff.getMagnitude() <= h) {
-      normal += gradientKernel(diff) * particles[j].getMass() / particles[j].getDensity();
+    //if (diff.getMagnitude() <= h) {
+    if (diff.getMagnitude() <= p.getSupportRadius()) {
+      normal += gradientKernel(diff, p.getSupportRadius()) * particles[j].getMass() / particles[j].getDensity();
     }
   }
   for(j = j + 1; j < particles.size(); j++) {
     diff = p.getPosition() - particles[j].getPosition();
-    if (diff.getMagnitude() <= h) {
-      normal += gradientKernel(diff) * particles[j].getMass() / particles[j].getDensity();
+    //if (diff.getMagnitude() <= h) {
+    if (diff.getMagnitude() <= p.getSupportRadius()) {
+      normal += gradientKernel(diff, p.getSupportRadius()) * particles[j].getMass() / particles[j].getDensity();
     }
   }
   return normal;
@@ -244,14 +230,16 @@ float ParticleSystem::curvature(Particle& p, unsigned const int& i) {
   unsigned int j;
   for(j = 0; j < i; j++) {
     diff = p.getPosition() - particles[j].getPosition();
-    if (diff.getMagnitude() <= h) {
-      curvature += particles[j].getMass() / particles[j].getDensity() * laplacianKernel(diff);
+    //if (diff.getMagnitude() <= h) {
+    if (diff.getMagnitude() <= p.getSupportRadius()) {
+      curvature += particles[j].getMass() / particles[j].getDensity() * laplacianKernel(diff, p.getSupportRadius());
     }
   }
   for(j = j + 1; j < particles.size(); j++) {
     diff = p.getPosition() - particles[j].getPosition();
-    if (diff.getMagnitude() <= h) {
-      curvature += particles[j].getMass() / particles[j].getDensity() * laplacianKernel(diff);
+    //if (diff.getMagnitude() <= h) {
+    if (diff.getMagnitude() <= p.getSupportRadius()) {
+      curvature += particles[j].getMass() / particles[j].getDensity() * laplacianKernel(diff, p.getSupportRadius());
     }
   }
   return curvature;
@@ -264,26 +252,26 @@ float ParticleSystem::curvature(Particle& p, unsigned const int& i) {
 // Less expensive compared to gaussian one because of computation of e and no square roots
 // Not sure whether I'm supposed to normalize Vector r though
 
-float ParticleSystem::defaultKernel(Vector r) {
+float ParticleSystem::defaultKernel(Vector r, const float h) {
   float rMag = r.getMagnitude();
   return (315.0f * pow((pow(h, 2.0f) - pow(rMag, 2.0f)),3.0) / (64.0f * PI * pow(h, 9.0f)));
 }
 
 /* gradient and laplacian of poly6 kernels. prob not needed if we use the spiky and viscosity kernels for other calculations*/
-Vector ParticleSystem::gradientKernel(Vector r) {
+Vector ParticleSystem::gradientKernel(Vector r, const float h) {
   float rMag = r.getMagnitude();
   float coeff = pow(pow(h, 2.0f) - pow(rMag, 2.0f), 2.0f) * -945 / (32 * PI * pow(h, 9.0f));
   return r * coeff;
 }
 
-float ParticleSystem::laplacianKernel(Vector r) {
+float ParticleSystem::laplacianKernel(Vector r, const float h) {
   float rMag = r.getMagnitude();
   return (-945 / (32 * PI * pow(h, 9.0f))) * (pow(h, 2.0f) - pow(rMag, 2.0f)) * (3 * pow(h, 2.0f) - 7 * pow(rMag, 2.0f));
 }
 
 // Spiky Kernel to calculate pressure 
 // Give more repulsive pressure at float distance and thus avoids clustering.
-Vector ParticleSystem::pressGradientKernel(Vector r) {
+Vector ParticleSystem::pressGradientKernel(Vector r, const float h) {
   float rMag = r.getMagnitude();
   /*if (rMag == 0) {
     return Vector(0,0,0);
@@ -296,7 +284,7 @@ Vector ParticleSystem::pressGradientKernel(Vector r) {
 // Viscosity kernel to calculate viscosity
 // Gives more stable viscosity and makes it possible to damp simulation better
 // Laplacian in poly6 kernel becomes negative really fast. The viscosity kernel's laplacian is positive everywhere
-float ParticleSystem::viscLaplacianKernel(Vector r) {
+float ParticleSystem::viscLaplacianKernel(Vector r, const float h) {
   float rMag = r.getMagnitude();
   return (45 * (h - rMag)) / (PI * pow(h, 6.0f));
 
@@ -315,18 +303,12 @@ void ParticleSystem::leapFrog(const float& dt) {
     // set position at time t. pos_{t + dt} = pos_{t} + v_{t + dt / 2} * dt
     Point3D tempPosition = p.getPosition() + (tempVelocityHalf * dt);
     Vector tempVelocity = (old + p.getVelocityHalf()) / 2.0f;
-    checkBoundary(&tempPosition, &tempVelocity, &tempVelocityHalf);
+    checkBoundary(p, &tempPosition, &tempVelocity, &tempVelocityHalf);
     p.setOldPosition(p.getPosition());
     p.setVelocityHalf(tempVelocityHalf); 
     p.setPosition(tempPosition); 
     // use midpoint approximation for velocity at time t. v_{t} = (v_{t - dt / 2} + v_{t + dt / 2}) / 2.
     p.setVelocity(tempVelocity); 
-
-    /*if (debug) {
-      cout << "//===========================================//" << endl
-        << "// Particle Index: " << i << "   Num: " << i+1 << endl
-        << particles[i] << endl;
-    }*/
   }
 }
 
@@ -338,56 +320,39 @@ void ParticleSystem::initializeLeapFrog(const float& dt) {
 }
 
 
-void ParticleSystem::checkBoundary(Point3D* position, Vector* velocity, Vector* velocityHalf) {
+void ParticleSystem::checkBoundary(Particle& p, Point3D* position, Vector* velocity, Vector* velocityHalf) {
   if (!position || !velocity || !velocityHalf) return;
-  // temporary variables just so it will compile. these define the "boundaries" of box
   // if goes past boundaries, reflect back.
   if(position->getX() > MAX_X) {
     position->setX(MAX_X);
-    /*bouncebackVelocity(velocity, Vector(-1, 0, 0));*/
-    /*bouncebackVelocity(velocityHalf, Vector(-1, 0, 0));*/
-	velocity->setX(-REST_COEFF * velocity->getX());
-    velocityHalf->setX(-REST_COEFF * velocityHalf->getX());
+	velocity->setX(-p.getRestCoeff() * velocity->getX());
+    velocityHalf->setX(-p.getRestCoeff() * velocityHalf->getX());
   }
   else if (position->getX() < MIN_X) {
     position->setX(MIN_X);
-    /*bouncebackVelocity(velocity, Vector(1, 0, 0));*/
-    /*bouncebackVelocity(velocityHalf, Vector(1, 0, 0));*/
-    velocity->setX(-REST_COEFF * velocity->getX());
-    velocityHalf->setX(-REST_COEFF * velocityHalf->getX());
+    velocity->setX(-p.getRestCoeff() * velocity->getX());
+    velocityHalf->setX(-p.getRestCoeff() * velocityHalf->getX());
   }
   if(position->getY() > MAX_Y) {
     position->setY(MAX_Y);
-    /*bouncebackVelocity(velocity, Vector(0, -1, 0));*/
-    /*bouncebackVelocity(velocityHalf, Vector(0, -1, 0));*/
-    velocity->setY(-REST_COEFF * velocity->getY());
-    velocityHalf->setY(-REST_COEFF * velocityHalf->getY());
+    velocity->setY(-p.getRestCoeff() * velocity->getY());
+    velocityHalf->setY(-p.getRestCoeff() * velocityHalf->getY());
   }
   else if (position->getY() < MIN_Y) {
     position->setY(MIN_Y);
-    /*bouncebackVelocity(velocity, Vector(0, 1, 0));*/
-    /*bouncebackVelocity(velocityHalf, Vector(0, 1, 0));*/
-    velocity->setY(-REST_COEFF * velocity->getY());
-    velocityHalf->setY(-REST_COEFF * velocityHalf->getY());
+    velocity->setY(-p.getRestCoeff() * velocity->getY());
+    velocityHalf->setY(-p.getRestCoeff() * velocityHalf->getY());
   }
   if(position->getZ() > MAX_Z) {
     position->setZ(MAX_Z);
-    /*bouncebackVelocity(velocity, Vector(0, 0, -1));*/
-    /*bouncebackVelocity(velocityHalf, Vector(0, 0, -1));*/
-    velocity->setZ(-REST_COEFF* velocity->getZ());
-    velocityHalf->setZ(-REST_COEFF * velocityHalf->getZ());
+    velocity->setZ(-p.getRestCoeff()* velocity->getZ());
+    velocityHalf->setZ(-p.getRestCoeff() * velocityHalf->getZ());
   }
   else if (position->getZ() < MIN_Z) {
     position->setZ(MIN_Z);
-    /*bouncebackVelocity(velocity, Vector(0, 0, 1));*/
-    /*bouncebackVelocity(velocityHalf, Vector(0, 0, 1));*/
-    velocity->setZ(-REST_COEFF* velocity->getZ());
-    velocityHalf->setZ(-REST_COEFF * velocityHalf->getZ());
+    velocity->setZ(-p.getRestCoeff()* velocity->getZ());
+    velocityHalf->setZ(-p.getRestCoeff() * velocityHalf->getZ());
   }
-}
-
-void ParticleSystem::bouncebackVelocity(Vector* velocity, Vector normal) {
-  *velocity = *velocity - (normal * (*velocity).dotProduct(normal) * (1 + REST_COEFF));
 }
 
 void ParticleSystem::addParticle(Particle& p) {

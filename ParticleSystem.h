@@ -9,11 +9,10 @@ class ParticleSystem {
   public:
     ParticleSystem();
 	  ParticleSystem(Vector grav);
-    ParticleSystem(Vector grav, float min_x, float min_y, float min_z, float max_x, float max_y, float max_z, float restCoeff);
+    ParticleSystem(Vector grav, float min_x, float min_y, float min_z, float max_x, float max_y, float max_z);
     void initialize(float timestep);
 	  void update(float timestep);
     
-    void setRestCoeff(float restCoeff);
     void setBoundaries(float min_x, float min_y, float min_z, float max_x, float max_y, float max_z);
 
     void addParticle(Particle& p);
@@ -24,8 +23,6 @@ class ParticleSystem {
 
   private:
     Vector grav;
-    float h;
-    float hSq;
     std::vector<Particle> particles;
 
     float MIN_X;
@@ -35,9 +32,6 @@ class ParticleSystem {
     float MAX_Y;
     float MAX_Z;
 
-    float REST_COEFF;
-
-    bool debug;
     SpatialGrid grid;
     int numRowBoxes;
 
@@ -51,18 +45,16 @@ class ParticleSystem {
     Vector surfaceNormal(Particle& p, unsigned const int& i);
     float curvature(Particle& p, unsigned const int& i);
 
-    float defaultKernel(Vector r);
-    Vector gradientKernel(Vector r);
-    float laplacianKernel(Vector r);
-    Vector pressGradientKernel(Vector r);
-    float viscLaplacianKernel(Vector r);
+    float defaultKernel(Vector r, const float h);
+    Vector gradientKernel(Vector r, const float h);
+    float laplacianKernel(Vector r, const float h);
+    Vector pressGradientKernel(Vector r, const float h);
+    float viscLaplacianKernel(Vector r, const float h);
 
     void initializeLeapFrog(const float& dt);
     void leapFrog(const float& dt);
 
-    void checkBoundary(Point3D* position, Vector* velocity, Vector* velocityHalf);
-    void bouncebackVelocity(Vector* velocity, Vector normal);
-
+    void checkBoundary(Particle& p, Point3D* position, Vector* velocity, Vector* velocityHalf);
 };
 
 #endif
