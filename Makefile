@@ -11,7 +11,7 @@ RM = /bin/rm -f
 all: main
 
 TARGET = fluid 
-main: Point3D.o Particle.o ParticleSystem.o Vector.o SpatialGrid.o window.o
+main: Point3D.o Particle.o ParticleSystem.o Vector.o SpatialGrid.o window1.o
 	$(CC) $(LDFLAGS) -o $(TARGET) $^  $(LIBRARIES) 
 	$(RM) test
 

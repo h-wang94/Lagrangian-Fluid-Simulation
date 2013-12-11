@@ -65,27 +65,31 @@ Ray Sampler::getRayThroughSample() {
  * Maybe edit this later so it commits to an array or put this somewhere else or idk. */
 Sample Sampler::getPixelRGBA(SpatialGrid &sg, float stepSize) {
 	Ray r = getRayThroughSample();
-	Particle p = Particle();
+	Particle p, temp;
 	vector<Particle> neighbors;
 	Sample newSample;
 	Point3D testPoint;
-	for (int i = 0; i < 1000 && s.opacity < 1.0; i++) { //while the color is still opaque...probably want to set i to something else later btw
+	float dist = 0, farClip = 3.0;
+	for (int i = 0; dist < farClip && s.opacity < 1.0; i++) { //while the color is still opaque...probably want to set i to something else later btw
 		testPoint = r.getPointAtT(stepSize * i);
 		p.setPosition(testPoint);
-		neighbors = sg.getNeighbors(p);
-		if (neighbors.empty()) {// || pSystem.colorFunction(p, some i here) < .5) {
+		//neighbors = sg.getNeighbors(p); until spatial grid works
+		neighbors = pSystem.getNeighbors(p);
+		if (neighbors.empty() || pSystem.colorFunction(p) < .5) {
 			continue; //if there are no neighbors, we're outside the fluid. Probably.
 		}
 		//find some way to average the opacities and color at this "particle"
 		//should these be weighted somehow?
 		newSample = Sample();
-		/*for (int j = 0; j < (int) neighbors.size(); j++) {
-			newSample.colorVals += neighbors[j]'s color values';
-			newSample.opacity += neighbors[j]'s opacity value;
-		}*/
-		//newSample.colorVals /= (float) neighbors.size();
-		//newSample.opacity /= (float) neighbors.size();
+		for (int j = 0; j < (int) neighbors.size(); j++) {
+			temp = neighbors[j];
+			newSample.colorVals += temp.getColor();
+			newSample.opacity += temp.getOpacity();
+		}
+		newSample.colorVals = newSample.colorVals / (float) neighbors.size();
+		newSample.opacity /= (float) neighbors.size();
 		s.addRGBAVals(newSample);
+		dist = stepSize * (i + 1);
 	}
 	return s;
 }

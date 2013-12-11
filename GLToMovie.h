@@ -20,11 +20,11 @@ class CGLToMovie
 public:
 
 	CGLToMovie(LPCTSTR lpszOutputMovieFileName = _T("Output.avi"), 
-		int nFrameWidth = GetSystemMetrics(SM_CXSCREEN),	/*Movie Frame Width*/
-		int nFrameHeight = GetSystemMetrics(SM_CYSCREEN),	/*Movie Frame Height*/
+		int nFrameWidth = 600,	/*Movie Frame Width*/
+		int nFrameHeight = 600,	/*Movie Frame Height*/
 		int nBitsPerPixel = 24,		/*Bits Per Pixel*/
-		DWORD dwCodec = mmioFOURCC('M','S','V','C'),	/*Video Codec for Frame Compression*/
-		DWORD dwFrameRate = 60)		/*Frames Per Second (FPS)*/
+		DWORD dwCodec = mmioFOURCC('D','I','B',' '),	/*Video Codec for Frame Compression*/
+		DWORD dwFrameRate = 30)		/*Frames Per Second (FPS)*/
 		: m_MovieFile(lpszOutputMovieFileName, dwCodec, dwFrameRate)
 	{
 		m_nWidth = nFrameWidth;
@@ -32,7 +32,12 @@ public:
 		m_nBitsPerPixel = nBitsPerPixel;
 		m_pBits = malloc(m_nWidth * m_nHeight * m_nBitsPerPixel/8);	/*create the required memory to hold the frame content*/
 	}
-
+	void setWidth(int width) {
+		m_nWidth = width;
+	}
+	void setHeight(int height) {
+		m_nHeight = height;
+	}
 	~CGLToMovie(void)
 	{
 		if(m_pBits)
@@ -49,7 +54,7 @@ public:
 	/// </Summary>
 	inline HRESULT RecordFrame()
 	{
-		glFlush(); glFinish();
+		glFinish();
 		glReadPixels(0, 0, m_nWidth, m_nHeight, GL_BGR_EXT, GL_UNSIGNED_BYTE, m_pBits);
 		return m_MovieFile.AppendNewFrame(m_nWidth, m_nHeight, m_pBits, m_nBitsPerPixel);
 	}
