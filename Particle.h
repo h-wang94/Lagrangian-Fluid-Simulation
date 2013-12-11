@@ -37,9 +37,12 @@ class Particle {
     void setVelocity(const Vector velocity);
     void setVelocityHalf(const Vector velocityHalf);
     void setAcceleration(const Vector acceleration);
+    void setViscosity(const float viscosity);
     void setColor(const Vector color);
     void setOpacity(const float opacity);
 
+    int getHashID() const;
+    void setHashID(const int i);
   protected:
     float mass;
     float pressure;
@@ -52,6 +55,7 @@ class Particle {
     Vector velocity;
     Vector velocityHalf; //velocity in halfstep for leapfrog integration. velocity = at time t, velocityHalf = at time t - 1/2
     Vector acceleration; // acceleration updated through F/rho;
+    int hashID;
     Vector color;
     float opacity;
     float restCoeff;

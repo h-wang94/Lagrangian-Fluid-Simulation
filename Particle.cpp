@@ -2,9 +2,9 @@
 #include <cstdlib>
 #include "Particle.h"
 
-#define MAX_X .18
-#define MAX_Y .18
-#define MAX_Z .18
+#define MAX_X .09
+#define MAX_Y .5
+#define MAX_Z .05
 
 // Constructor for a water particle in random locations
 Particle::Particle(void) {
@@ -43,7 +43,7 @@ Water::Water(void) {
   this->velocity = Vector(0,0,0);
   this->color = Vector(0, 0, .8f);
   this->opacity = 0.5f;
-  this->restCoeff = 0.8;
+  this->restCoeff = 0.9;
   this->threshold = 7.065f;
   this->surfTension = 0.0728f;
 }
@@ -64,7 +64,7 @@ Mucus::Mucus(void) {
   this->velocity = Vector(0, 0, 0);
   this->color = Vector(0, .8f, 0);
   this->opacity = 0.5f;
-  this->restCoeff = 0.2;
+  this->restCoeff = 0.8;
   this->threshold = 5.0f;
   this->surfTension = 6.0f;
 }
@@ -79,12 +79,16 @@ Particle::Particle(float mass, float pressure, float stiffness, float restDensit
   this->position = position;
   this->oldPosition = position;
   this->velocity = velocity;
-  this->color = color;
-  this->opacity = opacity;
-  this->supportRadius = supportRadius;
-  this->restCoeff = restCoeff;
-  this->threshold = threshold;
-  this->surfTension = surfTension;
+  this->color = Vector(.2,0,1);
+}
+
+int Particle::getHashID() const {
+	
+  return this->hashID;
+}
+
+void Particle::setHashID(const int i){
+  this->hashID = i;
 }
 
 float Particle::getMass() const {
@@ -167,6 +171,10 @@ void Particle::setDensity(const float density) {
   this->density = density;
 }
 
+void Particle::setViscosity(const float viscosity) {
+  this->density = viscosity;
+}
+
 void Particle::setPressure(const float pressure) {
   this->pressure = pressure;
 }
@@ -176,6 +184,7 @@ void Particle::setPosition(Point3D position) {
 }
 
 void Particle::setOldPosition(Point3D oldPosition) {
+	
   this->oldPosition = oldPosition;
 }
 

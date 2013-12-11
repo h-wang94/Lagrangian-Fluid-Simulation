@@ -11,19 +11,17 @@ ParticleSystem::ParticleSystem() {
 
 ParticleSystem::ParticleSystem(Vector grav){
   this->grav = grav;
-  //this->h = 1; // for funky fusion
   this->numRowBoxes = 100;
-  this->grid = SpatialGrid(100, 0.0457f);
+  this->grid = SpatialGrid(0.0457);
   setBoundaries(-.1, -1, -.1, .1, 1, .1);
 }
 
 ParticleSystem::ParticleSystem(Vector grav, float min_x, float min_y, float min_z, float max_x, float max_y, float max_z) {
   this->grav = grav;
-  //this->h = 1; // for funky fusion
   this->numRowBoxes = 100;
-  this->grid = SpatialGrid(100, 0.0457f);
+  this->grid = SpatialGrid(0.0457);
   setBoundaries(min_x, min_y, min_z, max_x, max_y, max_z);
-
+  this->grid = SpatialGrid(0.0457);
 }
 
 void ParticleSystem::setBoundaries(float min_x, float min_y, float min_z, float max_x, float max_y, float max_z) {
@@ -47,7 +45,7 @@ void ParticleSystem::update(float timestep){
   this->computePressure(); // now compute each particle's pressure. randomly put in numbers.
   this->computeForces();
   this->leapFrog(timestep);
-  grid.updateBoxes(particles);
+  this->particles = this->grid.updateBoxes(this->particles);
 }
 
 Particle* ParticleSystem::getParticle(const unsigned int i) {
@@ -70,7 +68,8 @@ void ParticleSystem::computeForces(){
     //tension = tensionForce(particles[i], i);
 
     force = gravity - pressure + viscosity;
-    particles[i].setAcceleration(force / particles[i].getDensity()); // intuitively using mass..but slides say density...
+    Vector acceleration = force / particles[i].getDensity();
+    particles[i].setAcceleration(acceleration); // intuitively using mass..but slides say density...
   }
 }
 
@@ -84,32 +83,22 @@ void ParticleSystem::computePressure() {
   }
 }
 
-// need to look at this
 void ParticleSystem::setDensities(){
-
   float density = 0;
-#pragma omp parallel for firstprivate(density)
+  std::vector<Particle> list;
+//#pragma omp parallel for firstprivate(density)
   for(unsigned int i = 0; i < particles.size(); i++){
     density = 0;
-
-    /*std::vector<Particle> list = grid.getNeighbors(particles[i]);
+    list = grid.getNeighbors(particles[i]);
     for(unsigned int j = 0; j < list.size(); j++){ 
-      Vector dist = particles[i].getPosition() - list[j].getPosition();
-      if (dist.getMagnitude() <= h) {
-        density += defaultKernel(dist) * list[j].getMass();
-      }*/
-
-    for(unsigned int j = 0; j < particles.size(); j++){ // need to use spatial grid	
-      Vector diff = particles[i].getPosition() - particles[j].getPosition();
-    //if (diff.getMagnitude() <= h) {
+      Vector diff = particles[i].getPosition() - list[j].getPosition();
       if (diff.getMagnitude() <= particles[i].getSupportRadius()) {
-        density += defaultKernel(diff, particles[i].getSupportRadius()) * particles[j].getMass();
+        density += defaultKernel(diff, particles[i].getSupportRadius()) * list[j].getMass();
       }
     }
     if(density == 0){
       density = particles[i].getMass() / .00000001;
     }
-
     particles[i].setDensity(density);											//set the particle[i]'s density to particle[i]
   }
 }
@@ -125,7 +114,6 @@ Vector ParticleSystem::pressureForce(Particle& p, unsigned const int& i) {
   // this is so stupid...........but ill think of a better way. i dont wanna do checks cause it might make a difference since this is computed every time for every particle
   for(j = 0; j < i; j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
-    //if (diff.getMagnitude() <= h) {
     if (diff.getMagnitude() <= p.getSupportRadius()) {
       coeff = (p.getPressure() + particles[j].getPressure()) / 2.0f * particles[j].getVolume();
       pressure += pressGradientKernel(diff, p.getSupportRadius()) * coeff;
@@ -133,7 +121,6 @@ Vector ParticleSystem::pressureForce(Particle& p, unsigned const int& i) {
   }
   for(j = j + 1; j < particles.size(); j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
-    //if (diff.getMagnitude() <= h) {
     if (diff.getMagnitude() <= p.getSupportRadius()) {
       coeff = (p.getPressure() + particles[j].getPressure()) / 2.0f * particles[j].getVolume();
       pressure += pressGradientKernel(diff, p.getSupportRadius()) * coeff;
@@ -148,7 +135,6 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int& i) {
   unsigned int j;
   for(j = 0; j < i; j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
-    //if (diff.getMagnitude() <= h) {
     if (diff.getMagnitude() <= p.getSupportRadius()) {
       coeff = (particles[j].getVelocity() - p.getVelocity()) * particles[j].getVolume();
       viscosity += coeff * viscLaplacianKernel(diff, p.getSupportRadius());
@@ -156,7 +142,6 @@ Vector ParticleSystem::viscosityForce(Particle& p, unsigned const int& i) {
   }
   for(j = j + 1; j < particles.size(); j++) {
     Vector diff = p.getPosition() - particles[j].getPosition();
-    //if (diff.getMagnitude() <= h) {
     if (diff.getMagnitude() <= p.getSupportRadius()) {
       coeff = (particles[j].getVelocity() - p.getVelocity()) * particles[j].getVolume();
       viscosity += coeff * viscLaplacianKernel(diff, p.getSupportRadius());
@@ -181,7 +166,6 @@ float ParticleSystem::colorFunction(Particle& p) {
   unsigned int j;
   for(j = 0; j < particles.size(); j++) {
     diff = p.getPosition() - particles[j].getPosition();
-    //if (diff.getMagnitude() <= h) {
     if (diff.getMagnitude() <= p.getSupportRadius()) {
       color += particles[j].getMass() / particles[j].getDensity() * defaultKernel(diff, p.getSupportRadius());
     }
@@ -195,7 +179,6 @@ vector<Particle> ParticleSystem::getNeighbors(Particle &p) {
 	unsigned int j;
 	for(j = 0; j < particles.size(); j++) {
 	    diff = p.getPosition() - particles[j].getPosition();
-			//if (diff.getMagnitude() <= h) {
       if (diff.getMagnitude() <= p.getSupportRadius()) {
 	        neighbors.push_back(particles[j]);
 	    }
@@ -209,14 +192,12 @@ Vector ParticleSystem::surfaceNormal(Particle& p, unsigned const int& i) {
   unsigned int j;
   for(j = 0; j < i; j++) {
     diff = p.getPosition() - particles[j].getPosition();
-    //if (diff.getMagnitude() <= h) {
     if (diff.getMagnitude() <= p.getSupportRadius()) {
       normal += gradientKernel(diff, p.getSupportRadius()) * particles[j].getMass() / particles[j].getDensity();
     }
   }
   for(j = j + 1; j < particles.size(); j++) {
     diff = p.getPosition() - particles[j].getPosition();
-    //if (diff.getMagnitude() <= h) {
     if (diff.getMagnitude() <= p.getSupportRadius()) {
       normal += gradientKernel(diff, p.getSupportRadius()) * particles[j].getMass() / particles[j].getDensity();
     }
@@ -325,7 +306,7 @@ void ParticleSystem::checkBoundary(Particle& p, Point3D* position, Vector* veloc
   // if goes past boundaries, reflect back.
   if(position->getX() > MAX_X) {
     position->setX(MAX_X);
-	velocity->setX(-p.getRestCoeff() * velocity->getX());
+    velocity->setX(-p.getRestCoeff() * velocity->getX());
     velocityHalf->setX(-p.getRestCoeff() * velocityHalf->getX());
   }
   else if (position->getX() < MIN_X) {
@@ -356,6 +337,9 @@ void ParticleSystem::checkBoundary(Particle& p, Point3D* position, Vector* veloc
 }
 
 void ParticleSystem::addParticle(Particle& p) {
+
+  long id = grid.addParticle(p);
+  p.setHashID(id);
+
   particles.push_back(p);
-  grid.addParticle(p);
 }

@@ -44,86 +44,97 @@ void testSpatialGrid() {
 	//Particle p4 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(0,-9, -9));
 	/*Particle p5 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(11,11, 11));*/
 	std::vector<Particle> listofparts;
-	Particle p1 = Particle();
-	Particle p2 = Particle();
-	Particle p3 = Particle();
-	Particle p4 = Particle();
-	Particle p5 = Particle();
-	SpatialGrid grid = SpatialGrid(10, 10);
-	grid.addParticle(p1);
-	grid.addParticle(p2);
-	grid.addParticle(p3);
-	grid.addParticle(p4);
-	grid.addParticle(p5);
-	listofparts.push_back(p1);
-	listofparts.push_back(p2);
-	listofparts.push_back(p3);
-	listofparts.push_back(p4);
-	listofparts.push_back(p5);
-	std::vector<Particle> list = grid.getNeighbors(p1);
-	unsigned int j = 0;
-	while (j < list.size()){
-		cout << list[j] << endl;
-		j++;
-	}
-	p4.setPosition(Point3D(10,10,10));
-	cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
-	cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
-	cout<<"++++++++++++++++++++++++++++++++++++"<<endl<<endl;
-	grid.updateBoxes(listofparts);
-	cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
-	cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
-	cout<<"++++++++++++++++++++++++++++++++++++"<<endl<<endl;
-	cout<<p4<<endl;
-	std::vector<Particle> list2 = grid.getNeighbors(p1);
-	j = 0;
-	while (j < list2.size()){
-		cout << list2[j] << endl;
-		j++;
-	}
+  Particle p1 = Particle();
+  Particle p2 = Particle();
+  Particle p3 = Particle();
+  Particle p4 = Particle();
+  Particle p5 = Particle();
+  SpatialGrid grid = SpatialGrid(1);
+  
+  grid.addParticle(p2);
+  grid.addParticle(p3);
+  grid.addParticle(p4);
+  grid.addParticle(p5);
+  grid.addParticle(p1);
+  listofparts.push_back(p1);
+  listofparts.push_back(p2);
+  listofparts.push_back(p3);
+  listofparts.push_back(p4);
+  listofparts.push_back(p5);
+  std::vector<Particle> list = grid.getNeighbors(p1);
+  unsigned int j = 0;
+  while (j < list.size()){
+    cout << list[j] << endl;
+    j++;
+  }
+  listofparts[4].setPosition(Point3D(10,10,10));
+  cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
+  cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
+  cout<<"++++++++++++++++++++++++++++++++++++"<<endl<<endl;
+  grid.updateBoxes(listofparts);
+  cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
+  cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
+  cout<<"++++++++++++++++++++++++++++++++++++"<<endl<<endl;
+  //cout<<p4<<endl;
+  std::vector<Particle> list2 = grid.getNeighbors(p1);
+  j = 0;
+  while (j < list2.size()){
+    cout << list2[j] << endl;
+    j++;
+  }
+  int breakpoint = 0;
+  cin>>breakpoint;
 }
 
 void createParticles() {
-	Particle p1 = Particle();
-	unsigned int i;
-	srand(time(NULL)); // for rand function
-	if (objFile) {
-		for(i = 0; i < numParticles; i++) {
-			p1 = Particle(0.02, 0.0, 3.0, 998.29, 0, 3.5, vertexes[i], Vector(0, 0, 0));
-			pSystem.addParticle(p1);
-		}
-	} else {
-		for(i = 0; i < numParticles; i++) {
+  Particle p1 = Particle();
+  unsigned int i;
+  srand(time(NULL)); // for rand function
+  if (objFile) {
+    for(i = 0; i < numParticles; i++) {
+      p1 = Particle(0.02, 0.0, 3.0, 998.29, 0, 3.5, vertexes[i], Vector(0, 0, 0));
+      pSystem.addParticle(p1);
+    }
+  } else {
+    for(i = 0; i < numParticles; i++) {
+		if(i <= numParticles/2){
 			p1 = Particle();
 			pSystem.addParticle(p1);
 		}
-		/*float maxX = .08f;
-		float minX = -.08f;
-		float maxY = .08f;
-		float minY = 0.0f;
-		float maxZ = .08f;
-		float minZ = -.08f;
-		float n = minX;
-		float m = minY;
-		float o = minZ;
-
-		while(n < maxX){
-		m=minY;
-		while(m < maxY){
-		o = minZ;
-		while(o < maxZ){
-		Point3D pos = Point3D(n,m,o);
-		//cout<<pos<<endl;
-		p1 = Particle(0.02, 0.0, 3.0, 998.29, 0, 3.5, Point3D(n,m,o), Vector(0, 0, 0));
-		pSystem.addParticle(p1);
-		o+=.014;
+		if(i > numParticles/2){
+			p1 = Particle();
+			//p1.setViscosity(10);
+			//p1.setColor(Point3D(0,1,.2));
+			pSystem.addParticle(p1);
 		}
-		m+=.014;
-		}
-		n+=.014;
-		}*/
+    }
+	  /*float maxX = .08f;
+	  float minX = -.08f;
+	  float maxY = .08f;
+	  float minY = 0.0f;
+	  float maxZ = .08f;
+	  float minZ = -.08f;
+	  float n = minX;
+	  float m = minY;
+	  float o = minZ;
+	  
+	  while(n < maxX){
+		  m=minY;
+		  while(m < maxY){
+			  o = minZ;
+			  while(o < maxZ){
+				  Point3D pos = Point3D(n,m,o);
+				  //cout<<pos<<endl;
+				p1 = Particle(0.02, 0.0, 3.0, 998.29, 0, 3.5, Point3D(n,m,o), Vector(0, 0, 0));
+				pSystem.addParticle(p1);
+				o+=.015;
+			  }
+			  m+=.015;
+		  }
+		  n+=.015;
+	  }*/
 
-	}  
+  }  
 }
 
 
