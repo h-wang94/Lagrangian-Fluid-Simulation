@@ -9,7 +9,7 @@ ParticleSystem::ParticleSystem() {
   this->h = 0.0457;
   this->hSq = pow(h, 2.0f);
   this->debug = true;
-  setRestCoeff(0.8f);
+  setRestCoeff(1.0f);
   setBoundaries(-.1, -1, -.1, .1, 1, .1);
 }
 
@@ -35,7 +35,7 @@ ParticleSystem::ParticleSystem(Vector grav, float min_x, float min_y, float min_
   this->grid = SpatialGrid(h);
   setRestCoeff(restCoeff);
   setBoundaries(min_x, min_y, min_z, max_x, max_y, max_z);
-
+  this->grid = SpatialGrid(h);
 }
 
 void ParticleSystem::setRestCoeff(float restCoeff) {
@@ -63,7 +63,7 @@ void ParticleSystem::update(float timestep){
   this->computePressure(); // now compute each particle's pressure. randomly put in numbers.
   this->computeForces();
   this->leapFrog(timestep);
-  //this->particles = this->grid.updateBoxes(this->particles);
+  this->particles = this->grid.updateBoxes(this->particles);
 }
 
 Particle* ParticleSystem::getParticle(const unsigned int i) {
@@ -110,26 +110,26 @@ void ParticleSystem::setDensities(){
   for(unsigned int i = 0; i < particles.size(); i++){
     density = 0;
 	//cout<<"beep";
-    //list = grid.getNeighbors(particles[i]);
+    list = grid.getNeighbors(particles[i]);
 	//cout<<"boop"<<endl;
 	//cout<<list.size()<<endl;
 	//cout<<particles.size()<<endl;
 	//cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
-    /*for(unsigned int j = 0; j < list.size(); j++){ 
+    for(unsigned int j = 0; j < list.size(); j++){ 
 		
 		//cout<<list[j]<<endl;
       Vector dist = particles[i].getPosition() - list[j].getPosition();
       //if (dist.getMagnitude() <= hSq) {
       if (dist.getMagnitude() <= h) {
         density += defaultKernel(dist) * list[j].getMass();
-      }*/
+      }
 
-      for(unsigned int j = 0; j < particles.size(); j++){ // need to use spatial grid	
+      /*for(unsigned int j = 0; j < particles.size(); j++){ // need to use spatial grid	
         Vector dist = particles[i].getPosition() - particles[j].getPosition();
       //if (dist.getMagnitude() <= hSq) {
       if (dist.getMagnitude() <= h) {
       density += defaultKernel(dist) * particles[j].getMass();
-      }
+      }*/
 
     }
 	//cout<<">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"<<endl;
