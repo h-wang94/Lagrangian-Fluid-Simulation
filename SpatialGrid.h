@@ -11,7 +11,7 @@ public:
 	SpatialGrid(const float h);//establish grid with h box lengths
 	SpatialGrid();
 	int addParticle(Particle p); //add particle to list of particles in box
-	std::vector<Particle> updateBoxes(std::vector<Particle> particles); //when particles move, they might change boxes, so we need to update boxes
+	Particle updateBoxes(Particle partc); //when particles move, they might change boxes, so we need to update boxes
 	std::vector<Particle> getNeighbors(Particle p); //get the neighbor particles in the box and in the surrounding boxes
 	void clear();
 	
