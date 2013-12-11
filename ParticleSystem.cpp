@@ -306,32 +306,129 @@ void ParticleSystem::checkBoundary(Particle& p, Point3D* position, Vector* veloc
   if (!position || !velocity || !velocityHalf) return;
   // if goes past boundaries, reflect back.
   if(position->getX() > MAX_X) {
+
+	  /*Vector normal = Vector(-1,0,0);
+	  Point3D cp = Point3D(MAX_X, position->getY(), position->getZ());
+	  float d = abs(MAX_X - position->getX());
+
+	  Vector vel = *velocity;
+	  Vector v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
+	  velocity->setX(v1.getX());
+	  velocity->setY(v1.getY());
+	  velocity->setZ(v1.getZ());
+	  vel = *velocityHalf;
+	  v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
+	  velocityHalf->setX(v1.getX());
+	  velocityHalf->setY(v1.getY());
+	  velocityHalf->setZ(v1.getZ());*/
+
     position->setX(MAX_X);
+	
     velocity->setX(-p.getRestCoeff() * velocity->getX());
     velocityHalf->setX(-p.getRestCoeff() * velocityHalf->getX());
   }
   else if (position->getX() < MIN_X) {
+	  /*Vector normal = Vector(1,0,0);
+	  Point3D cp = Point3D(MIN_X, position->getY(), position->getZ());
+	  float d = abs(MIN_X - position->getX());
+
+	  Vector vel = *velocity;
+	  Vector v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
+	  velocity->setX(v1.getX());
+	  velocity->setY(v1.getY());
+	  velocity->setZ(v1.getZ());
+	  vel = *velocityHalf;
+	  v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
+	  velocityHalf->setX(v1.getX());
+	  velocityHalf->setY(v1.getY());
+	  velocityHalf->setZ(v1.getZ());*/
+
     position->setX(MIN_X);
+
     velocity->setX(-p.getRestCoeff() * velocity->getX());
     velocityHalf->setX(-p.getRestCoeff() * velocityHalf->getX());
   }
   if(position->getY() > MAX_Y) {
+	  /*Vector normal = Vector(0,-1,0);
+	  Point3D cp = Point3D(position->getX(), MAX_Y, position->getZ());
+	  float d = abs(MAX_Y - position->getY());
+
+	  Vector vel = *velocity;
+	  Vector v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
+	  velocity->setX(v1.getX());
+	  velocity->setY(v1.getY());
+	  velocity->setZ(v1.getZ());
+	  vel = *velocityHalf;
+	  v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
+	  velocityHalf->setX(v1.getX());
+	  velocityHalf->setY(v1.getY());
+	  velocityHalf->setZ(v1.getZ());*/
+
     position->setY(MAX_Y);
+	
     velocity->setY(-p.getRestCoeff() * velocity->getY());
     velocityHalf->setY(-p.getRestCoeff() * velocityHalf->getY());
   }
   else if (position->getY() < MIN_Y) {
+	  Vector normal = Vector(0,1,0);
+	  Point3D cp = Point3D(position->getX(), MIN_Y, position->getZ());
+	  float d = abs(MIN_Y - position->getY());
+
+	  /*Vector vel = *velocity;
+	  Vector v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
+	  velocity->setX(v1.getX());
+	  velocity->setY(v1.getY());
+	  velocity->setZ(v1.getZ());
+	  vel = *velocityHalf;
+	  v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
+	  velocityHalf->setX(v1.getX());
+	  velocityHalf->setY(v1.getY());
+	  velocityHalf->setZ(v1.getZ());*/
+
     position->setY(MIN_Y);
+
     velocity->setY(-p.getRestCoeff() * velocity->getY());
     velocityHalf->setY(-p.getRestCoeff() * velocityHalf->getY());
   }
   if(position->getZ() > MAX_Z) {
+	  Vector normal = Vector(0,0,-1);
+	  Point3D cp = Point3D(position->getX(), position->getY(), MAX_Z);
+	  float d = abs(MAX_Z - position->getZ());
+
+	  /*Vector vel = *velocity;
+	  Vector v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
+	  velocity->setX(v1.getX());
+	  velocity->setY(v1.getY());
+	  velocity->setZ(v1.getZ());
+	  vel = *velocityHalf;
+	  v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
+	  velocityHalf->setX(v1.getX());
+	  velocityHalf->setY(v1.getY());
+	  velocityHalf->setZ(v1.getZ());*/
+
     position->setZ(MAX_Z);
+
     velocity->setZ(-p.getRestCoeff()* velocity->getZ());
     velocityHalf->setZ(-p.getRestCoeff() * velocityHalf->getZ());
   }
   else if (position->getZ() < MIN_Z) {
+	  Vector normal = Vector(0,0,1);
+	  Point3D cp = Point3D(position->getX(), position->getY(), MIN_Z);
+	  float d = abs(MIN_Z - position->getZ());
+
+	  /*Vector vel = *velocity;
+	  Vector v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
+	  velocity->setX(v1.getX());
+	  velocity->setY(v1.getY());
+	  velocity->setZ(v1.getZ());
+	  vel = *velocityHalf;
+	  v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
+	  velocityHalf->setX(v1.getX());
+	  velocityHalf->setY(v1.getY());
+	  velocityHalf->setZ(v1.getZ());*/
+
     position->setZ(MIN_Z);
+
     velocity->setZ(-p.getRestCoeff()* velocity->getZ());
     velocityHalf->setZ(-p.getRestCoeff() * velocityHalf->getZ());
   }
