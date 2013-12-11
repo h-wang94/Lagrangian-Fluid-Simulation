@@ -32,6 +32,7 @@ void Film::renderScene(Camera &c, SpatialGrid &sg, float stepSize) {
 	Sampler sampler = Sampler(c);
 	Sample s;
 	while (sampler.hasNext()) {
+		cout << "yeehaw\n";
 		sampler.next();
 		s = sampler.getPixelRGBA(sg, stepSize);
 		commitSample(s);

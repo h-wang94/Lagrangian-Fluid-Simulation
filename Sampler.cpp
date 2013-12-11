@@ -22,12 +22,11 @@ Sample Sampler::getSample() {
 }
 
 bool Sampler::hasNext() {
-	Sample temp = Sample(s.x, s.y);
-	temp.x += 1;
-	if (temp.x == c.imgWidth) {
-		temp.y += 1;
+	float add1 = 0;
+	if (s.x + 1 >= c.imgWidth) {
+		add1 = 1;
 	}
-	if (temp.y == c.imgHeight) {
+	if (s.y + add1 >= c.imgHeight) {
 		return false;
 	}
 	return true;
@@ -40,7 +39,7 @@ Sample Sampler::next() {
 		exit(1);
 	}
 	s.x += 1;
-	if (s.x == c.imgWidth) {
+	if (s.x >= c.imgWidth) {
 		s.x = 0;
 		s.y += 1;
 	}

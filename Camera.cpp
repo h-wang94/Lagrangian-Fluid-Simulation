@@ -18,7 +18,7 @@ Camera::Camera() {
 	R = T * imgWidth/imgHeight;
 }
 
-Camera::Camera(float imgH, float imgW, float fovV, Point3D lookFrom, Point3D lookAt, Vector up) {
+Camera::Camera(float imgW, float imgH, float fovV, Point3D lookFrom, Point3D lookAt, Vector up) {
 	this->lookFrom = lookFrom;
 	Vector temp = (lookAt - lookFrom);
 	temp.normalize();
