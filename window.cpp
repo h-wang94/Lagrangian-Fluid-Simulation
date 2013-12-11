@@ -82,44 +82,6 @@ void testSpatialGrid() {
 		cout << list2[j] << endl;
 		j++;
 	}
-  Particle p1 = Particle();
-  Particle p2 = Particle();
-  Particle p3 = Particle();
-  Particle p4 = Particle();
-  Particle p5 = Particle();
-  SpatialGrid grid = SpatialGrid(1);
-  
-  grid.addParticle(p2);
-  grid.addParticle(p3);
-  grid.addParticle(p4);
-  grid.addParticle(p5);
-  grid.addParticle(p1);
-  listofparts.push_back(p1);
-  listofparts.push_back(p2);
-  listofparts.push_back(p3);
-  listofparts.push_back(p4);
-  listofparts.push_back(p5);
-  std::vector<Particle> list = grid.getNeighbors(p1);
-  unsigned int j = 0;
-  while (j < list.size()){
-    cout << list[j] << endl;
-    j++;
-  }
-  listofparts[4].setPosition(Point3D(10,10,10));
-  cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
-  cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
-  cout<<"++++++++++++++++++++++++++++++++++++"<<endl<<endl;
-  grid.updateBoxes(listofparts);
-  cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
-  cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
-  cout<<"++++++++++++++++++++++++++++++++++++"<<endl<<endl;
-  //cout<<p4<<endl;
-  std::vector<Particle> list2 = grid.getNeighbors(p1);
-  j = 0;
-  while (j < list2.size()){
-    cout << list2[j] << endl;
-    j++;
-  }
   int breakpoint = 0;
   cin>>breakpoint;
 }
