@@ -48,6 +48,24 @@ Water::Water(void) {
   this->surfTension = 0.0728f;
 }
 
+Water::Water(Point3D position) {
+  this->mass = 0.02f;
+  this->pressure = 0.0f;
+  this->stiffness = 3.0f;
+  this->restDensity = 998.29f;
+  this->density = 0.0f;
+  this->viscosity = 3.5f;
+  this->position = position;
+  this->oldPosition = position;
+  this->supportRadius = 0.0457f;
+  this->velocity = Vector(0,0,0);
+  this->color = Vector(0, 0, .8f);
+  this->opacity = 0.5f;
+  this->restCoeff = 0.9;
+  this->threshold = 7.065f;
+  this->surfTension = 0.0728f;
+}
+
 Mucus::Mucus(void) {
   this->mass = 0.04f;
   this->pressure = 0.0f;
@@ -59,6 +77,24 @@ Mucus::Mucus(void) {
   float y = MAX_Y*((2*(static_cast <float> (rand()) / static_cast <float> (RAND_MAX)))-1)-.5;
   float z = MAX_Z*((2*(static_cast <float> (rand()) / static_cast <float> (RAND_MAX)))-1);
   this->position = Point3D(x, y, z);
+  this->oldPosition = position;
+  this->supportRadius = 0.0726f;
+  this->velocity = Vector(0, 0, 0);
+  this->color = Vector(0, .8f, 0);
+  this->opacity = 0.5f;
+  this->restCoeff = 0.8;
+  this->threshold = 5.0f;
+  this->surfTension = 6.0f;
+}
+
+Mucus::Mucus(Point3D position) {
+  this->mass = 0.04f;
+  this->pressure = 0.0f;
+  this->stiffness = 5.0f;
+  this->restDensity = 1000.0f;
+  this->density = 0.0f;
+  this->viscosity = 36.0f;
+  this->position = position; 
   this->oldPosition = position;
   this->supportRadius = 0.0726f;
   this->velocity = Vector(0, 0, 0);

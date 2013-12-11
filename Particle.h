@@ -77,12 +77,14 @@ class Particle {
 class Water: public Particle {
   public:
     Water(void);
+    Water(Point3D position);
 };
 
 // Mucus class to define mucus particle. 
 class Mucus: public Particle {
   public:
     Mucus(void);
+    Mucus(Point3D position);
 };
 
 std::ostream& operator<<(ostream& outs, const Particle& particle);

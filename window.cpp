@@ -549,11 +549,17 @@ void keyboard(unsigned char key, int x, int y) {
 	  case 'b':
 		pSystem.setBoundaries(-1, -1, -1, 1, 1, 1);
 		break;
-	 case 'p':
+	case 'p':
 		p1 = Water();
 		p1.setPosition(Point3D(0,.1,0));
 		pSystem.addParticle(p1);
 		break;
+  case 'x': // opens up x portion of boundary
+    pSystem.setBoundaries(-1, -1, -.1, .1, 1, .1);
+    break;
+  case 'z': // open up z portion of the boundary
+    pSystem.setBoundaries(-.1, -1, -.2, .1, 1, .1);
+    break;
 	default:
 		break;
 	}
