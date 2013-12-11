@@ -121,7 +121,6 @@ std::vector<Particle> SpatialGrid::getNeighbors(Particle p){
 		cin >> breakpoint;
 		exit(666);*/
 	//}
-	cout << "DONE WITH GET NEIGHBORS" << endl;
 	return list;
 
 }
