@@ -85,7 +85,7 @@ void ParticleSystem::computePressure() {
 void ParticleSystem::setDensities(){
   float density = 0;
   std::vector<Particle> list;
-#pragma omp parallel for firstprivate(density)
+//#pragma omp parallel for firstprivate(density)
   for(unsigned int i = 0; i < particles.size(); i++){
     density = 0;
     list = grid.getNeighbors(particles[i]);
