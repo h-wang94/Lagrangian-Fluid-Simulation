@@ -18,13 +18,13 @@ Film::Film(float x, float y) {
 }
 
 void Film::commitSample(Sample s) {
-	pixelRGBAs.push_back((unsigned char) s.colorVals.getX());
-	pixelRGBAs.push_back((unsigned char) s.colorVals.getY());
-	pixelRGBAs.push_back((unsigned char) s.colorVals.getZ());
-	pixelRGBAs.push_back((unsigned char) s.opacity);
+	pixelRGBAs.push_back(s.colorVals.getX());
+	pixelRGBAs.push_back(s.colorVals.getY());
+	pixelRGBAs.push_back(s.colorVals.getZ());
+	pixelRGBAs.push_back(s.opacity);
 }
 
-unsigned char* Film::getBMP() {
+float* Film::getBMP() {
 	return &(pixelRGBAs[0]);
 }
 

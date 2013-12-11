@@ -24,7 +24,9 @@ Camera::Camera(float imgW, float imgH, float fovV, Point3D lookFrom, Point3D loo
 	temp.normalize();
 	zAxis = temp;
 	xAxis = zAxis.crossProduct(up);
+	xAxis.normalize();
 	yAxis = xAxis.crossProduct(zAxis);
+	yAxis.normalize();
 	imgHeight = imgH;
 	imgWidth = imgW;
 	T = tan(fovV * .5);
