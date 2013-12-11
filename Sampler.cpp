@@ -26,6 +26,9 @@ bool Sampler::hasNext() {
 	if (s.x + 1 >= c.imgWidth) {
 		add1 = 1;
 	}
+	if (s.x + 1 >= c.imgWidth) {
+		add1 = 1;
+	}
 	if (s.y + add1 >= c.imgHeight) {
 		return false;
 	}
@@ -74,7 +77,9 @@ Sample Sampler::getPixelRGBA(SpatialGrid &sg, float stepSize) {
 		p.setPosition(testPoint);
 		//neighbors = sg.getNeighbors(p); until spatial grid works
 		neighbors = pSystem.getNeighbors(p);
+
 		if (neighbors.empty() || pSystem.colorFunction(p) < .5) {
+			dist = stepSize * (i + 1);
 			continue; //if there are no neighbors, we're outside the fluid. Probably.
 		}
 		//find some way to average the opacities and color at this "particle"
@@ -84,11 +89,13 @@ Sample Sampler::getPixelRGBA(SpatialGrid &sg, float stepSize) {
 			temp = neighbors[j];
 			newSample.colorVals += temp.getColor();
 			newSample.opacity += temp.getOpacity();
+		
 		}
 		newSample.colorVals = newSample.colorVals / (float) neighbors.size();
 		newSample.opacity /= (float) neighbors.size();
 		s.addRGBAVals(newSample);
 		dist = stepSize * (i + 1);
 	}
+
 	return s;
 }

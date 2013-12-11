@@ -10,6 +10,7 @@
 #include "ParticleSystem.h"
 #include "SpatialGrid.h"
 #include "GLToMovie.h"
+#include "Film.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -44,6 +45,43 @@ void testSpatialGrid() {
 	//Particle p4 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(0,-9, -9));
 	/*Particle p5 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(11,11, 11));*/
 	std::vector<Particle> listofparts;
+	Particle p1 = Particle();
+	Particle p2 = Particle();
+	Particle p3 = Particle();
+	Particle p4 = Particle();
+	Particle p5 = Particle();
+	SpatialGrid grid = SpatialGrid(10);
+	grid.addParticle(p1);
+	grid.addParticle(p2);
+	grid.addParticle(p3);
+	grid.addParticle(p4);
+	grid.addParticle(p5);
+	listofparts.push_back(p1);
+	listofparts.push_back(p2);
+	listofparts.push_back(p3);
+	listofparts.push_back(p4);
+	listofparts.push_back(p5);
+	std::vector<Particle> list = grid.getNeighbors(p1);
+	unsigned int j = 0;
+	while (j < list.size()){
+		cout << list[j] << endl;
+		j++;
+	}
+	p4.setPosition(Point3D(10,10,10));
+	cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
+	cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
+	cout<<"++++++++++++++++++++++++++++++++++++"<<endl<<endl;
+	grid.updateBoxes(listofparts);
+	cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
+	cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
+	cout<<"++++++++++++++++++++++++++++++++++++"<<endl<<endl;
+	cout<<p4<<endl;
+	std::vector<Particle> list2 = grid.getNeighbors(p1);
+	j = 0;
+	while (j < list2.size()){
+		cout << list2[j] << endl;
+		j++;
+	}
   Particle p1 = Particle();
   Particle p2 = Particle();
   Particle p3 = Particle();
@@ -341,7 +379,7 @@ void determineFunction(int argc, char *argv[]) {
 	}
 }
 
-
+unsigned char* myBMP;
 float angle = 0;
 /* Display is updated/rendered here. */
 void displayFunc() {
@@ -450,6 +488,93 @@ void displayFunc() {
 	glutSwapBuffers();
 }
 
+void displayFunc1() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glLoadIdentity();
+// Set the camera
+ gluLookAt( 0.0f, 0.3f, 2.0f,
+  0.0f, -.5f,  0.0f,
+  0.0f, 1.0f,  0.0f);
+
+ glRotatef(angle, 0.0f, 1.0f, 0.0f);
+
+ glBegin(GL_TRIANGLES);
+ glVertex3f( -1.0f, -1.0f, -1.0f);
+ glVertex3f( 1.0f, -1.0f, -1.0);
+ glVertex3f( 1.0f, -1.0f, 1.0);
+ glEnd();
+
+ glBegin(GL_TRIANGLES);
+ glVertex3f( 1.0f, -1.0f, 1.0f);
+ glVertex3f( -1.0f, -1.0f, 1.0);
+ glVertex3f( -1.0f, -1.0f, -1.0);
+ glEnd();
+
+ angle+=0.3f;
+
+
+ /*glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+ glLoadIdentity();
+ gluLookAt( 0.0f, 0.0f, 10.0f,
+ -1.0f, -1.0f,  -1.0f,
+ 0.0f, 1.0f,  0.0f);
+ glEnable(GL_DEPTH_TEST);
+ glMatrixMode(GL_MODELVIEW);
+ glLoadIdentity();*/
+
+
+ // rendering stuff goes here
+ //for each particle
+ //glEnable(GL_LIGHTING);
+ //glEnable(GL_LIGHT0);
+ //GLfloat a[] = {0.4, 0.4, 0.4};
+ //GLfloat b[] = {0.2, 0.3, 1.0};
+ //GLfloat c[] = {0.1, 0.7, 0.2};
+ //glLightfv(GL_LIGHT0, GL_SPECULAR, a);
+ //glLightfv(GL_LIGHT0, GL_AMBIENT, b);
+ //glLightfv(GL_LIGHT0, GL_DIFFUSE, c);
+ //GLfloat diffuse[] = {0, 0, 1, 1};
+ //GLfloat specular[] = {1, 1, 1, 1};
+ //GLfloat shininess = 5;
+ //glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+ //glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+ //glMaterialfv(GL_FRONT, GL_SHININESS, &shininess);
+
+
+
+
+
+ glBegin(GL_POINTS);
+ glColor4f(0.0, 0.2, 1.0, 1.0);
+ Particle* p;
+ for (unsigned int i = 0; i < pSystem.getParticles().size(); i+=1) {
+  if (i == pSystem.getParticles().size() - 1) {
+   glColor4f(1.0, 1.0, 1.0, 1.0);
+  }
+  p = pSystem.getParticle(i);
+  //if (p->getPosition().getZ() < 0.5) {
+  //glColor4f(1.0, 0.0, 0.0, 1.0);
+  //}
+  //else if (p->getPosition().getZ() >= 0.5) {
+  //glColor4f(0.0, 1.0, 0.0, 1.0);
+  //}
+  glVertex3f(p->getPosition().getX(), p->getPosition().getY(), p->getPosition().getZ());
+ }
+ if (currentTime < totalTime) {
+  pSystem.update(dt);
+  currentTime += dt;
+ } else {
+  exit(1);
+ }
+ glDisable(GL_LIGHTING);
+ glEnd();
+ glFlush();
+ if(record) {
+  recorder.RecordFrame();
+ }
+ glutSwapBuffers();
+}
+
 void keyboard(unsigned char key, int x, int y) {
 	Particle p1;
 	switch(key) {
@@ -521,8 +646,8 @@ int main(int argc, char** argv) {
 	glEnable(GL_BLEND);
 	glutKeyboardFunc(keyboard);
 
-	glutDisplayFunc(displayFunc);
-	glutIdleFunc(displayFunc); //if we do user interaction
+	glutDisplayFunc(displayFunc1);
+	glutIdleFunc(displayFunc1); //if we do user interaction
 	glutReshapeFunc(changeSize);
 	glutMainLoop();
 	return 0;
