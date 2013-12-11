@@ -9,7 +9,7 @@
 #define MIN_X -.1
 #define MIN_Y -1
 #define MIN_Z -.1
-#define REST_COEFF 0.8
+#define REST_COEFF .8
 
 ParticleSystem::ParticleSystem() {
   this->grav = Vector(0,0,-9.8);
@@ -25,7 +25,7 @@ ParticleSystem::ParticleSystem(Vector grav){
   this->hSq = pow(h, 2.0f);
   this->debug = true;
   this->numRowBoxes = 100;
-  this->grid = SpatialGrid(100, h);
+  this->grid = SpatialGrid(h);
 }
 
 void ParticleSystem::initialize(float timestep) {
@@ -40,7 +40,7 @@ void ParticleSystem::update(float timestep){
   this->computePressure(); // now compute each particle's pressure. randomly put in numbers.
   this->computeForces();
   this->leapFrog(timestep);
-  grid.updateBoxes(particles);
+  //this->particles = this->grid.updateBoxes(this->particles);
 }
 
 Particle* ParticleSystem::getParticle(const unsigned int i) {
@@ -77,16 +77,24 @@ void ParticleSystem::computePressure() {
   }
 }
 
+int counter = 0;
 // need to look at this
 void ParticleSystem::setDensities(){
-
+	//cout<<"START2"<<endl;
   float density = 0;
+  std::vector<Particle> list;
 #pragma omp parallel for firstprivate(density)
   for(unsigned int i = 0; i < particles.size(); i++){
     density = 0;
-
-    /*std::vector<Particle> list = grid.getNeighbors(particles[i]);
-    for(unsigned int j = 0; j < list.size(); j++){ 
+	//cout<<"beep";
+    //list = grid.getNeighbors(particles[i]);
+	//cout<<"boop"<<endl;
+	//cout<<list.size()<<endl;
+	//cout<<particles.size()<<endl;
+	//cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
+    /*for(unsigned int j = 0; j < list.size(); j++){ 
+		
+		//cout<<list[j]<<endl;
       Vector dist = particles[i].getPosition() - list[j].getPosition();
       //if (dist.getMagnitude() <= hSq) {
       if (dist.getMagnitude() <= h) {
@@ -101,12 +109,26 @@ void ParticleSystem::setDensities(){
       }
 
     }
+	//cout<<">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"<<endl;
+	/*cout<<list.size()<<endl;
+	cout<<"in particles[j]: "<<endl;
+	for(unsigned int j = 0; j < particles.size(); j++){ // need to use spatial grid	
+       cout<<particles[j]<<endl;
+      }
+
+	int breakpoint;
+	cin >> breakpoint;*/
+
     if(density == 0){
       density = particles[i].getMass() / .00000001;
     }
+	
+
+	//counter++;
 
     particles[i].setDensity(density);											//set the particle[i]'s density to particle[i]
   }
+  //cout<<"STOP"<<endl;
 }
 
 Vector ParticleSystem::gravityForce(Particle& p) {
@@ -361,6 +383,9 @@ void ParticleSystem::bouncebackVelocity(Vector* velocity, Vector normal) {
 }
 
 void ParticleSystem::addParticle(Particle& p) {
+
+  long id = grid.addParticle(p);
+  p.setHashID(id);
+
   particles.push_back(p);
-  grid.addParticle(p);
 }

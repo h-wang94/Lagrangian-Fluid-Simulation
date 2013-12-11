@@ -48,12 +48,13 @@ void testSpatialGrid() {
   Particle p3 = Particle();
   Particle p4 = Particle();
   Particle p5 = Particle();
-  SpatialGrid grid = SpatialGrid(10, 10);
-  grid.addParticle(p1);
+  SpatialGrid grid = SpatialGrid(1);
+  
   grid.addParticle(p2);
   grid.addParticle(p3);
   grid.addParticle(p4);
   grid.addParticle(p5);
+  grid.addParticle(p1);
   listofparts.push_back(p1);
   listofparts.push_back(p2);
   listofparts.push_back(p3);
@@ -65,7 +66,7 @@ void testSpatialGrid() {
     cout << list[j] << endl;
     j++;
   }
-  p4.setPosition(Point3D(10,10,10));
+  listofparts[4].setPosition(Point3D(10,10,10));
   cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
   cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
   cout<<"++++++++++++++++++++++++++++++++++++"<<endl<<endl;
@@ -73,13 +74,15 @@ void testSpatialGrid() {
   cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
   cout<<"++++++++++++++++++++++++++++++++++++"<<endl;
   cout<<"++++++++++++++++++++++++++++++++++++"<<endl<<endl;
-  cout<<p4<<endl;
+  //cout<<p4<<endl;
   std::vector<Particle> list2 = grid.getNeighbors(p1);
   j = 0;
   while (j < list2.size()){
     cout << list2[j] << endl;
     j++;
   }
+  int breakpoint = 0;
+  cin>>breakpoint;
 }
 
 void createParticles() {
@@ -93,8 +96,16 @@ void createParticles() {
     }
   } else {
     for(i = 0; i < numParticles; i++) {
-      p1 = Particle();
-      pSystem.addParticle(p1);
+		if(i <= numParticles/2){
+			p1 = Particle();
+			pSystem.addParticle(p1);
+		}
+		if(i > numParticles/2){
+			p1 = Particle();
+			//p1.setViscosity(10);
+			//p1.setColor(Point3D(0,1,.2));
+			pSystem.addParticle(p1);
+		}
     }
 	  /*float maxX = .08f;
 	  float minX = -.08f;
@@ -115,11 +126,11 @@ void createParticles() {
 				  //cout<<pos<<endl;
 				p1 = Particle(0.02, 0.0, 3.0, 998.29, 0, 3.5, Point3D(n,m,o), Vector(0, 0, 0));
 				pSystem.addParticle(p1);
-				o+=.014;
+				o+=.015;
 			  }
-			  m+=.014;
+			  m+=.015;
 		  }
-		  n+=.014;
+		  n+=.015;
 	  }*/
 
   }  
@@ -428,13 +439,20 @@ void displayFunc() {
       glColor4f(1.0, 1.0, 1.0, 1.0);
     }
     p = pSystem.getParticle(i);
+	glColor4f(p->getColor().getX(), p->getColor().getY(), p->getColor().getZ(), 1.0);
     //if (p->getPosition().getZ() < 0.5) {
       //glColor4f(1.0, 0.0, 0.0, 1.0);
     //}
     //else if (p->getPosition().getZ() >= 0.5) {
       //glColor4f(0.0, 1.0, 0.0, 1.0);
     //}
+	/*glPushMatrix();
+	glTranslatef(p->getPosition().getX(), p->getPosition().getY(), p->getPosition().getZ());
+	glutSolidSphere(0.01,10,10);
+	glPopMatrix();*/
+
     glVertex3f(p->getPosition().getX(), p->getPosition().getY(), p->getPosition().getZ());
+	glColor4f(1,1,1,1.0);
 	}
   if (currentTime < totalTime) {
     pSystem.update(dt);
@@ -442,7 +460,7 @@ void displayFunc() {
   } else {
     exit(1);
   }
-  glDisable(GL_LIGHTING);
+  //glDisable(GL_LIGHTING);
 	glEnd();
 	glFlush();
 	glutSwapBuffers();
@@ -485,6 +503,7 @@ void changeSize(int w, int h) {
 }
 
 int main(int argc, char** argv) {
+	//testSpatialGrid();
   pSystem = ParticleSystem(Vector(0,-9.8, 0));
   determineFunction(argc, argv);
   createParticles();

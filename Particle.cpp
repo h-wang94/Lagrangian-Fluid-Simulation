@@ -2,9 +2,9 @@
 #include <cstdlib>
 #include "Particle.h"
 
-#define MAX_X .08
-#define MAX_Y .08
-#define MAX_Z .08
+#define MAX_X .09
+#define MAX_Y .5
+#define MAX_Z .05
 
 // Constructor for a water particle in random locations
 Particle::Particle(void) {
@@ -21,6 +21,8 @@ Particle::Particle(void) {
   this->oldPosition = position;
   //this->velocity = Vector(rand() % 3, rand() % 3, rand() % 3);
   this->velocity = Vector(0, 0, 0);
+  this->hashID = 0;
+  this->color = Point3D(.2,0,1);
 
 }
 
@@ -34,6 +36,25 @@ Particle::Particle(float mass, float pressure, float stiffness, float restDensit
   this->position = position;
   this->oldPosition = position;
   this->velocity = velocity;
+  this->color = Point3D(.2,0,1);
+}
+
+int Particle::getHashID() const {
+	
+  return this->hashID;
+}
+
+void Particle::setHashID(const int i){
+  this->hashID = i;
+}
+
+Point3D Particle::getColor() const {
+	
+  return this->color;
+}
+
+void Particle::setColor(const Point3D c){
+  this->color = c;
 }
 
 float Particle::getMass() const {
@@ -92,6 +113,10 @@ void Particle::setDensity(const float density) {
   this->density = density;
 }
 
+void Particle::setViscosity(const float viscosity) {
+  this->density = viscosity;
+}
+
 void Particle::setPressure(const float pressure) {
   this->pressure = pressure;
 }
@@ -101,6 +126,7 @@ void Particle::setPosition(Point3D position) {
 }
 
 void Particle::setOldPosition(Point3D oldPosition) {
+	
   this->oldPosition = oldPosition;
 }
 

@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AviFile.cpp" />
+    <ClCompile Include="Bucket.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="Point3D.cpp" />
@@ -27,6 +28,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AviFile.h" />
+    <ClInclude Include="Bucket.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="GLToMovie.h" />
     <ClInclude Include="Particle.h" />
