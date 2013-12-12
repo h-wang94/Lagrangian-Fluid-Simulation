@@ -3,7 +3,7 @@
 #include <time.h>
 
 #define PI 3.14159265
-#define MAX_NAIVE 10000
+#define MAX_NAIVE 50
 
 ParticleSystem::ParticleSystem() {
   this->grav = Vector(0,0,-9.8);
@@ -95,19 +95,69 @@ void ParticleSystem::computePressure() {
 void ParticleSystem::setDensities(){
   float density = 0;
   std::vector<Particle> list;
-#pragma omp parallel for firstprivate(density, list)
+
+  std::map<int, std::vector<int>> hashMap;
+
+  for(unsigned int i = 0; i < particles.size(); i++){//create the hash map (O(n) time)
+
+	Point3D pos = particles[i].getPosition();
+	float x = pos.getX();
+	float y = pos.getY();
+	float z = pos.getZ();
+
+	int xindex = (int)floor((x+10)/(.0457));
+	int yindex = (int)floor((y+10)/(.0457));
+	int zindex = (int)floor((z+10)/(.0457));
+
+	int hash = (xindex * 10619863)^(yindex * 94418953)^(zindex * 54018521);
+
+	hashMap[hash].push_back(i);
+
+  }
+
+//#pragma omp parallel for firstprivate(density, list)
   for(unsigned int i = 0; i < particles.size(); i++){
     density = 0;
 
-    if(particles.size() > MAX_NAIVE){
-      list = grid.getNeighbors(particles[i]);
-      for(unsigned int j = 0; j < list.size(); j++){ 
+    if(particles.size() > MAX_NAIVE){//doing spatial hashing
+      //list = grid.getNeighbors(particles[i]);
+
+		Point3D pos = particles[i].getPosition();
+		float x = pos.getX();
+		float y = pos.getY();
+		float z = pos.getZ();
+
+		int xindex = (int)floor((x+10)/(.0457));
+		int yindex = (int)floor((y+10)/(.0457));
+		int zindex = (int)floor((z+10)/(.0457));
+
+		int hash = (xindex * 10619863)^(yindex * 94418953)^(zindex * 54018521);
+		std::vector<int> ints = hashMap[hash];
+#pragma omp parallel for firstprivate(c)
+		for(int c = 0; c < ints.size(); c++){//get surrounding parts
+			list.push_back(particles[ints[c]]);
+		}
+		for(int a = -1; a <= 1; a++){
+			for(int b = -1; b <= 1; b++){
+				for(int c = -1; c <= 1; c++){//get surrounding boxes 
+					int hash2 = ((xindex+a) * 10619863)^((yindex+b) * 94418953)^((zindex+c) * 54018521);
+					std::vector<int> ints2 = hashMap[hash2];
+					#pragma omp parallel for firstprivate(d)
+					for(int d = 0; d < ints2.size(); d++){
+						list.push_back(particles[ints2[d]]);
+					}
+				}
+			}
+		}
+    for(unsigned int j = 0; j < list.size(); j++){ //loop through neighbors
         Vector diff = particles[i].getPosition() - list[j].getPosition();
         if (diff.getMagnitude() <= particles[i].getSupportRadius()) {
         density += defaultKernel(diff, particles[i].getSupportRadius()) * list[j].getMass();
         }
       }
+	list.clear();
     }
+
     else{
       for(unsigned int j = 0; j < particles.size(); j++){ 
         Vector diff = particles[i].getPosition() - particles[j].getPosition();
@@ -334,7 +384,7 @@ void ParticleSystem::leapFrog(const float& dt) {
     p.setVelocity(tempVelocity); 
 
     if(particles.size() > MAX_NAIVE){
-      p = this->grid.updateBoxes(p); // update the boxes of the particles in spatialgrid
+      //p = this->grid.updateBoxes(p); // update the boxes of the particles in spatialgrid
     }
   }
 }
@@ -389,8 +439,8 @@ void ParticleSystem::checkBoundary(Particle& p, Point3D* position, Vector* veloc
 }
 
 void ParticleSystem::addParticle(Particle& p) {
-  long id = grid.addParticle(p);
-  p.setHashID(id);
+  //long id = grid.addParticle(p);
+  //p.setHashID(id);
 
   particles.push_back(p);
 }
