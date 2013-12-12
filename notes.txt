@@ -39,6 +39,9 @@ http://www.inf.ufrgs.br/cgi2007/cd_cgi/papers/harada.pdf
 Bucket Generation & Neighborhood search (Pg. 7-9)
 http://individuals.iii.u-tokyo.ac.jp/~yoichiro/report/report-pdf/harada/international/2007apcom.pdf
 
+Marching Cubes (with source code!)
+http://paulbourke.net/geometry/polygonise/
+
 
 
 //===================
