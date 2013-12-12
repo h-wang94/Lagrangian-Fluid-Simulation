@@ -58,20 +58,12 @@ std::vector<Particle> ParticleSystem::getParticles() {
 // computes the internal and external forces.
 // also sets acceleration
 void ParticleSystem::computeForces(){
-  //Vector gravity, pressure, viscosity, tension, force;
   Vector gravity, force, total, tension;
-//#pragma omp parallel for firstprivate(gravity, pressure, viscosity, tension, force)
 #pragma omp parallel for firstprivate(gravity, total, force, tension)
   for(unsigned int i = 0; i < particles.size(); i++) {
     gravity = gravityForce(particles[i]);
-    /*pressure = pressureForce(particles[i], i);*/
-    //viscosity = viscosityForce(particles[i], i);
-    total = press_visc(particles[i], i);
-    //tension = tensionForce(particles[i], i);
+    total = press_visc(particles[i], i); // viscosity - pressure forces
 
-    //force = gravity - pressure + viscosity;
-    //force = gravity - pressure + viscosity + tension;
-    //force = gravity + total + tension;
     force = gravity + total;
     Vector acceleration = force / particles[i].getDensity();
     particles[i].setAcceleration(acceleration);
@@ -80,9 +72,21 @@ void ParticleSystem::computeForces(){
 
 void ParticleSystem::computePressure() {
   float pressure = 0;
+  unsigned int i = 0;
 #pragma omp parallel for firstprivate(pressure)
-  for(unsigned int i = 0; i < particles.size(); i++) {
+  // loop unroll by 4
+  for(i = 0; i < particles.size()/4*4; i+=4) {
     // Equation: p = k ( (p / p0)^7 - 1)
+    pressure = particles[i].getStiffness() * (pow((particles[i].getDensity() / particles[i].getRestDensity()), 7.0f) - 1.0f);
+    particles[i].setPressure(pressure);
+    pressure = particles[i+1].getStiffness() * (pow((particles[i+1].getDensity() / particles[i+1].getRestDensity()), 7.0f) - 1.0f);
+    particles[i+1].setPressure(pressure);
+    pressure = particles[i+2].getStiffness() * (pow((particles[i+2].getDensity() / particles[i+2].getRestDensity()), 7.0f) - 1.0f);
+    particles[i+2].setPressure(pressure);
+    pressure = particles[i+3].getStiffness() * (pow((particles[i+3].getDensity() / particles[i+3].getRestDensity()), 7.0f) - 1.0f);
+    particles[i+3].setPressure(pressure);
+  }
+  for(; i < particles.size(); i++) {
     pressure = particles[i].getStiffness() * (pow((particles[i].getDensity() / particles[i].getRestDensity()), 7.0f) - 1.0f);
     particles[i].setPressure(pressure);
   }
@@ -91,27 +95,27 @@ void ParticleSystem::computePressure() {
 void ParticleSystem::setDensities(){
   float density = 0;
   std::vector<Particle> list;
-//#pragma omp parallel for firstprivate(density)
+#pragma omp parallel for firstprivate(density, list)
   for(unsigned int i = 0; i < particles.size(); i++){
     density = 0;
 
-	if(particles.size() > MAX_NAIVE){
-		list = grid.getNeighbors(particles[i]);
-		for(unsigned int j = 0; j < list.size(); j++){ 
-		  Vector diff = particles[i].getPosition() - list[j].getPosition();
-		  if (diff.getMagnitude() <= particles[i].getSupportRadius()) {
-			density += defaultKernel(diff, particles[i].getSupportRadius()) * list[j].getMass();
-		  }
-		}
-	}
-	else{
-		for(unsigned int j = 0; j < particles.size(); j++){ 
-		  Vector diff = particles[i].getPosition() - particles[j].getPosition();
-		  if (diff.getMagnitude() <= particles[i].getSupportRadius()) {
-			density += defaultKernel(diff, particles[i].getSupportRadius()) * particles[j].getMass();
-		  }
-		}
-	}
+    if(particles.size() > MAX_NAIVE){
+      list = grid.getNeighbors(particles[i]);
+      for(unsigned int j = 0; j < list.size(); j++){ 
+        Vector diff = particles[i].getPosition() - list[j].getPosition();
+        if (diff.getMagnitude() <= particles[i].getSupportRadius()) {
+        density += defaultKernel(diff, particles[i].getSupportRadius()) * list[j].getMass();
+        }
+      }
+    }
+    else{
+      for(unsigned int j = 0; j < particles.size(); j++){ 
+        Vector diff = particles[i].getPosition() - particles[j].getPosition();
+        if (diff.getMagnitude() <= particles[i].getSupportRadius()) {
+        density += defaultKernel(diff, particles[i].getSupportRadius()) * particles[j].getMass();
+        }
+      }
+    }
     if(density == 0){
       density = particles[i].getMass() / .00000001;
     }
@@ -347,127 +351,36 @@ void ParticleSystem::checkBoundary(Particle& p, Point3D* position, Vector* veloc
   if (!position || !velocity || !velocityHalf) return;
   // if goes past boundaries, reflect back.
   if(position->getX() > MAX_X) {
-
-	  /*Vector normal = Vector(-1,0,0);
-	  Point3D cp = Point3D(MAX_X, position->getY(), position->getZ());
-	  float d = abs(MAX_X - position->getX());
-
-	  Vector vel = *velocity;
-	  Vector v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
-	  velocity->setX(v1.getX());
-	  velocity->setY(v1.getY());
-	  velocity->setZ(v1.getZ());
-	  vel = *velocityHalf;
-	  v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
-	  velocityHalf->setX(v1.getX());
-	  velocityHalf->setY(v1.getY());
-	  velocityHalf->setZ(v1.getZ());*/
-
     position->setX(MAX_X);
 	
     velocity->setX(-p.getRestCoeff() * velocity->getX());
     velocityHalf->setX(-p.getRestCoeff() * velocityHalf->getX());
   }
   else if (position->getX() < MIN_X) {
-	  /*Vector normal = Vector(1,0,0);
-	  Point3D cp = Point3D(MIN_X, position->getY(), position->getZ());
-	  float d = abs(MIN_X - position->getX());
-
-	  Vector vel = *velocity;
-	  Vector v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
-	  velocity->setX(v1.getX());
-	  velocity->setY(v1.getY());
-	  velocity->setZ(v1.getZ());
-	  vel = *velocityHalf;
-	  v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
-	  velocityHalf->setX(v1.getX());
-	  velocityHalf->setY(v1.getY());
-	  velocityHalf->setZ(v1.getZ());*/
-
     position->setX(MIN_X);
 
     velocity->setX(-p.getRestCoeff() * velocity->getX());
     velocityHalf->setX(-p.getRestCoeff() * velocityHalf->getX());
   }
   if(position->getY() > MAX_Y) {
-	  /*Vector normal = Vector(0,-1,0);
-	  Point3D cp = Point3D(position->getX(), MAX_Y, position->getZ());
-	  float d = abs(MAX_Y - position->getY());
-
-	  Vector vel = *velocity;
-	  Vector v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
-	  velocity->setX(v1.getX());
-	  velocity->setY(v1.getY());
-	  velocity->setZ(v1.getZ());
-	  vel = *velocityHalf;
-	  v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
-	  velocityHalf->setX(v1.getX());
-	  velocityHalf->setY(v1.getY());
-	  velocityHalf->setZ(v1.getZ());*/
-
     position->setY(MAX_Y);
 	
     velocity->setY(-p.getRestCoeff() * velocity->getY());
     velocityHalf->setY(-p.getRestCoeff() * velocityHalf->getY());
   }
   else if (position->getY() < MIN_Y) {
-		/*Vector normal = Vector(0,1,0);*/
-		/*Point3D cp = Point3D(position->getX(), MIN_Y, position->getZ());*/
-		//float d = abs(MIN_Y - position->getY());
-
-	  /*Vector vel = *velocity;
-	  Vector v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
-	  velocity->setX(v1.getX());
-	  velocity->setY(v1.getY());
-	  velocity->setZ(v1.getZ());
-	  vel = *velocityHalf;
-	  v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
-	  velocityHalf->setX(v1.getX());
-	  velocityHalf->setY(v1.getY());
-	  velocityHalf->setZ(v1.getZ());*/
-
     position->setY(MIN_Y);
 
     velocity->setY(-p.getRestCoeff() * velocity->getY());
     velocityHalf->setY(-p.getRestCoeff() * velocityHalf->getY());
   }
   if(position->getZ() > MAX_Z) {
-		/*Vector normal = Vector(0,0,-1);*/
-		/*Point3D cp = Point3D(position->getX(), position->getY(), MAX_Z);*/
-		//float d = abs(MAX_Z - position->getZ());
-
-	  /*Vector vel = *velocity;
-	  Vector v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
-	  velocity->setX(v1.getX());
-	  velocity->setY(v1.getY());
-	  velocity->setZ(v1.getZ());
-	  vel = *velocityHalf;
-	  v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
-	  velocityHalf->setX(v1.getX());
-	  velocityHalf->setY(v1.getY());
-	  velocityHalf->setZ(v1.getZ());*/
-
     position->setZ(MAX_Z);
 
     velocity->setZ(-p.getRestCoeff()* velocity->getZ());
     velocityHalf->setZ(-p.getRestCoeff() * velocityHalf->getZ());
   }
   else if (position->getZ() < MIN_Z) {
-	  /*Vector normal = Vector(0,0,1);*/
-		/*Point3D cp = Point3D(position->getX(), position->getY(), MIN_Z);*/
-		//float d = abs(MIN_Z - position->getZ());
-
-	  /*Vector vel = *velocity;
-	  Vector v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
-	  velocity->setX(v1.getX());
-	  velocity->setY(v1.getY());
-	  velocity->setZ(v1.getZ());
-	  vel = *velocityHalf;
-	  v1 = vel - normal*((1 + p.getRestCoeff() * d / (.01 * vel.getMagnitude()))*(vel.dotProduct(normal)));
-	  velocityHalf->setX(v1.getX());
-	  velocityHalf->setY(v1.getY());
-	  velocityHalf->setZ(v1.getZ());*/
-
     position->setZ(MIN_Z);
 
     velocity->setZ(-p.getRestCoeff()* velocity->getZ());
