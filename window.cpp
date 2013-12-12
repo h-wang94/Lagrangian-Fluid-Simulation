@@ -478,6 +478,8 @@ void noBound() {
   glEnd();
 }
 
+int camera = 1;
+int numcameras = 3;
 unsigned char* myBMP;
 float angle = 0;
 /* Display is updated/rendered here. */
@@ -489,13 +491,24 @@ void displayFunc() {
   // Reset transformations
   glLoadIdentity();
   // Set the camera
-  /*gluLookAt(	0.0f, 0.3f, 2.0f,*/
-      //0.0f, -.5f,  0.0f,
-      /*0.0f, 1.0f,  0.0f);*/
+  
+  if(camera==1){
+  gluLookAt(	0.0f, 0.3f, 2.0f,
+		0.0f, -.5f,  0.0f,
+		0.0f, 1.0f,  0.0f);
+  }
+  else if(camera == 2){
+  gluLookAt(	0.0f, -.7f, 2.0f,
+		0.0f, -.7f,  0.0f,
+		0.0f, 1.0f,  0.0f);
+  }
   // new settings just to see obj file. can change later.
+  else if(camera == 3){
   gluLookAt(	0.0f, 2.3f, 1.5f,
 		0.0f, -.5f,  0.0f,
 		0.0f, 1.0f,  0.0f);
+  }
+
 
   glRotatef(angle, 0.0f, 1.0f, 0.0f);
   glColor4f(1.0, 1.0, 1.0, 1.0);
@@ -657,6 +670,17 @@ void keyboard(unsigned char key, int x, int y) {
       p1.setPosition(Point3D(0,.1,0));
       pSystem.addParticle(p1);
       break;
+	case 'o':
+		for(float i = 0.; i < 5; i++){
+			for(float j = 0.; j < 5; j++){
+				for(float k = 0.; k < 5; k++){
+					p1 = Mucus();
+					p1.setPosition(Point3D(i/50,j/50-.2,k/50));
+					pSystem.addParticle(p1);
+				}
+			}
+		}
+      break;
     case 'x': // opens up x portion of boundary
       bBoxScene = false;
       bxScene = true;
@@ -671,6 +695,11 @@ void keyboard(unsigned char key, int x, int y) {
       bNoBound = false;
       pSystem.setBoundaries(-.1, -1, -.2, .1, 0, .1);
       break;
+	case 'c': // change camera
+		camera++;
+		if (camera > numcameras)
+			camera = 1;
+		break;
     default:
       break;
   }
