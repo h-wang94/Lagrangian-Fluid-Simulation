@@ -10,20 +10,34 @@
 
 #include "ParticleSystem.h"
 
+extern ParticleSystem pSystem;
+
+class CubeVertex {
+public:
+	CubeVertex();
+	CubeVertex(Particle p); //representation for a Point3D for use with ParticleSystem
+	void setColor(float c);
+	float getColor();
+	Particle getParticle();
+
+private:
+	Particle particle;
+	float colorFuncVal;
+};
+
 class Cube {
 public:
 	Cube();
-	Cube(const vector<Point3D> &);
-	vector<Point3D> getVertices();
-	void setVertices(const vector<Point3D> &);
-	vector<Point3D> getTriangles(const float &isolevel, const __int8 &vertices);
-	float colorFunction(const ParticleSystem &ps, const vector<Particle> &neighbors, const float neighborRadius, const Point3D &position);
+	Cube(const vector<CubeVertex> &);
+	vector<CubeVertex> getVertices();
+	void setVertices(const vector<CubeVertex> &);
+	vector<Point3D> getTriangles(const float &isolevel);
 
 private:
 	__int8 getCutVertices();
 	int getCutEdges(__int8 v);
 	vector<int> getVertexNumsFromEdge(int edge);
-	vector<Point3D> vertices;
+	vector<CubeVertex> vertices;
 };
 
 
