@@ -350,6 +350,113 @@ void determineFunction(int argc, char *argv[]) {
   }
 }
 
+void boxScene() {
+  glBegin(GL_LINE_STRIP);
+  glColor3f(1.0, 1.0, 1.0);
+  glVertex3f(-.11, -1, -.11);
+  glVertex3f(-.11, 0, -.11);
+  glVertex3f(-.11, 0, .11);
+  glVertex3f(-.11, -1, .11);
+  glVertex3f(-.11, -1, -.11);
+  glVertex3f(.11, -1, -.11);
+  glVertex3f(.11, 0, -.11);
+  glVertex3f(-.11, 0, -.11);
+  glVertex3f(-.11, -1, -.11);
+  glEnd();
+  glBegin(GL_LINE_STRIP);
+  glColor3f(1.0, 1.0, 1.0);
+  glVertex3f(.11, -1, .11);
+  glVertex3f(-.11, -1, .11);
+  glVertex3f(-.11, 0, .11);
+  glVertex3f(.11, 0, .11);
+  glVertex3f(.11, -1, .11);
+  glVertex3f(.11, -1, -.11);
+  glVertex3f(.11, 0, -.11);
+  glVertex3f(.11, 0, .11);
+  glVertex3f(.11, -1, .11);
+  glEnd();
+}
+
+void xScene() {
+  glBegin(GL_LINE_STRIP);
+  glColor3f(1.0, 1.0, 1.0);
+  glVertex3f(-1.01, -1, -.11);
+  glVertex3f(-1.01, 0, -.11);
+  glVertex3f(-1.01, 0, .11);
+  glVertex3f(-1.01, -1, .11);
+  glVertex3f(-1.01, -1, -.11);
+  glVertex3f(.11, -1, -.11);
+  glVertex3f(.11, 0, -.11);
+  glVertex3f(-1.01, 0, -.11);
+  glVertex3f(-1.01, -1, -.11);
+  glEnd();
+  glBegin(GL_LINE_STRIP);
+  glColor3f(1.0, 1.0, 1.0);
+  glVertex3f(.11, -1, .11);
+  glVertex3f(-1.01, -1, .11);
+  glVertex3f(-1.01, 0, .11);
+  glVertex3f(.11, 0, .11);
+  glVertex3f(.11, -1, .11);
+  glVertex3f(.11, -1, -.11);
+  glVertex3f(.11, 0, -.11);
+  glVertex3f(.11, 0, .11);
+  glVertex3f(.11, -1, .11);
+  glEnd();
+}
+
+void zScene() {
+  glBegin(GL_LINE_STRIP);
+  glColor3f(1.0, 1.0, 1.0);
+  glVertex3f(-.11, -1, -.21);
+  glVertex3f(-.11, 0, -.21);
+  glVertex3f(-.11, 0, .11);
+  glVertex3f(-.11, -1, .11);
+  glVertex3f(-.11, -1, -.21);
+  glVertex3f(.11, -1, -.21);
+  glVertex3f(.11, 0, -.21);
+  glVertex3f(-.11, 0, -.21);
+  glVertex3f(-.11, -1, -.21);
+  glEnd();
+  glBegin(GL_LINE_STRIP);
+  glColor3f(1.0, 1.0, 1.0);
+  glVertex3f(.11, -1, .11);
+  glVertex3f(-.11, -1, .11);
+  glVertex3f(-.11, 0, .11);
+  glVertex3f(.11, 0, .11);
+  glVertex3f(.11, -1, .11);
+  glVertex3f(.11, -1, -.21);
+  glVertex3f(.11, 0, -.21);
+  glVertex3f(.11, 0, .11);
+  glVertex3f(.11, -1, .11);
+  glEnd();
+}
+
+void noBound() {
+  glBegin(GL_LINE_STRIP);
+  glColor3f(1.0, 1.0, 1.0);
+  glVertex3f(-1.01, -1, -1.01);
+  glVertex3f(-1.01, 0, -1.01);
+  glVertex3f(-1.01, 0, 1.01);
+  glVertex3f(-1.01, -1, 1.01);
+  glVertex3f(-1.01, -1, -1.01);
+  glVertex3f(1.01, -1, -1.01);
+  glVertex3f(1.01, 0, -1.01);
+  glVertex3f(-1.01, 0, -1.01);
+  glVertex3f(-1.01, -1, -1.01);
+  glEnd();
+  glBegin(GL_LINE_STRIP);
+  glColor3f(1.0, 1.0, 1.0);
+  glVertex3f(1.01, -1, 1.01);
+  glVertex3f(-1.01, -1, 1.01);
+  glVertex3f(-1.01, 0, 1.01);
+  glVertex3f(1.01, 0, 1.01);
+  glVertex3f(1.01, -1, 1.01);
+  glVertex3f(1.01, -1, -1.01);
+  glVertex3f(1.01, 0, -1.01);
+  glVertex3f(1.01, 0, 1.01);
+  glVertex3f(1.01, -1, 1.01);
+  glEnd();
+}
 unsigned char* myBMP;
 float angle = 0;
 /* Display is updated/rendered here. */
