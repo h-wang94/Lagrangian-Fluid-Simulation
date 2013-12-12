@@ -8,18 +8,28 @@
 #include "reconstruct.h"
 #include <cmath>
 
-/* Surface is where this returns 1/2. Needs a list of the neighbors OR access to a method
- * to find the neighbors to this position given the neighborhood radius. Either or.
- *
- * It would probably make more sense to have this in ParticleSystem or something.*/
-float Cube::colorFunction(const ParticleSystem &ps, const vector<Particle> &neighbors, const float neighborRadius, const Point3D &position) {
-	float total = 0;
-	for (int i = 0; i < (int) neighbors.size(); i++) {
-		Particle temp = neighbors[i];
-		//total += (temp.getMass() / temp.getDensity()) * ps.defaultKernel <- this is private rn;
-	}
-	return total;
+CubeVertex::CubeVertex() {
+	particle = Particle();
+	colorFuncVal = 0;
 }
+
+CubeVertex::CubeVertex(Particle p) {
+	particle = p;
+	colorFuncVal = 0; //probably can't initialize yet
+}
+
+void CubeVertex::setColor(float c) {
+	colorFuncVal = c;
+}
+
+float CubeVertex::getColor() {
+	return colorFuncVal;
+}
+
+Particle CubeVertex::getParticle() {
+	return particle;
+}
+
 
 /* Returns the point where the surface intersects the edge given by v1 and v2.
  *
@@ -27,7 +37,7 @@ float Cube::colorFunction(const ParticleSystem &ps, const vector<Particle> &neig
  * v1 and v2 through the color function.
  */
 Point3D interpVertex(float isolevel, Point3D v1, Point3D v2, float valv1, float valv2) {
-	float thres = 0.0001;
+	float thres = 0.001;
 	Point3D p;
 	if (abs(isolevel - valv1) < thres || abs(valv1 - valv2) < thres) { // isolevel is really close to a vertex
 		return v1;                                                     // or v1 and v2 at same level-ish
@@ -43,20 +53,20 @@ Point3D interpVertex(float isolevel, Point3D v1, Point3D v2, float valv1, float 
 }
 
 Cube::Cube() {
-	vertices.resize(8, Point3D());
+	vertices.resize(8, CubeVertex());
 }
 
-Cube::Cube(const vector<Point3D> &v) {
+Cube::Cube(const vector<CubeVertex> &v) {
 	for (int i = 0; i < ((int)v.size()); i++) {
 		vertices.push_back(v.at(i));
 	}
 }
 
-vector<Point3D> Cube::getVertices() {
+vector<CubeVertex> Cube::getVertices() {
 	return vertices;
 }
 
-void Cube::setVertices(const vector<Point3D> &v) {
+void Cube::setVertices(const vector<CubeVertex> &v) {
 	vertices.resize(0);
 	for (int i = 0; i < ((int) v.size()); i++) {
 		vertices.push_back(v.at(i));
@@ -70,9 +80,10 @@ void Cube::setVertices(const vector<Point3D> &v) {
 __int8 Cube::getCutVertices() {
 	__int8 result = 0;
 	for (int i = 0; i < (int) vertices.size(); i++) {
-		//if (colorfunc(cube vertex) < surface level) {
-		//    result |= 1 << i;
-	    //}
+		if (vertices[i].getColor() < 0.5) {
+		    result |= 1 << i;
+		    cout << "heythere\n";
+	    }
 	}
 	return result;
 }
@@ -166,8 +177,8 @@ vector<int> Cube::getVertexNumsFromEdge(int edge) {
 
 }
 
-vector<Point3D> Cube::getTriangles(const float &isolevel, const __int8 &cutV) {
-	//__int8 cutV = getCutVertices(); if we make a Mesh class of Cubes so we don't recalc vertices?
+vector<Point3D> Cube::getTriangles(const float &isolevel) {
+	__int8 cutV = getCutVertices();
 	int cutE = getCutEdges(cutV);
 	vector<Point3D> triangles;
 	Point3D interpV[12];
@@ -178,7 +189,9 @@ vector<Point3D> Cube::getTriangles(const float &isolevel, const __int8 &cutV) {
 		int edge = cutE & (1 << i);
 		if (edge) {
 			vector<int> edgeVertices = getVertexNumsFromEdge(edge);
-			//interpV[i] = interpVertex(isolevel, edgeVertices[0], edgeVertices[1], colorFunction on vertex 0, colorFunction on vertex 1);
+			interpV[i] = interpVertex(isolevel, vertices[edgeVertices[0]].getParticle().getPosition(),
+					vertices[edgeVertices[1]].getParticle().getPosition(),
+					vertices[edgeVertices[0]].getColor(), vertices[edgeVertices[1]].getColor());
 		}
 	}
 	int triTable[256][16] =
