@@ -17,7 +17,7 @@ public:
 	Film(float imgW, float imgH);
 	float* getBMP();
 	void commitSample(Sample s);
-	void renderScene(Camera &c, SpatialGrid &sg, float stepSize);
+	void renderScene(Camera &c, float stepSize);
 
 private:
 	vector<float> pixelRGBAs;

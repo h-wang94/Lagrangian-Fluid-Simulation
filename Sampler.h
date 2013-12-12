@@ -24,7 +24,7 @@ public:
 	Sample next();
 	Sample getSample();
 	Ray getRayThroughSample();
-	Sample getPixelRGBA(SpatialGrid &, float);
+	Sample getPixelRGBA(float);
 private:
 	Sample s;
 	Camera c;

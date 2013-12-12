@@ -28,13 +28,16 @@ float* Film::getBMP() {
 	return &(pixelRGBAs[0]);
 }
 
-void Film::renderScene(Camera &c, SpatialGrid &sg, float stepSize) {
+void Film::renderScene(Camera &c, float stepSize) {
 	Sampler sampler = Sampler(c);
 	Sample s;
 	while (sampler.hasNext()) {
-		cout << "yeehaw\n";
 		sampler.next();
-		s = sampler.getPixelRGBA(sg, stepSize);
+		if (sampler.getSample().x < 300 && sampler.getSample().y > 100) {
+			commitSample(Sample());
+			continue;
+		}
+		s = sampler.getPixelRGBA(stepSize);
 		commitSample(s);
 	}
 }
