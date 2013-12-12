@@ -539,7 +539,7 @@ void displayFunc() {
     noBound();
   }
   glClearDepth(1);
-  glEnable(GL_DEPTH_TEST);
+  /*glEnable(GL_DEPTH_TEST);
   glEnable(GL_LIGHTING);
   glEnable(GL_COLOR_MATERIAL);
 
@@ -554,7 +554,25 @@ void displayFunc() {
   glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
 
-  glEnable(GL_LIGHT0);
+  glEnable(GL_LIGHT0);*/
+
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_LIGHTING);
+  glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHT0);
+  float lightPos0[4] = { 0, 0, 5, 1 };
+  float dif0[4] = { .6, .6, .6, 1 };
+  float amb0[4] = { .1, .1, .1, 1 };
+  float spec0[4] = { .6, .6, .6, 1 };
+  float shine0[1] = {1};
+  glLightfv(GL_LIGHT0, GL_POSITION, lightPos0);
+  glLightfv(GL_LIGHT0, GL_AMBIENT, amb0);
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, dif0);
+  glLightfv(GL_LIGHT0, GL_SPECULAR, spec0);
+  glLightfv(GL_LIGHT0, GL_SHININESS, shine0);
+  glEnable(GL_LIGHT1);
+  float lightPos1[4] = {0, 2, -5, 1};
+  glLightfv(GL_LIGHT1, GL_POSITION, lightPos1);
 
 
   glBegin(GL_POINTS);

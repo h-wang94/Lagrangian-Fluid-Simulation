@@ -14,6 +14,7 @@
     <ClCompile Include="AviFile.cpp" />
     <ClCompile Include="Bucket.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="mesh.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="Point3D.cpp" />
     <ClCompile Include="ParticleSystem.cpp" />
@@ -31,6 +32,7 @@
     <ClInclude Include="Bucket.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="GLToMovie.h" />
+    <ClInclude Include="mesh.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Point3D.h" />
