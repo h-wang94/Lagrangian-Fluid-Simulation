@@ -80,12 +80,10 @@ void Cube::setVertices(const vector<CubeVertex> &v) {
 __int8 Cube::getCutVertices() {
 	__int8 result = 0;
 	for (int i = 0; i < 8; i++) {
-		cout << vertices[i].getParticle().getPosition() << "\n";
 		if (vertices[i].getColor() < 0.5) {
 		    result |= (1 << i);
 	    }
 	}
-	cout <<endl;
 	return result;
 }
 
