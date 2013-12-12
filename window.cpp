@@ -43,6 +43,10 @@ bool bxScene = false;
 bool bzScene = false;
 bool bNoBound = false;
 
+float maxX = 0.1f;
+float maxY = 0.0f;
+float maxZ = 0.1f;
+
 void testSpatialGrid() {
   /*Particle p1 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(0,0,0));*/
   //Particle p2 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(1,0,0));
@@ -100,10 +104,24 @@ void createParticles() {
   unsigned int i;
   srand(time(NULL)); // for rand function
   if (objFile) {
-    for(i = 0; i < numParticles; i++) {
+    maxX = vertexes[0].getX();
+    maxY = vertexes[0].getY();
+    maxZ = vertexes[0].getZ();
+    for(i = 0; i < vertexes.size(); i++) {
       //p1 = Particle(0.02, 0.0, 3.0, 998.29, 0, 3.5, vertexes[i], Vector(0, 0, 0));
+      p1 = Water(vertexes[i]);
+      if (maxX < vertexes[i].getX()) {
+        maxX = vertexes[i].getX();
+      }
+      if (maxY < vertexes[i].getY()) {
+        maxY = vertexes[i].getY();
+      }
+      if (maxZ < vertexes[i].getZ()) {
+        maxZ = vertexes[i].getZ();
+      }
       pSystem.addParticle(p1);
     }
+    pSystem.setBoundaries(-maxX, -1, -maxZ, maxX + 1, maxY + 1, maxZ + 1);
   } else {
     for(i = 0; i < numParticles/2; i++) {
       p1 = Water();
@@ -332,6 +350,8 @@ void determineFunction(int argc, char *argv[]) {
       totalTime = std::atof(argv[i]);
     } else if (strcmp(argv[i], "-objInput") == 0) {
       i++;
+      bNoBound = true;
+      bBoxScene = false;
       objFile = true;
       readInput(string(argv[i]));
     } else if (strcmp(argv[i], "-width") == 0) {
@@ -434,29 +454,30 @@ void zScene() {
 void noBound() {
   glBegin(GL_LINE_STRIP);
   glColor3f(1.0, 1.0, 1.0);
-  glVertex3f(-1.01, -1, -1.01);
-  glVertex3f(-1.01, 0, -1.01);
-  glVertex3f(-1.01, 0, 1.01);
-  glVertex3f(-1.01, -1, 1.01);
-  glVertex3f(-1.01, -1, -1.01);
-  glVertex3f(1.01, -1, -1.01);
-  glVertex3f(1.01, 0, -1.01);
-  glVertex3f(-1.01, 0, -1.01);
-  glVertex3f(-1.01, -1, -1.01);
+  glVertex3f(-maxX, -1, -maxZ);
+  glVertex3f(-maxX, maxY, -maxZ);
+  glVertex3f(-maxX, maxY, maxZ);
+  glVertex3f(-maxX, -1, maxZ);
+  glVertex3f(-maxX, -1, -maxZ);
+  glVertex3f(maxX, -1, -maxZ);
+  glVertex3f(maxX, maxY, -maxZ);
+  glVertex3f(-maxX, maxY, -maxZ);
+  glVertex3f(-maxX, -1, -maxZ);
   glEnd();
   glBegin(GL_LINE_STRIP);
   glColor3f(1.0, 1.0, 1.0);
-  glVertex3f(1.01, -1, 1.01);
-  glVertex3f(-1.01, -1, 1.01);
-  glVertex3f(-1.01, 0, 1.01);
-  glVertex3f(1.01, 0, 1.01);
-  glVertex3f(1.01, -1, 1.01);
-  glVertex3f(1.01, -1, -1.01);
-  glVertex3f(1.01, 0, -1.01);
-  glVertex3f(1.01, 0, 1.01);
-  glVertex3f(1.01, -1, 1.01);
+  glVertex3f(maxX, -1, maxZ);
+  glVertex3f(-maxX, -1, maxZ);
+  glVertex3f(-maxX, maxY, maxZ);
+  glVertex3f(maxX, maxY, maxZ);
+  glVertex3f(maxX, -1, maxZ);
+  glVertex3f(maxX, -1, -maxZ);
+  glVertex3f(maxX, maxY, -maxZ);
+  glVertex3f(maxX, maxY, maxZ);
+  glVertex3f(maxX, -1, maxZ);
   glEnd();
 }
+
 unsigned char* myBMP;
 float angle = 0;
 /* Display is updated/rendered here. */
@@ -468,9 +489,13 @@ void displayFunc() {
   // Reset transformations
   glLoadIdentity();
   // Set the camera
-  gluLookAt(	0.0f, 0.3f, 2.0f,
-      0.0f, -.5f,  0.0f,
-      0.0f, 1.0f,  0.0f);
+  /*gluLookAt(	0.0f, 0.3f, 2.0f,*/
+      //0.0f, -.5f,  0.0f,
+      /*0.0f, 1.0f,  0.0f);*/
+  // new settings just to see obj file. can change later.
+  gluLookAt(	0.0f, 2.3f, 1.5f,
+		0.0f, -.5f,  0.0f,
+		0.0f, 1.0f,  0.0f);
 
   glRotatef(angle, 0.0f, 1.0f, 0.0f);
   glColor4f(1.0, 1.0, 1.0, 1.0);
@@ -618,7 +643,14 @@ void keyboard(unsigned char key, int x, int y) {
       exit(0);
       break;
     case 'b':
-      pSystem.setBoundaries(-1, -1, -1, 1, 0, 1);
+      maxX = 1;
+      maxY = 0;
+      maxZ = 1;
+      bBoxScene = false;
+      bxScene = false;
+      bzScene = false;
+      bNoBound = true;
+      pSystem.setBoundaries(-maxX, -1, -maxZ, maxX, maxY, maxZ);
       break;
     case 'p':
       p1 = Water();
@@ -626,9 +658,17 @@ void keyboard(unsigned char key, int x, int y) {
       pSystem.addParticle(p1);
       break;
     case 'x': // opens up x portion of boundary
+      bBoxScene = false;
+      bxScene = true;
+      bzScene = false;
+      bNoBound = false;
       pSystem.setBoundaries(-1, -1, -.1, .1, 0, .1);
       break;
     case 'z': // open up z portion of the boundary
+      bBoxScene = false;
+      bxScene = false;
+      bzScene = true;
+      bNoBound = false;
       pSystem.setBoundaries(-.1, -1, -.2, .1, 0, .1);
       break;
     default:
