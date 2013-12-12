@@ -15,7 +15,7 @@ extern int frameWidth, frameHeight;
 class Mesh {
 public:
 	Mesh();
-	Mesh(int width, int height, int depth, int step);
+	Mesh(int width, int height, int depth);
 	CubeVertex getVertexAt(int x, int y, int z);
 	void setVertexAt(int x, int y, int z, const CubeVertex &c);
 	void updateColors();
