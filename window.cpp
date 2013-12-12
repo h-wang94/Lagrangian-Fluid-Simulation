@@ -576,18 +576,20 @@ void displayFunc() {
 
 
   glBegin(GL_POINTS);
-  glColor4f(0.0, 0.2, 1.0, 1.0);
+  //glColor4f(0.0, 0.2, 1.0, 1.0);
   Particle* p;
   unsigned int i = 0;
   for (i = 0; i < pSystem.getParticles().size()/2; i++) {
     p = pSystem.getParticle(i);
+	glColor4f(p->getColor().getX(),p->getColor().getY(),p->getColor().getZ(), 1.0);
     glVertex3f(p->getPosition().getX(), p->getPosition().getY(), p->getPosition().getZ());
   }
   glEnd();
   glBegin(GL_POINTS);
-  glColor4f(0.2, 0.7, 0.0, 1.0);
+  //glColor4f(0.2, 0.7, 0.0, 1.0);
   for (; i < pSystem.getParticles().size(); i++) {
     p = pSystem.getParticle(i);
+	glColor4f(p->getColor().getX(),p->getColor().getY(),p->getColor().getZ(), 1.0);
     glVertex3f(p->getPosition().getX(), p->getPosition().getY(), p->getPosition().getZ());
   }
   glEnd();
@@ -693,6 +695,17 @@ void keyboard(unsigned char key, int x, int y) {
 			for(float j = 0.; j < 5; j++){
 				for(float k = 0.; k < 5; k++){
 					p1 = Mucus();
+					p1.setPosition(Point3D(i/50,j/50-.2,k/50));
+					pSystem.addParticle(p1);
+				}
+			}
+		}
+      break;
+	  	case 'w':
+		for(float i = 0.; i < 5; i++){
+			for(float j = 0.; j < 5; j++){
+				for(float k = 0.; k < 5; k++){
+					p1 = Water();
 					p1.setPosition(Point3D(i/50,j/50-.2,k/50));
 					pSystem.addParticle(p1);
 				}
