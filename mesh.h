@@ -15,11 +15,11 @@ extern int frameWidth, frameHeight;
 class Mesh {
 public:
 	Mesh();
-	Mesh(int width, int height, int depth);
+	Mesh(int width, int height, int depth, float leftbound, float rightbound, float highbound, float lowbound, float closebound, float farbound);
 	CubeVertex getVertexAt(int x, int y, int z);
 	void setVertexAt(int x, int y, int z, const CubeVertex &c);
 	void updateColors();
-	std::vector<std::vector<Point3D> > marchingCubes(); //returns vectors of vectors of points for triangles
+	void marchingCubes(vector<Point3D> &triangles); //returns vectors of vectors of points for triangles
 
 
 	std::vector<CubeVertex> mesh;

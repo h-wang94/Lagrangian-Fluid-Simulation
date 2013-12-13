@@ -81,6 +81,7 @@ void Cube::updateColors() {
 	for (int i = 0; i < (int) vertices.size(); i++) {
 		Particle p = vertices[i].getParticle();
 		vertices[i].setColor(pSystem.colorFunction(p));
+		cout << vertices[i].getColor() << endl;
 	}
 }
 
@@ -186,13 +187,12 @@ vector<int> Cube::getVertexNumsFromEdge(int edge) {
 	}
 }
 
-vector<Point3D> Cube::getTriangles(const float &isolevel) {
+void Cube::getTriangles(const float &isolevel, vector<Point3D> &triangles) {
 	int cutV = getCutVertices();
 	int cutE = getCutEdges(cutV);
-	vector<Point3D> triangles;
 	Point3D interpV[12];
 	if (cutE == 0) {  // all vertices above or below surface
-		return triangles;
+		return;
 	}
 	for (int i = 0; i < 12; i++) {
 		int edge = cutE & (1 << i);
@@ -466,5 +466,4 @@ vector<Point3D> Cube::getTriangles(const float &isolevel) {
 		triangles.push_back(interpV[triangleVertices[i+1]]);
 		triangles.push_back(interpV[triangleVertices[i+2]]);
 	}
-	return triangles;
 }

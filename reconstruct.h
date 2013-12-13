@@ -32,7 +32,7 @@ public:
 	Cube(const vector<CubeVertex> &);
 	vector<CubeVertex> getVertices();
 	void setVertices(const vector<CubeVertex> &);
-	vector<Point3D> getTriangles(const float &isolevel);
+	void getTriangles(const float &isolevel, vector<Point3D> &);
 	void updateColors(); // debugging only (probably)
 
 //private:
