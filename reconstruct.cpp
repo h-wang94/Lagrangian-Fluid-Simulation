@@ -9,12 +9,12 @@
 #include <cmath>
 
 CubeVertex::CubeVertex() {
-	particle = Particle();
+	position = Point3D();
 	colorFuncVal = 0;
 }
 
-CubeVertex::CubeVertex(Particle p) {
-	particle = p;
+CubeVertex::CubeVertex(Point3D p) {
+	position = p;
 	colorFuncVal = 0; //probably can't initialize yet
 }
 
@@ -27,7 +27,11 @@ float CubeVertex::getColor() {
 }
 
 Particle CubeVertex::getParticle() {
-	return particle;
+	return Water(position);
+}
+
+Point3D CubeVertex::getPosition() {
+	return position;
 }
 
 
@@ -73,16 +77,23 @@ void Cube::setVertices(const vector<CubeVertex> &v) {
 	}
 }
 
+void Cube::updateColors() {
+	for (int i = 0; i < (int) vertices.size(); i++) {
+		Particle p = vertices[i].getParticle();
+		vertices[i].setColor(pSystem.colorFunction(p));
+	}
+}
+
 /* Returns an int8, where each bit represents a corner of the
  * cube, going from 7->0. The bit is a 1 if the corner is under
  * the surface.
  */
-__int8 Cube::getCutVertices() {
-	__int8 result = 0;
+int Cube::getCutVertices() {
+	int result = 0;
 	for (int i = 0; i < 8; i++) {
 		if (vertices[i].getColor() < 0.5) {
 		    result |= (1 << i);
-	    }
+		}
 	}
 	return result;
 }
@@ -95,7 +106,7 @@ __int8 Cube::getCutVertices() {
  *
  * Tables from Paul Bourke's work, original creator unknown.
  */
-int Cube::getCutEdges(__int8 v) {
+int Cube::getCutEdges(int v) {
 	int edgeTable[256]={
 	0x0  , 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c,
 	0x80c, 0x905, 0xa0f, 0xb06, 0xc0a, 0xd03, 0xe09, 0xf00,
@@ -176,7 +187,7 @@ vector<int> Cube::getVertexNumsFromEdge(int edge) {
 }
 
 vector<Point3D> Cube::getTriangles(const float &isolevel) {
-	__int8 cutV = getCutVertices();
+	int cutV = getCutVertices();
 	int cutE = getCutEdges(cutV);
 	vector<Point3D> triangles;
 	Point3D interpV[12];

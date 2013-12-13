@@ -15,13 +15,14 @@ extern ParticleSystem pSystem;
 class CubeVertex {
 public:
 	CubeVertex();
-	CubeVertex(Particle p); //representation for a Point3D for use with ParticleSystem
+	CubeVertex(Point3D p); //representation for a Point3D for use with ParticleSystem
 	void setColor(float c);
 	float getColor();
 	Particle getParticle();
+	Point3D getPosition();
 
 private:
-	Particle particle;
+	Point3D position;
 	float colorFuncVal;
 };
 
@@ -32,10 +33,11 @@ public:
 	vector<CubeVertex> getVertices();
 	void setVertices(const vector<CubeVertex> &);
 	vector<Point3D> getTriangles(const float &isolevel);
+	void updateColors(); // debugging only (probably)
 
-private:
-	__int8 getCutVertices();
-	int getCutEdges(__int8 v);
+//private:
+	int getCutVertices();
+	int getCutEdges(int v);
 	vector<int> getVertexNumsFromEdge(int edge);
 	vector<CubeVertex> vertices;
 };

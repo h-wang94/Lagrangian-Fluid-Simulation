@@ -18,24 +18,17 @@ Mesh::Mesh(int width, int height, int depth) {
 	this->width = width;
 	this->height = height;
 	this->depth = depth;
-	mesh.resize((width+1) * (height+1) * (depth+1)); //ow
 	float T = frameHeight / frameWidth;
 	float B = 2.0;
 	float cubeW = 2.0 / (float) width;
 	float cubeH = T * 2 / (float) height; //height of a cube
 	float cubeD = B * 2 / (float) depth;
-	int i = 0, j = 0, k = 0;
 	for (float z = B; z >= -B; z-=cubeD) {
 		for (float y = T; y >= -T; y-=cubeH) {
 			for (float x = -1.0; x <= 1.0; x+=cubeW) {
-				setVertexAt(i, j, k, CubeVertex(Water(Point3D(x, y, z))));
-				i++;
+				mesh.push_back(CubeVertex(Point3D(x, y, z)));
 			}
-			j++;
-			i = 0;
 		}
-		k++;
-		j = 0;
 	}
 }
 
@@ -48,14 +41,10 @@ void Mesh::setVertexAt(int x, int y, int z, const CubeVertex &c) {
 }
 
 void Mesh::updateColors() {
-	for (int z = 0; z < depth; z++) {
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				CubeVertex cv = getVertexAt(x, y, z);
-				Particle p = cv.getParticle();
-				cv.setColor(pSystem.colorFunction(p));
-			}
-		}
+	for (int i = 0; i < (int) mesh.size(); i++) {
+		CubeVertex cv = mesh[i];
+		Particle p = cv.getParticle();
+		cv.setColor(pSystem.colorFunction(p));
 	}
 }
 

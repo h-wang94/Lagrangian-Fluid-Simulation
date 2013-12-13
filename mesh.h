@@ -21,7 +21,7 @@ public:
 	void updateColors();
 	std::vector<std::vector<Point3D> > marchingCubes(); //returns vectors of vectors of points for triangles
 
-private:
+
 	std::vector<CubeVertex> mesh;
 	int width, height, depth;
 };
