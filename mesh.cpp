@@ -45,7 +45,7 @@ void Mesh::updateColors() {
 	}
 }
 
-void Mesh::marchingCubes(vector<Point3D> &triangles) {
+void Mesh::marchingCubes(vector<float> &triangles) {
 	Cube c;
 	vector<CubeVertex> cv;
 	vector<Point3D> newtriangs;

@@ -41,6 +41,7 @@ Point3D CubeVertex::getPosition() {
  * v1 and v2 through the color function.
  */
 Point3D interpVertex(float isolevel, Point3D v1, Point3D v2, float valv1, float valv2) {
+	//cout << "Interpolating " << v1 << " with " << v2 << endl;
 	float thres = 0.001;
 	Point3D p;
 	if (abs(isolevel - valv1) < thres || abs(valv1 - valv2) < thres) { // isolevel is really close to a vertex
@@ -183,11 +184,11 @@ vector<int> Cube::getVertexNumsFromEdge(int edge) {
 		result[0] = 3;
 		result[1] = 7;
 		break;
-	return result;
 	}
+	return result;
 }
 
-void Cube::getTriangles(const float &isolevel, vector<Point3D> &triangles) {
+void Cube::getTriangles(const float &isolevel, vector<float> &triangles) {
 	int cutV = getCutVertices();
 	int cutE = getCutEdges(cutV);
 	Point3D interpV[12];
@@ -197,9 +198,9 @@ void Cube::getTriangles(const float &isolevel, vector<Point3D> &triangles) {
 	for (int i = 0; i < 12; i++) {
 		int edge = cutE & (1 << i);
 		if (edge) {
-			vector<int> edgeVertices = getVertexNumsFromEdge(edge);
-			interpV[i] = interpVertex(isolevel, vertices[edgeVertices[0]].getParticle().getPosition(),
-					vertices[edgeVertices[1]].getParticle().getPosition(),
+			vector<int> edgeVertices = getVertexNumsFromEdge(i);
+			interpV[i] = interpVertex(isolevel, vertices[edgeVertices[0]].getPosition(),
+					vertices[edgeVertices[1]].getPosition(),
 					vertices[edgeVertices[0]].getColor(), vertices[edgeVertices[1]].getColor());
 		}
 	}
@@ -461,9 +462,10 @@ void Cube::getTriangles(const float &isolevel, vector<Point3D> &triangles) {
 	{0, 3, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}};
 	int* triangleVertices = triTable[cutV];
-	for (int i = 0; triangleVertices[i] != -1; i+=3) {
-		triangles.push_back(interpV[triangleVertices[i  ]]);
-		triangles.push_back(interpV[triangleVertices[i+1]]);
-		triangles.push_back(interpV[triangleVertices[i+2]]);
+	for (int i = 0; triangleVertices[i] != -1; i++) {
+		Point3D temp = interpV[triangleVertices[i]];
+		triangles.push_back(temp.getX());
+		triangles.push_back(temp.getY());
+		triangles.push_back(temp.getZ());
 	}
 }
