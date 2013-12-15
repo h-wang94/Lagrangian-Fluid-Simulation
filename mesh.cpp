@@ -22,7 +22,11 @@ Mesh::Mesh(int width, int height, int depth, float rightbound, float leftbound, 
 	float cubeW = (rightbound - leftbound) / (float) width;
 	float cubeH = (highbound - lowbound) / (float) height; //height of a cube
 	float cubeD = (closebound - farbound) / (float) depth;
-	threshold = .1 * fmin(cubeW, fmin(cubeH, cubeD));
+	if (cubeW == 0 || cubeH == 0 || cubeD == 0) {
+		cerr << "Possible division by 0.\n";
+		exit(1);
+	}
+	threshold = .01 * fmin(cubeW, fmin(cubeH, cubeD));
 	for (float z = closebound; z >= farbound; z-=cubeD) {
 		for (float y = highbound; y >= lowbound; y-=cubeH) {
 			for (float x = leftbound; x <= rightbound; x+=cubeW) {

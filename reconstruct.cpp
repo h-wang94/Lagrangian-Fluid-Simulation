@@ -44,7 +44,7 @@ Point3D interpVertex(float isolevel, Point3D v1, Point3D v2, float valv1, float 
 	Point3D p;
 	if (abs(isolevel - valv1) < thres || abs(valv1 - valv2) < thres) { // isolevel is really close to a vertex
 		return v1;                                                     // or v1 and v2 at same level-ish
-	} else if (abs(isolevel - valv2 < thres)) {
+	} else if (abs(isolevel - valv2) < thres) {
 		return v2;
 	}
 	float mu = (isolevel - valv1) / (valv2 - valv1);

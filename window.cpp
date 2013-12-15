@@ -824,7 +824,7 @@ int main(int argc, char** argv) {
   determineFunction(argc, argv);
   createParticles();
   pSystem.initialize(dt);
-  mesh = Mesh(100, 100, 30, 1.0, -1.0, .5, -1.5, 1.0, -1.0);
+  mesh = Mesh(40, 40, 40, 1.0, -1.0, .5, -1.5, 1.0, -1.0);
   // dont need this now that we have opengl.
   // but we can use this if we don't want to display...i guess
   /*for(float j = 0; j < totalTime; j+=dt) {*/
