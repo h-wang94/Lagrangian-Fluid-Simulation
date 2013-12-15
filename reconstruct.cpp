@@ -40,9 +40,7 @@ Point3D CubeVertex::getPosition() {
  * Not sure where to put this yet. valv1 and 2 should be the result of putting
  * v1 and v2 through the color function.
  */
-Point3D interpVertex(float isolevel, Point3D v1, Point3D v2, float valv1, float valv2) {
-	//cout << "Interpolating " << v1 << " with " << v2 << endl;
-	float thres = 0.001;
+Point3D interpVertex(float isolevel, Point3D v1, Point3D v2, float valv1, float valv2, float thres) {
 	Point3D p;
 	if (abs(isolevel - valv1) < thres || abs(valv1 - valv2) < thres) { // isolevel is really close to a vertex
 		return v1;                                                     // or v1 and v2 at same level-ish
@@ -188,7 +186,7 @@ vector<int> Cube::getVertexNumsFromEdge(int edge) {
 	return result;
 }
 
-void Cube::getTriangles(const float &isolevel, vector<float> &triangles) {
+void Cube::getTriangles(const float &isolevel, vector<float> &triangles, float threshold) {
 	int cutV = getCutVertices();
 	int cutE = getCutEdges(cutV);
 	Point3D interpV[12];
@@ -201,7 +199,8 @@ void Cube::getTriangles(const float &isolevel, vector<float> &triangles) {
 			vector<int> edgeVertices = getVertexNumsFromEdge(i);
 			interpV[i] = interpVertex(isolevel, vertices[edgeVertices[0]].getPosition(),
 					vertices[edgeVertices[1]].getPosition(),
-					vertices[edgeVertices[0]].getColor(), vertices[edgeVertices[1]].getColor());
+					vertices[edgeVertices[0]].getColor(), vertices[edgeVertices[1]].getColor(),
+					threshold);
 		}
 	}
 	int triTable[256][16] =

@@ -11,6 +11,7 @@ Mesh::Mesh() {
 	width = 0;
 	height = 0;
 	depth = 0;
+	threshold = 0;
 }
 
 /* A mesh WIDTH boxes wide, HEIGHT boxes tall, DEPTH boxes deep. */
@@ -21,6 +22,7 @@ Mesh::Mesh(int width, int height, int depth, float rightbound, float leftbound, 
 	float cubeW = (rightbound - leftbound) / (float) width;
 	float cubeH = (highbound - lowbound) / (float) height; //height of a cube
 	float cubeD = (closebound - farbound) / (float) depth;
+	threshold = .1 * fmin(cubeW, fmin(cubeH, cubeD));
 	for (float z = closebound; z >= farbound; z-=cubeD) {
 		for (float y = highbound; y >= lowbound; y-=cubeH) {
 			for (float x = leftbound; x <= rightbound; x+=cubeW) {
@@ -63,7 +65,7 @@ void Mesh::marchingCubes(vector<float> &triangles) {
 				cv.push_back(getVertexAt(x+1, y, z));
 				cv.push_back(getVertexAt(x, y, z));
 				c.setVertices(cv);
-				c.getTriangles(0.5, triangles);
+				c.getTriangles(0.5, triangles, threshold);
 			}
 		}
 	}

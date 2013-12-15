@@ -11,6 +11,7 @@
 #include "SpatialGrid.h"
 #include "GLToMovie.h"
 #include "Film.h"
+#include "mesh.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -31,6 +32,7 @@ std::vector<Point3D> vertexes, vt;
 std::vector<Vector>normals;
 std::vector< std::vector<int> > vertexIndexes;
 ParticleSystem pSystem;
+Mesh mesh;
 bool objFile = false;
 bool record = false;
 unsigned int numParticles;
@@ -608,65 +610,120 @@ void displayFunc() {
 }
 
 void displayFunc1() {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glLoadIdentity();
-  // Set the camera
-  gluLookAt( 0.0f, 0.3f, 2.0f,
-      0.0f, -.5f,  0.0f,
-      0.0f, 1.0f,  0.0f);
 
-  glRotatef(angle, 0.0f, 1.0f, 0.0f);
+	  // Clear Color and Depth Buffers
+	  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glBegin(GL_TRIANGLES);
-  glVertex3f( -1.0f, -1.0f, -1.0f);
-  glVertex3f( 1.0f, -1.0f, -1.0);
-  glVertex3f( 1.0f, -1.0f, 1.0);
-  glEnd();
+	  // Reset transformations
+	  glLoadIdentity();
+	  // Set the camera
 
-  glBegin(GL_TRIANGLES);
-  glVertex3f( 1.0f, -1.0f, 1.0f);
-  glVertex3f( -1.0f, -1.0f, 1.0);
-  glVertex3f( -1.0f, -1.0f, -1.0);
-  glEnd();
+	  if(camera==1){
+	  gluLookAt(	0.0f, 0.3f, 2.0f,
+			0.0f, -.5f,  0.0f,
+			0.0f, 1.0f,  0.0f);
+	  }
+	  else if(camera == 2){
+	  gluLookAt(	0.0f, -.7f, 2.0f,
+			0.0f, -.7f,  0.0f,
+			0.0f, 1.0f,  0.0f);
+	  }
+	  // new settings just to see obj file. can change later.
+	  else if(camera == 3){
+	  gluLookAt(	0.0f, 2.3f, 1.5f,
+			0.0f, -.5f,  0.0f,
+			0.0f, 1.0f,  0.0f);
+	  }
 
-  angle+=0.3f;
 
-  if (bBoxScene) {
-    boxScene();
-  }
-  else if (bxScene) {
-    xScene();
-  }
-  else if (bzScene) {
-    zScene();
-  }
-  else if (bNoBound) {
-    noBound();
-  }
+	  glRotatef(angle, 0.0f, 1.0f, 0.0f);
+	  glColor4f(1.0, 1.0, 1.0, 1.0);
+	  glBegin(GL_TRIANGLES);
+	  glVertex3f( -1.0f, -1.0f, -1.0f);
+	  glVertex3f( 1.0f, -1.0f, -1.0);
+	  glVertex3f( 1.0f, -1.0f, 1.0);
+	  glEnd();
 
-  glBegin(GL_POINTS);
-  glColor4f(0.0, 0.2, 1.0, 1.0);
-  Particle* p;
-  for (unsigned int i = 0; i < pSystem.getParticles().size(); i+=1) {
-    if (i == pSystem.getParticles().size() - 1) {
-      glColor4f(1.0, 1.0, 1.0, 1.0);
-    }
-    p = pSystem.getParticle(i);
-    glVertex3f(p->getPosition().getX(), p->getPosition().getY(), p->getPosition().getZ());
-  }
-  if (currentTime < totalTime) {
-    pSystem.update(dt);
-    currentTime += dt;
-  } else {
-    exit(1);
-  }
-  glDisable(GL_LIGHTING);
-  glEnd();
-  glFlush();
-  if(record) {
-    recorder.RecordFrame();
-  }
-  glutSwapBuffers();
+	  glBegin(GL_TRIANGLES);
+	  glVertex3f( 1.0f, -1.0f, 1.0f);
+	  glVertex3f( -1.0f, -1.0f, 1.0);
+	  glVertex3f( -1.0f, -1.0f, -1.0);
+	  glEnd();
+
+	  angle+=0.3f;
+
+	  if (bBoxScene) {
+	    boxScene();
+	  }
+	  else if (bxScene) {
+	    xScene();
+	  }
+	  else if (bzScene) {
+	    zScene();
+	  }
+	  else if (bNoBound) {
+	    noBound();
+	  }
+	  glClearDepth(1);
+	  /*glEnable(GL_DEPTH_TEST);
+	  glEnable(GL_LIGHTING);
+	  glEnable(GL_COLOR_MATERIAL);
+
+	  GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	  GLfloat mat_shininess[] = { 50.0 };
+	  GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
+	  glClearColor (0.0, 0.0, 0.0, 0.0);
+	  glShadeModel (GL_SMOOTH);
+
+	  glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	  glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+	  glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+
+	  glEnable(GL_LIGHT0);*/
+
+	  glEnable(GL_DEPTH_TEST);
+	  glEnable(GL_LIGHTING);
+	  glEnable(GL_COLOR_MATERIAL);
+	    glEnable(GL_LIGHT0);
+	  float lightPos0[4] = { 0, 0, 5, 1 };
+	  float dif0[4] = { .6, .6, .6, 1 };
+	  float amb0[4] = { .1, .1, .1, 1 };
+	  float spec0[4] = { .6, .6, .6, 1 };
+	  float shine0[1] = {1};
+	  glLightfv(GL_LIGHT0, GL_POSITION, lightPos0);
+	  glLightfv(GL_LIGHT0, GL_AMBIENT, amb0);
+	  glLightfv(GL_LIGHT0, GL_DIFFUSE, dif0);
+	  glLightfv(GL_LIGHT0, GL_SPECULAR, spec0);
+	  glLightfv(GL_LIGHT0, GL_SHININESS, shine0);
+	  glEnable(GL_LIGHT1);
+	  float lightPos1[4] = {0, 2, -5, 1};
+	  glLightfv(GL_LIGHT1, GL_POSITION, lightPos1);
+
+
+	  mesh.updateColors();
+	  vector<float> triangles;
+	  mesh.marchingCubes(triangles);
+
+	  glBegin(GL_TRIANGLES);
+	  glColor4f(0.1, 0.3, 0.8, 0.7);
+	  for (int j = 0; j < (int) triangles.size(); j+=3) {
+		glVertex3f(triangles[j], triangles[j+1], triangles[j+2]);
+	  }
+	  glEnd();
+
+	  if (currentTime < totalTime) {
+	    pSystem.update(dt);
+	    currentTime += dt;
+	  } else {
+	    exit(1);
+	  }
+	  //glDisable(GL_LIGHTING);
+	  glFlush();
+	  if(record) {
+	    recorder.RecordFrame();
+	  }
+	  glutSwapBuffers();
 }
 
 void keyboard(unsigned char key, int x, int y) {
@@ -767,6 +824,7 @@ int main(int argc, char** argv) {
   determineFunction(argc, argv);
   createParticles();
   pSystem.initialize(dt);
+  mesh = Mesh(100, 100, 30, 1.0, -1.0, .5, -1.5, 1.0, -1.0);
   // dont need this now that we have opengl.
   // but we can use this if we don't want to display...i guess
   /*for(float j = 0; j < totalTime; j+=dt) {*/
@@ -788,8 +846,8 @@ int main(int argc, char** argv) {
   glEnable(GL_BLEND);
   glutKeyboardFunc(keyboard);
 
-  glutDisplayFunc(displayFunc);
-  glutIdleFunc(displayFunc); //if we do user interaction
+  glutDisplayFunc(displayFunc1);
+  glutIdleFunc(displayFunc1); //if we do user interaction
   glutReshapeFunc(changeSize);
   glutMainLoop();
   return 0;

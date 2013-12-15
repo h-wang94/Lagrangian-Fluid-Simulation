@@ -21,9 +21,10 @@ public:
 	void updateColors();
 	void marchingCubes(vector<float> &triangles); //returns vectors of vectors of points for triangles
 
-
+private:
 	std::vector<CubeVertex> mesh;
 	int width, height, depth;
+	float threshold;
 };
 
 #endif /* MESH_H_ */
