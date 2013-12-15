@@ -6,6 +6,7 @@
  */
 
 #include "mesh.h"
+#include <math.h>
 
 Mesh::Mesh() {
 	width = 0;
@@ -22,7 +23,7 @@ Mesh::Mesh(int width, int height, int depth, float rightbound, float leftbound, 
 	float cubeW = (rightbound - leftbound) / (float) width;
 	float cubeH = (highbound - lowbound) / (float) height; //height of a cube
 	float cubeD = (closebound - farbound) / (float) depth;
-	threshold = .1 * fmin(cubeW, fmin(cubeH, cubeD));
+	threshold = .1 * min(cubeW, min(cubeH, cubeD));
 	for (float z = closebound; z >= farbound; z-=cubeD) {
 		for (float y = highbound; y >= lowbound; y-=cubeH) {
 			for (float x = leftbound; x <= rightbound; x+=cubeW) {
@@ -51,6 +52,7 @@ void Mesh::marchingCubes(vector<float> &triangles) {
 	Cube c;
 	vector<CubeVertex> cv;
 	vector<Point3D> newtriangs;
+	#pragma omp parallel for
 	for (int z = 0; z < depth; z++) {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
