@@ -710,7 +710,7 @@ void displayFunc1() {
 	  mesh.marchingCubes(triangles, normals);
 
 	  glBegin(GL_TRIANGLES);
-	  //glColor4f(0.1, 0.3, 0.8, 0.7);
+	  glColor4f(0.1, 0.3, 0.8, 0.7);
 	  for (int j = 0; j < (int) triangles.size(); j+=3) {
 		glNormal3f(normals[j], normals[j+1], normals[j+2]);
 		glVertex3f(triangles[j], triangles[j+1], triangles[j+2]);
