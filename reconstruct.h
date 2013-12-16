@@ -32,7 +32,8 @@ public:
 	Cube(const vector<CubeVertex> &);
 	vector<CubeVertex> getVertices();
 	void setVertices(const vector<CubeVertex> &);
-	void getTriangles(const float &isolevel, vector<float> &, vector<float> &, float threshold);
+	//void getTriangles(const float &isolevel, vector<float> &, vector<float> &, float threshold);
+	void getTriangles(const float &isolevel, map<pair<int, int>, int> &interpIndices, vector<int> &indices, vector<float> &interpVals, vector<float> &normals, vector<int> &cubeIndices, float threshold);
 	void updateColors(); // debugging only (probably)
 
 private:

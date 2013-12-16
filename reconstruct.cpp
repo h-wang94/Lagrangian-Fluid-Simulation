@@ -186,6 +186,43 @@ vector<int> Cube::getVertexNumsFromEdge(int edge) {
 	return result;
 }
 
+void Cube::getTriangles(const float &isolevel, map<pair<int, int>, int> &interpIndices, vector<int> &indices, vector<float> &interpVals, vector<float> &normals, vector<int> &cubeIndices, float threshold) {
+	int cutV = getCutVertices();
+	int cutE = getCutEdges(cutV);
+	int interpV[12];
+	if (cutE == 0) {
+		return;
+	}
+	for (int i = 0; i < 12; i++) {
+		int edge = cutE & (1 << i);
+		if (edge) {
+			vector<int> edgeVertices = getVertexNumsFromEdge(i);
+			pair<int, int> a(cubeIndices[edgeVertices[0]], cubeIndices[edgeVertices[1]]);
+			pair<int, int> b(cubeIndices[edgeVertices[1]], cubeIndices[edgeVertices[0]]);
+			if (interpIndices.count(a)) {
+				interpV[i] = interpIndices[a];
+			} else if (interpIndices.count(b)) {
+				interpV[i] = interpIndices[b];
+			} else {
+				interpIndices[a] = (int) interpVals.size() / 3;
+				interpV[i] = interpIndices[a];
+				Point3D temp = interpVertex(isolevel, vertices[edgeVertices[0]].getPosition(),
+						vertices[edgeVertices[1]].getPosition(),
+						vertices[edgeVertices[0]].getColor(), vertices[edgeVertices[1]].getColor(),
+						threshold);
+				interpVals.push_back(temp.getX());
+				interpVals.push_back(temp.getY());
+				interpVals.push_back(temp.getZ());
+				Particle p = Water(temp);
+				Vector norm = pSystem.surfaceNormal(p, 0);
+				normals.push_back(norm.getX());
+				normals.push_back(norm.getY());
+				normals.push_back(norm.getZ());
+			}
+		}
+	}
+/*}
+
 void Cube::getTriangles(const float &isolevel, vector<float> &triangles, vector<float> &normals, float threshold) {
 	int cutV = getCutVertices();
 	int cutE = getCutEdges(cutV);
@@ -202,7 +239,7 @@ void Cube::getTriangles(const float &isolevel, vector<float> &triangles, vector<
 					vertices[edgeVertices[0]].getColor(), vertices[edgeVertices[1]].getColor(),
 					threshold);
 		}
-	}
+	}*/
 	int triTable[256][16] =
 	{{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 	{0, 8, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
@@ -462,7 +499,8 @@ void Cube::getTriangles(const float &isolevel, vector<float> &triangles, vector<
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}};
 	int* triangleVertices = triTable[cutV];
 	for (int i = 0; triangleVertices[i] != -1; i++) {
-		Point3D temp = interpV[triangleVertices[i]];
+		indices.push_back(interpV[triangleVertices[i]]);
+		/*Point3D temp = interpV[triangleVertices[i]];
 		Particle tempP = Water(temp);
 		Vector norm = pSystem.surfaceNormal(tempP, 0);
 		triangles.push_back(temp.getX());
@@ -470,6 +508,6 @@ void Cube::getTriangles(const float &isolevel, vector<float> &triangles, vector<
 		triangles.push_back(temp.getZ());
 		normals.push_back(norm.getX());
 		normals.push_back(norm.getY());
-		normals.push_back(norm.getZ());
+		normals.push_back(norm.getZ());*/
 	}
 }

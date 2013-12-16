@@ -49,26 +49,40 @@ void Mesh::updateColors() {
 	}
 }
 
-void Mesh::marchingCubes(vector<float> &triangles, vector<float> &normals) {
+void Mesh::marchingCubes(map<pair<int, int>, int> &interpIndices, vector<int> &indices, vector<float> &interpVals, vector<float> &normals) {
+//void Mesh::marchingCubes(vector<float> &triangles, vector<float> &normals) {
 	Cube c;
 	vector<CubeVertex> cv;
 	vector<Point3D> newtriangs;
+	vector<int> cubeIndices;
 	#pragma omp parallel for
 	for (int z = 0; z < depth; z++) {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				cv.resize(0); //reset the vertices
+				cubeIndices.resize(0);
 
-				cv.push_back(getVertexAt(x, y+1, z+1)); //Corner 0, according to Bourke's picture
-				cv.push_back(getVertexAt(x+1, y+1, z+1));
-				cv.push_back(getVertexAt(x+1, y+1, z));
-				cv.push_back(getVertexAt(x, y+1, z));
-				cv.push_back(getVertexAt(x, y, z+1));
-				cv.push_back(getVertexAt(x+1, y, z+1));
-				cv.push_back(getVertexAt(x+1, y, z));
-				cv.push_back(getVertexAt(x, y, z));
+				cubeIndices.push_back(x + (y+1) * (width + 1) + (z+1) * (width + 1) * (height + 1));
+				cubeIndices.push_back((x+1) + (y+1) * (width + 1) + (z+1) * (width + 1) * (height + 1));
+				cubeIndices.push_back((x+1) + (y+1) * (width + 1) + z * (width + 1) * (height + 1));
+				cubeIndices.push_back(x + (y+1) * (width + 1) + z * (width + 1) * (height + 1));
+				cubeIndices.push_back(x + y * (width + 1) + (z+1) * (width + 1) * (height + 1));
+				cubeIndices.push_back((x+1) + y * (width + 1) + (z+1) * (width + 1) * (height + 1));
+				cubeIndices.push_back((x+1) + y * (width + 1) + z * (width + 1) * (height + 1));
+				cubeIndices.push_back(x + y * (width + 1) + z * (width + 1) * (height + 1));
+
+				cv.push_back(mesh[cubeIndices[0]]); //Corner 0, according to Bourke's picture
+				cv.push_back(mesh[cubeIndices[1]]);
+				cv.push_back(mesh[cubeIndices[2]]);
+				cv.push_back(mesh[cubeIndices[3]]);
+				cv.push_back(mesh[cubeIndices[4]]);
+				cv.push_back(mesh[cubeIndices[5]]);
+				cv.push_back(mesh[cubeIndices[6]]);
+				cv.push_back(mesh[cubeIndices[7]]);
+
 				c.setVertices(cv);
-				c.getTriangles(0.5, triangles, normals, threshold);
+				c.getTriangles(0.5, interpIndices, indices, interpVals, normals, cubeIndices, threshold);
+				//c.getTriangles(0.5, triangles, normals, threshold);
 			}
 		}
 	}

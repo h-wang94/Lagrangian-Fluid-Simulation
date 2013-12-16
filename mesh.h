@@ -19,7 +19,8 @@ public:
 	CubeVertex getVertexAt(int x, int y, int z);
 	void setVertexAt(int x, int y, int z, const CubeVertex &c);
 	void updateColors();
-	void marchingCubes(vector<float> &triangles, vector<float> &normals); //returns vectors of vectors of points for triangles
+	//void marchingCubes(vector<float> &triangles, vector<float> &normals); //returns vectors of vectors of points for triangles
+	void marchingCubes(map<pair<int, int>, int> &interpIndices, vector<int> &indices, vector<float> &interpVals, vector<float> &normals);
 
 private:
 	std::vector<CubeVertex> mesh;

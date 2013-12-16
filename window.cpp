@@ -706,16 +706,22 @@ void displayFunc1() {
 
 
 	  mesh.updateColors();
-	  vector<float> triangles, normals;
-	  mesh.marchingCubes(triangles, normals);
+	  vector<float> interpVals, normals;
+	  vector<int> indices;
+	  map<pair<int, int>, int> interpIndices;
+	  mesh.marchingCubes(interpIndices, indices, interpVals, normals);
+	  //glColor4f(0.1, 0.3, 0.8, 0.5);
 
-	  glBegin(GL_TRIANGLES);
-	  glColor4f(0.1, 0.3, 0.8, 0.7);
-	  for (int j = 0; j < (int) triangles.size(); j+=3) {
-		glNormal3f(normals[j], normals[j+1], normals[j+2]);
-		glVertex3f(triangles[j], triangles[j+1], triangles[j+2]);
-	  }
-	  glEnd();
+	  glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
+      glEnableClientState(GL_VERTEX_ARRAY);
+      glEnableClientState(GL_NORMAL_ARRAY);
+
+	  glVertexPointer(3, GL_FLOAT, 0, &interpVals[0]);
+	  glNormalPointer(GL_FLOAT, 0, &normals);
+
+	  glDrawElements(GL_TRIANGLES, ((int) indices.size()), GL_UNSIGNED_INT, &indices[0]);
+	  glDisableClientState(GL_VERTEX_ARRAY);
+	  glDisableClientState(GL_NORMAL_ARRAY);
 
 	  if (currentTime < totalTime) {
 	    pSystem.update(dt);
@@ -843,18 +849,19 @@ int main(int argc, char** argv) {
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
   glutCreateWindow("CS184 Final");
   glClearColor(0.0, 0.0, 0.0, 1.0);
-  glEnable(GL_POINT_SMOOTH);
-  glHint(GL_POINT_SMOOTH_HINT, GL_FASTEST);
-  glPointSize(5.0f);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_BLEND);
   glutKeyboardFunc(keyboard);
 
   if (useCubes) {
-      mesh = Mesh(32, 33, 18, 1.0, -1.0, .5, -1.5, .5, -.5);
+      mesh = Mesh(40, 40, 30, 1.0, -1.0, .5, -1.5, .5, -.5);
+      //glShadeModel(GL_SMOOTH); //is this doing anything??
 	  glutDisplayFunc(displayFunc1);
 	  glutIdleFunc(displayFunc1);
   } else {
+	  glEnable(GL_POINT_SMOOTH);
+	  glHint(GL_POINT_SMOOTH_HINT, GL_FASTEST);
+	  glPointSize(5.0f);
 	  glutDisplayFunc(displayFunc);
 	  glutIdleFunc(displayFunc);
   }
