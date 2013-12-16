@@ -49,7 +49,7 @@ void Mesh::updateColors() {
 	}
 }
 
-void Mesh::marchingCubes(vector<float> &triangles) {
+void Mesh::marchingCubes(vector<float> &triangles, vector<float> &normals) {
 	Cube c;
 	vector<CubeVertex> cv;
 	vector<Point3D> newtriangs;
@@ -68,7 +68,7 @@ void Mesh::marchingCubes(vector<float> &triangles) {
 				cv.push_back(getVertexAt(x+1, y, z));
 				cv.push_back(getVertexAt(x, y, z));
 				c.setVertices(cv);
-				c.getTriangles(0.5, triangles, threshold);
+				c.getTriangles(0.5, triangles, normals, threshold);
 			}
 		}
 	}

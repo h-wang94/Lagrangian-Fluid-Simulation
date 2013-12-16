@@ -49,6 +49,8 @@ float maxX = 0.1f;
 float maxY = 0.0f;
 float maxZ = 0.1f;
 
+bool useCubes = false;
+
 void testSpatialGrid() {
   /*Particle p1 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(0,0,0));*/
   //Particle p2 = Particle(1, 1, 3.5, 1, Vector(0,0,0), Point3D(1,0,0));
@@ -366,6 +368,8 @@ void determineFunction(int argc, char *argv[]) {
       recorder.setHeight(frameHeight);
     } else if (strcmp(argv[i], "-record") == 0) {
       record = true;
+    } else if (strcmp(argv[i], "-cubes") == 0) {
+    	useCubes = true;
     } else {
       cerr << "Unknown argument: " << argv[i] << endl;
     }
@@ -702,12 +706,13 @@ void displayFunc1() {
 
 
 	  mesh.updateColors();
-	  vector<float> triangles;
-	  mesh.marchingCubes(triangles);
+	  vector<float> triangles, normals;
+	  mesh.marchingCubes(triangles, normals);
 
 	  glBegin(GL_TRIANGLES);
-	  glColor4f(0.1, 0.3, 0.8, 0.7);
+	  //glColor4f(0.1, 0.3, 0.8, 0.7);
 	  for (int j = 0; j < (int) triangles.size(); j+=3) {
+		glNormal3f(normals[j], normals[j+1], normals[j+2]);
 		glVertex3f(triangles[j], triangles[j+1], triangles[j+2]);
 	  }
 	  glEnd();
@@ -824,7 +829,6 @@ int main(int argc, char** argv) {
   determineFunction(argc, argv);
   createParticles();
   pSystem.initialize(dt);
-  mesh = Mesh(40, 40, 40, 1.0, -1.0, .5, -1.5, 1.0, -1.0);
   // dont need this now that we have opengl.
   // but we can use this if we don't want to display...i guess
   /*for(float j = 0; j < totalTime; j+=dt) {*/
@@ -846,8 +850,14 @@ int main(int argc, char** argv) {
   glEnable(GL_BLEND);
   glutKeyboardFunc(keyboard);
 
-  glutDisplayFunc(displayFunc1);
-  glutIdleFunc(displayFunc1); //if we do user interaction
+  if (useCubes) {
+      mesh = Mesh(32, 33, 18, 1.0, -1.0, .5, -1.5, .5, -.5);
+	  glutDisplayFunc(displayFunc1);
+	  glutIdleFunc(displayFunc1);
+  } else {
+	  glutDisplayFunc(displayFunc);
+	  glutIdleFunc(displayFunc);
+  }
   glutReshapeFunc(changeSize);
   glutMainLoop();
   return 0;

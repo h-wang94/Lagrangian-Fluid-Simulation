@@ -96,7 +96,7 @@ void ParticleSystem::setDensities(){
   float density = 0;
   std::vector<Particle> list;
 
-  std::map<int, std::vector<int>> hashMap;
+  std::map<int, std::vector<int> > hashMap;
 
   for(unsigned int i = 0; i < particles.size(); i++){//create the hash map (O(n) time)
 

@@ -186,7 +186,7 @@ vector<int> Cube::getVertexNumsFromEdge(int edge) {
 	return result;
 }
 
-void Cube::getTriangles(const float &isolevel, vector<float> &triangles, float threshold) {
+void Cube::getTriangles(const float &isolevel, vector<float> &triangles, vector<float> &normals, float threshold) {
 	int cutV = getCutVertices();
 	int cutE = getCutEdges(cutV);
 	Point3D interpV[12];
@@ -463,8 +463,13 @@ void Cube::getTriangles(const float &isolevel, vector<float> &triangles, float t
 	int* triangleVertices = triTable[cutV];
 	for (int i = 0; triangleVertices[i] != -1; i++) {
 		Point3D temp = interpV[triangleVertices[i]];
+		Particle tempP = Water(temp);
+		Vector norm = pSystem.surfaceNormal(tempP, 0);
 		triangles.push_back(temp.getX());
 		triangles.push_back(temp.getY());
 		triangles.push_back(temp.getZ());
+		normals.push_back(norm.getX());
+		normals.push_back(norm.getY());
+		normals.push_back(norm.getZ());
 	}
 }
