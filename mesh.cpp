@@ -25,9 +25,9 @@ Mesh::Mesh(int width, int height, int depth, float rightbound, float leftbound, 
 	float cubeD = (closebound - farbound) / (float) depth;
 
 	threshold = .1 * min(cubeW, min(cubeH, cubeD));
-	for (float z = closebound; z >= farbound; z-=cubeD) {
-		for (float y = highbound; y >= lowbound; y-=cubeH) {
-			for (float x = leftbound; x <= rightbound; x+=cubeW) {
+	for (float z = closebound; z >= (farbound - threshold); z-=cubeD) {
+		for (float y = highbound; y >= (lowbound - threshold); y-=cubeH) {
+			for (float x = leftbound; x <= (rightbound + threshold); x+=cubeW) {
 				mesh.push_back(CubeVertex(Point3D(x, y, z)));
 			}
 		}
