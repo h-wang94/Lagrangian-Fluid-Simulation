@@ -60,7 +60,7 @@ std::vector<Particle> ParticleSystem::getParticles() {
 void ParticleSystem::computeForces(){
   Vector gravity, force, total, tension;
 #pragma omp parallel for firstprivate(gravity, total, force, tension)
-  for(unsigned int i = 0; i < particles.size(); i++) {
+  for(signed i = 0; i < particles.size(); i++) {
     gravity = gravityForce(particles[i]);
     total = press_visc(particles[i], i); // viscosity - pressure forces
 
@@ -75,7 +75,7 @@ void ParticleSystem::computePressure() {
   unsigned int i = 0;
 #pragma omp parallel for firstprivate(pressure)
   // loop unroll by 4
-  for(i = 0; i < particles.size()/4*4; i+=4) {
+  for(signed i = 0; i < particles.size()/4*4; i+=4) {
     // Equation: p = k ( (p / p0)^7 - 1)
     pressure = particles[i].getStiffness() * (pow((particles[i].getDensity() / particles[i].getRestDensity()), 7.0f) - 1.0f);
     particles[i].setPressure(pressure);
@@ -133,8 +133,9 @@ void ParticleSystem::setDensities(){
 
 		int hash = (xindex * 10619863)^(yindex * 94418953)^(zindex * 54018521);
 		std::vector<int> ints = hashMap[hash];
-#pragma omp parallel for firstprivate(c)
-		for(int c = 0; c < ints.size(); c++){//get surrounding parts
+		signed c;
+//#pragma omp parallel for firstprivate(c)
+		for(c = 0; c < ints.size(); c++){//get surrounding parts
 			list.push_back(particles[ints[c]]);
 		}
 		for(int a = -1; a <= 1; a++){
@@ -142,8 +143,9 @@ void ParticleSystem::setDensities(){
 				for(int c = -1; c <= 1; c++){//get surrounding boxes 
 					int hash2 = ((xindex+a) * 10619863)^((yindex+b) * 94418953)^((zindex+c) * 54018521);
 					std::vector<int> ints2 = hashMap[hash2];
-					#pragma omp parallel for firstprivate(d)
-					for(int d = 0; d < ints2.size(); d++){
+					signed d;
+					//#pragma omp parallel for firstprivate(d)
+					for(d = 0; d < ints2.size(); d++){
 						list.push_back(particles[ints2[d]]);
 					}
 				}
@@ -367,7 +369,7 @@ float ParticleSystem::viscLaplacianKernel(Vector r, const float h) {
 // Can be changed to work with leapfrogging just a certain particle.
 void ParticleSystem::leapFrog(const float& dt) {
 #pragma omp parallel for
-  for(unsigned int i = 0; i < particles.size(); i++) {
+  for(signed int i = 0; i < particles.size(); i++) {
     Particle& p = particles[i];
     // get velocity at time t - dt/2. v_{t - dt/2}
     Vector old = p.getVelocityHalf(); 
