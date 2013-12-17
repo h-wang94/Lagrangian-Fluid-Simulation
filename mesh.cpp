@@ -53,7 +53,7 @@ void Mesh::marchingCubes(vector<float> &triangles, vector<float> &normals) {
 	Cube c;
 	vector<CubeVertex> cv;
 	vector<Point3D> newtriangs;
-	#pragma omp parallel for
+	//#pragma omp parallel for
 	for (int z = 0; z < depth; z++) {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {

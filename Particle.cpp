@@ -2,9 +2,9 @@
 #include <cstdlib>
 #include "Particle.h"
 
-#define MAX_X .09
-#define MAX_Y .5
-#define MAX_Z .05
+#define MAX_X .2
+#define MAX_Y .2
+#define MAX_Z .2
 
 // Constructor for a water particle in random locations
 Particle::Particle(void) {

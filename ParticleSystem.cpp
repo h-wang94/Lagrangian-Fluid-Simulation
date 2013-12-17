@@ -14,7 +14,7 @@ ParticleSystem::ParticleSystem(Vector grav){
   this->grav = grav;
   this->numRowBoxes = 100;
   this->grid = SpatialGrid(0.0457);
-  setBoundaries(-.1, -1, -.1, .1, 1, .1);
+  setBoundaries(-.3, -1, -.3, .3, 1, .3);
 }
 
 ParticleSystem::ParticleSystem(Vector grav, float min_x, float min_y, float min_z, float max_x, float max_y, float max_z) {
