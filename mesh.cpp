@@ -50,12 +50,11 @@ void Mesh::updateColors() {
 }
 
 void Mesh::marchingCubes(map<pair<int, int>, int> &interpIndices, vector<int> &indices, vector<float> &interpVals, vector<float> &normals) {
-//void Mesh::marchingCubes(vector<float> &triangles, vector<float> &normals) {
 	Cube c;
 	vector<CubeVertex> cv;
 	vector<Point3D> newtriangs;
 	vector<int> cubeIndices;
-	#pragma omp parallel for
+	//#pragma omp parallel for
 	for (int z = 0; z < depth; z++) {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -82,7 +81,6 @@ void Mesh::marchingCubes(map<pair<int, int>, int> &interpIndices, vector<int> &i
 
 				c.setVertices(cv);
 				c.getTriangles(0.5, interpIndices, indices, interpVals, normals, cubeIndices, threshold);
-				//c.getTriangles(0.5, triangles, normals, threshold);
 			}
 		}
 	}
