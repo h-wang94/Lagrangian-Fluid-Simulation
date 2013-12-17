@@ -43,6 +43,7 @@ void Mesh::setVertexAt(int x, int y, int z, const CubeVertex &c) {
 }
 
 void Mesh::updateColors() {
+    #pragma omp parallel for
 	for (int i = 0; i < (int) mesh.size(); i++) {
 		Particle p = mesh[i].getParticle();
 		mesh[i].setColor(pSystem.colorFunction(p));
